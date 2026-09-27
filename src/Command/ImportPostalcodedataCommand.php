@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Command;
 
 use App\GeoEntity\PostalCodeData;
+use Doctrine\DBAL\Platforms\AbstractMySQLPlatform;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\SchemaTool;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -178,14 +179,20 @@ class ImportPostalcodedataCommand extends Command
         $connection = $this->geoEntityManager->getConnection();
         $platform = $connection->getDatabasePlatform();
         $tableName = $cmd->getTableName();
+        // FOREIGN_KEY_CHECKS is MySQL/MariaDB-only; other platforms clear the table directly.
+        $toggleForeignKeyChecks = $platform instanceof AbstractMySQLPlatform;
 
         try {
-            $connection->executeStatement('SET FOREIGN_KEY_CHECKS=0');
+            if ($toggleForeignKeyChecks) {
+                $connection->executeStatement('SET FOREIGN_KEY_CHECKS=0');
+            }
             $connection->executeStatement($platform->getTruncateTableSQL($tableName, true));
         } catch (\Throwable $e) {
             throw new \RuntimeException(sprintf('Could not clear table "%s".', $tableName), 0, $e);
         } finally {
-            $connection->executeStatement('SET FOREIGN_KEY_CHECKS=1');
+            if ($toggleForeignKeyChecks) {
+                $connection->executeStatement('SET FOREIGN_KEY_CHECKS=1');
+            }
         }
     }
 }
