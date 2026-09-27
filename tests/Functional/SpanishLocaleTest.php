@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional;
 
+use App\Entity\AppSettings;
 use App\Sqlite\SqliteBaselineInitializer;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Translation\Translator;
@@ -56,6 +57,21 @@ final class SpanishLocaleTest extends WebTestCase
         self::assertInstanceOf(Translator::class, $translator);
         self::assertSame('Iniciar sesión', $translator->trans('login.title', [], 'messages', 'es'));
         self::assertSame('en', $translator->getCatalogue('es')->getFallbackCatalogue()?->getLocale());
+    }
+
+    public function testDefaultCustomerSalutationsAreTranslated(): void
+    {
+        self::bootKernel(['environment' => 'sqlite_test']);
+        $translator = self::getContainer()->get('translator');
+        self::assertInstanceOf(Translator::class, $translator);
+
+        // Salutations are translated by key and the translated text is stored on the customer.
+        $expected = ['Ms' => ['Ms', 'Sra.'], 'Mr' => ['Mr', 'Sr.'], 'Family' => ['Family', 'Familia']];
+        foreach ((new AppSettings())->getCustomerSalutations() as $salutation) {
+            self::assertArrayHasKey($salutation, $expected);
+            self::assertSame($expected[$salutation][0], $translator->trans($salutation, [], 'messages', 'en'));
+            self::assertSame($expected[$salutation][1], $translator->trans($salutation, [], 'messages', 'es'));
+        }
     }
 
     public function testLoginPageIsSpanishWithLocaleEs(): void

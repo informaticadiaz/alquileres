@@ -35,6 +35,8 @@ customer.id.type.national_id: ID card
 customer.id.type.passport: Passport
 customer.lastname: Last Name
 customer.mobilephone: Mobile Phone
+# Default customer salutation (AppSettings::$customerSalutations), translated by key.
+Family: Family
 Mr: Mr
 Ms: Ms
 customer.person: Person
