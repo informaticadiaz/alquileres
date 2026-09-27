@@ -344,7 +344,7 @@ class TemplatesService
     public function importTemplates(TemplateType $type, array $entries, string $baseUrl): int
     {
         $client = \Symfony\Component\HttpClient\HttpClient::create();
-        $imported = 0;
+        $templates = [];
 
         foreach ($entries as $entry) {
             $templateFile = $entry['file'];
@@ -353,7 +353,22 @@ class TemplatesService
                 continue;
             }
 
-            $content = $response->getContent();
+            $templates[] = array_merge($entry, ['content' => $response->getContent()]);
+        }
+
+        return $this->importTemplateContents($type, $templates);
+    }
+
+    /**
+     * Import template records from already available content.
+     *
+     * @param array<int, array{content: string, name?: string, isDefault?: bool, params?: array<string, mixed>}> $entries
+     */
+    public function importTemplateContents(TemplateType $type, array $entries): int
+    {
+        $imported = 0;
+
+        foreach ($entries as $entry) {
             $templateName = $this->resolveTemplateName(
                 $type->getName(),
                 $entry['name'] ?? null
@@ -371,7 +386,7 @@ class TemplatesService
             $template->setIsDefault(isset($entry['isDefault']) ? (bool) $entry['isDefault'] : false);
             $template->setName($templateName);
             $template->setTemplateType($type);
-            $template->setText($content);
+            $template->setText($entry['content']);
 
             $this->em->persist($template);
             ++$imported;

@@ -1,0 +1,15 @@
+doctrine:
+    dbal:
+        connections:
+            default:
+                driver: 'pdo_sqlite'
+                url: 'sqlite:///%kernel.project_dir%/var/sqlite-test/fewohbee.sqlite'
+                server_version: null
+                charset: null
+                default_table_options: []
+            geo:
+                driver: 'pdo_sqlite'
+                url: 'sqlite:///%kernel.project_dir%/var/sqlite-test/fewohbee.sqlite'
+                server_version: null
+                charset: null
+                default_table_options: []

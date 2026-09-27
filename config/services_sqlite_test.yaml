@@ -1,0 +1,14 @@
+services:
+    App\Doctrine\SqliteConnectionPragmaMiddleware:
+        tags:
+            - { name: doctrine.middleware, connection: default }
+            - { name: doctrine.middleware, connection: geo }
+
+    App\Sqlite\SqliteBaselineInitializer:
+        autowire: true
+        public: true
+
+    App\DataFixtures\TemplatesFixtures:
+        autowire: true
+        arguments:
+            $useSqliteLocalTemplates: true

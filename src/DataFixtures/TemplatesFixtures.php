@@ -20,7 +20,12 @@ use Doctrine\Persistence\ObjectManager;
 
 class TemplatesFixtures extends Fixture implements FixtureGroupInterface
 {
-    public function __construct(private readonly TemplatesService $templatesService)
+    private const SQLITE_LOCAL_TEMPLATE_CONTENT = 'SQLite market-validation local seed';
+
+    public function __construct(
+        private readonly TemplatesService $templatesService,
+        private readonly bool $useSqliteLocalTemplates = false,
+    )
     {
     }
 
@@ -67,8 +72,17 @@ class TemplatesFixtures extends Fixture implements FixtureGroupInterface
                 continue;
             }
 
-            $templateEntries = $templates[$name];
-            $this->templatesService->importTemplates($type, $templateEntries, $baseUrl);
+            if ($this->useSqliteLocalTemplates) {
+                $this->templatesService->importTemplateContents($type, [[
+                    'content' => self::SQLITE_LOCAL_TEMPLATE_CONTENT,
+                    'name' => 'sqlite.market_validation.'.$name,
+                    'isDefault' => true,
+                ]]);
+
+                continue;
+            }
+
+            $this->templatesService->importTemplates($type, $templates[$name], $baseUrl);
         }
 
         $manager->flush();
