@@ -5,8 +5,12 @@ declare(strict_types=1);
 namespace App\Tests\Functional;
 
 use App\Entity\AppSettings;
+use App\Entity\GuestCategory;
 use App\Sqlite\SqliteBaselineInitializer;
+use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\Translation\Translator;
 
 /**
@@ -72,6 +76,34 @@ final class SpanishLocaleTest extends WebTestCase
             self::assertSame($expected[$salutation][0], $translator->trans($salutation, [], 'messages', 'en'));
             self::assertSame($expected[$salutation][1], $translator->trans($salutation, [], 'messages', 'es'));
         }
+    }
+
+    public function testFirstRunSeedsDataInTheConfiguredLanguage(): void
+    {
+        self::bootKernel(['environment' => 'sqlite_test']);
+        /** @var SqliteBaselineInitializer $baseline */
+        $baseline = self::getContainer()->get(SqliteBaselineInitializer::class);
+        $baseline->initialize();
+
+        $firstRun = new CommandTester((new Application(self::$kernel))->find('app:first-run'));
+        self::assertSame(Command::SUCCESS, $firstRun->execute([
+            '--username' => 'es-admin',
+            '--password' => 'safe-test-password',
+            '--first-name' => 'Prueba',
+            '--last-name' => 'Español',
+            '--email' => 'es-admin@example.test',
+            '--accommodation-name' => 'Alojamiento de prueba',
+        ], ['interactive' => false]), $firstRun->getDisplay());
+
+        // Seeded names are stored in the language active at first run and do not change later.
+        $translator = self::getContainer()->get('translator');
+        self::assertInstanceOf(Translator::class, $translator);
+        $names = array_map(
+            static fn (GuestCategory $category): string => (string) $category->getName(),
+            self::getContainer()->get('doctrine')->getRepository(GuestCategory::class)->findAll(),
+        );
+        self::assertContains($translator->trans('guest_category.default.adult.name', [], 'messages', 'es'), $names);
+        self::assertNotContains($translator->trans('guest_category.default.adult.name', [], 'messages', 'de'), $names);
     }
 
     public function testLoginPageIsSpanishWithLocaleEs(): void

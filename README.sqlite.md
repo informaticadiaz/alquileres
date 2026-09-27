@@ -74,9 +74,19 @@ placeholders, plural intervals or HTML tags differ, so new upstream English
 keys must be translated before they pass. Style: neutral Spanish addressing
 the user informally (tú).
 
-Not covered yet: e-mail and PDF templates created by users, the default
-customer salutations stored in the settings, and texts outside
-`translations/`.
+Set `LOCALE` before `app:first-run`: seeded data (guest categories, and with
+`--load-sample-data` also room categories, reservation origins, statuses and
+prices) is stored in the language active at that moment and does not change
+when `LOCALE` changes later. Rename it in the settings if needed.
+
+Not translated on purpose or not covered:
+
+- The anonymous customer created by `app:first-run` keeps the name "Anonym"
+  (and salutation "Herr"): the application finds it by that name when it
+  anonymizes deleted customers.
+- E-mail and PDF templates are user content; the local first-run templates are
+  technical placeholders.
+- Template previews use German sample values.
 
 ## Tests
 
