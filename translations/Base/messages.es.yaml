@@ -1,0 +1,108 @@
+base.action: Acción
+button.accept: Aceptar
+button.add: Agregar
+button.back: Volver
+button.next: Siguiente
+button.cancel: Cancelar
+button.close: Cerrar
+button.continue: Continuar
+button.continue.with: Continuar con
+button.delete: Eliminar
+button.details: Detalles
+button.download: Descargar
+button.edit: Editar
+button.export.pdf: Exportar como PDF
+button.export.einvoicepdf: Exportar como PDF con factura electrónica incrustada
+button.export.xml: Exportar como XML XRechnung (para portales de organismos públicos)
+button.gdpr: Resumen RGPD
+button.hide: Ocultar
+button.save: Guardar
+copy.sucess: ¡Texto copiado al portapapeles!
+copy.text: Copiar
+first.apartments: 'Crear las habitaciones:'
+first.categories: 'Crear las categorías de habitación:'
+first.origin: 'Crear los orígenes de la reserva:'
+first.prices: 'Crear los precios:'
+first.status: 'Crear los estados de la reserva:'
+first.templates: 'Agregar plantillas:'
+first.txt: >-
+  FewohBee se instaló correctamente. Solo faltan unos pocos pasos para
+  empezar a usar la aplicación.
+flash.access.denied: Acceso denegado.
+flash.invalidtoken: Token no válido.
+flash.mandatory: Completa todos los campos obligatorios.
+housekeeping.flash.updated: Estado de limpieza actualizado.
+housekeeping.flash.apartment_missing: No se encontró la habitación.
+login.application.title: FewohBee
+nav.appartment: Habitación
+nav.appartment.add: Crear habitación
+nav.appartment.overview: Resumen de habitaciones
+nav.cashjournal: Libro de caja
+nav.accounting: Contabilidad
+nav.journal: Libro diario
+nav.category: Categorías de habitación
+nav.category.add: Crear categorías de habitación
+nav.customer.add: Crear huésped
+nav.customer.overview: Resumen de huéspedes
+nav.customers: Huéspedes
+nav.housekeeping: Limpieza
+nav.operations: Operaciones
+nav.operations.frontdesk: Lista de control de recepción
+nav.operations.reports: Informes
+operations.reports.title: Informes de operaciones
+operations.reports.date_start: Fecha de inicio
+operations.reports.date_end: Fecha de fin
+operations.reports.template: Plantilla
+operations.reports.download: Descargar PDF
+operations.reports.template.missing: Selecciona una plantilla.
+operations.reports.preview: Vista previa
+operations.frontdesk.title: Lista de control de recepción
+operations.frontdesk.filter.date: Fecha
+operations.frontdesk.filter.subsidiary: Establecimiento
+operations.frontdesk.filter.sections: Mostrar
+operations.frontdesk.filter.reservations: Reservas
+operations.filter.reservationStatus: Estado de la reserva
+operations.frontdesk.arrivals: Llegadas
+operations.frontdesk.departures: Salidas
+operations.frontdesk.inhouse: Alojados
+operations.frontdesk.room: Habitación
+operations.frontdesk.guest: Huésped
+operations.frontdesk.period: Período
+operations.frontdesk.category: Categoría
+operations.frontdesk.actions: Acciones
+operations.frontdesk.registration.print: Imprimir formulario de registro
+operations.frontdesk.confirmation.send: Enviar confirmación / correo informativo
+operations.frontdesk.note.edit: Editar nota
+operations.frontdesk.registration.missing: No se encontraron plantillas de registro. Crea una plantilla o importa las predeterminadas.
+operations.frontdesk.header.registration: Registro
+operations.frontdesk.header.invoice: Factura
+operations.frontdesk.header.email: Correo electrónico
+operations.frontdesk.header.note: Nota
+nav.invoice.add: Crear factura
+nav.invoices: Resumen de facturas
+nav.logout: Cerrar sesión
+nav.object: Establecimiento
+nav.object.add: Crear establecimiento
+nav.object.overview: Resumen de establecimientos
+nav.origin: Origen de la reserva
+nav.price.add: Agregar precio
+nav.prices: Precios
+nav.registrationbook: Libro de registro de huéspedes
+nav.reservation.edit: Editar reserva
+nav.reservation.overview: Resumen de reservas
+nav.reservationorigin: Origen de la reserva
+nav.settings: Configuración
+nav.statistics: Estadísticas
+nav.status: Estado de la reserva
+nav.guest_category: Categorías de huésped
+nav.tourist_tax: Tasa turística
+nav.templates: Plantillas
+nav.turnover: Facturación
+nav.tourism: Turismo
+nav.calendars: Administrar calendarios
+nav.user: Usuarios
+nav.user.add: Agregar usuario
+nav.user.overview: Resumen de usuarios
+nav.utilization: Ocupación
+nav.welcome: Hola, %user%
+nav.profile: Perfil
