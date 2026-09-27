@@ -1,0 +1,32 @@
+calendar:
+  form:
+    ics_file_invalid: Sube un archivo ICS (.ics) válido.
+form:
+  email:
+    notblank: Ingresa tu dirección de correo electrónico.
+    invalid: Ingresa una dirección de correo electrónico válida.
+  password:
+    min: 'La contraseña debe tener al menos {{ limit }} caracteres.'
+    nomatch: Las contraseñas no coinciden.
+    notblank: Ingresa una contraseña.
+  username:
+    na: 'El nombre de inicio de sesión seleccionado {{ string }} ya está en uso.'
+  vatid:
+    invalid_country: El número de IVA debe comenzar con un código de país válido.
+invoice_number_pattern:
+  missing_number: El patrón necesita un marcador <number>; de lo contrario, todas las facturas tendrían el mismo número.
+  duplicate_number: El patrón solo puede contener un marcador <number>.
+  unknown_placeholder: 'Marcador desconocido %placeholder%. Se permiten <year>, <year2>, <month>, <day> y <number>.'
+  invalid_width: El ancho del número correlativo debe estar entre 1 y %max%.
+  width_not_allowed: El marcador %placeholder% tiene una longitud fija y no admite un ancho.
+  month_without_year: Sin un año, la numeración se reinicia cada mes y se repite en los años siguientes.
+  too_long: El número de factura generado no puede superar los %max% caracteres.
+  empty: Ingresa un patrón.
+accounting:
+  bank_import:
+    upload:
+      file:
+        invalid_type: Sube un archivo válido (.csv, .xls, .xlsx, .xml).
+    rules:
+      validation:
+        regex_invalid: Esta no es una expresión regular válida.

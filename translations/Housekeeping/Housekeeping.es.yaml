@@ -1,0 +1,34 @@
+housekeeping.title: Limpieza
+housekeeping.view.day: Día
+housekeeping.view.week: Semana
+housekeeping.date: Fecha
+housekeeping.subsidiary: Establecimiento
+housekeeping.subsidiary.all: Todos los establecimientos
+housekeeping.apply: Aplicar
+housekeeping.export.day: Exportar CSV (día)
+housekeeping.export.week: Exportar CSV (semana)
+housekeeping.room: Habitación
+housekeeping.occupancy: Ocupación
+housekeeping.filter.occupancy: Filtro de ocupación
+housekeeping.guests: Huéspedes
+housekeeping.guests.short: Huésp.
+housekeeping.guest.short: Huésp.
+housekeeping.reservation: Reserva
+housekeeping.status: Estado
+housekeeping.assigned_to: Asignado a
+housekeeping.note: Nota
+housekeeping.save: Guardar
+housekeeping.unassigned: Sin asignar
+housekeeping.no_rooms: No se encontraron habitaciones.
+housekeeping.status.open: Pendiente
+housekeeping.status.in_progress: En curso
+housekeeping.status.cleaned: Limpia
+housekeeping.status.inspected: Revisada
+housekeeping.occupancy.free: Libre
+housekeeping.occupancy.stayover: Permanencia
+housekeeping.occupancy.arrival: Llegada
+housekeeping.occupancy.departure: Salida
+housekeeping.occupancy.turnover: Cambio de huésped
+housekeeping.occupancy.blocked: Bloqueada
+housekeeping.summary.arrive: Llegada
+housekeeping.summary.depart: Salida
