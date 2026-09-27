@@ -1,0 +1,8 @@
+# The SQLite profile has its own migration line. The upstream MySQL history in
+# migrations/ must never run against SQLite (see App\Sqlite\SqliteBaselineInitializer).
+doctrine_migrations:
+    migrations_paths:
+        'SqliteMigrations': '%kernel.project_dir%/migrations-sqlite'
+    storage:
+        table_storage:
+            table_name: 'fewohbee_sqlite_migration_versions'

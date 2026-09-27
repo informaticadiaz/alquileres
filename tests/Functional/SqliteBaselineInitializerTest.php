@@ -45,7 +45,7 @@ final class SqliteBaselineInitializerTest extends KernelTestCase
         $registry = self::getContainer()->get(ManagerRegistry::class);
         $default = $registry->getConnection('default');
         $geo = $registry->getConnection('geo');
-        $tables = $default->createSchemaManager()->listTableNames();
+        $tables = $default->fetchFirstColumn("SELECT name FROM sqlite_master WHERE type = 'table'");
 
         self::assertContains('fewohbee_sqlite_baseline_metadata', $tables);
         self::assertContains('users', $tables);

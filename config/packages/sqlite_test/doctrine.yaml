@@ -11,9 +11,13 @@ doctrine:
                 server_version: null
                 charset: null
                 default_table_options: []
+                # Both connections share one file: skip the profile bookkeeping tables
+                # (no entity mapping) and the table owned by the geo connection.
+                schema_filter: '~^(?!(fewohbee_sqlite_baseline_metadata|fewohbee_sqlite_migration_versions|postal_code_data)$)~'
             geo:
                 driver: 'pdo_sqlite'
                 url: 'sqlite:///%kernel.project_dir%/var/sqlite-test/fewohbee.sqlite'
                 server_version: null
                 charset: null
                 default_table_options: []
+                schema_filter: '~^postal_code_data$~'

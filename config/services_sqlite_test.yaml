@@ -7,6 +7,8 @@ services:
     App\Sqlite\SqliteBaselineInitializer:
         autowire: true
         public: true
+        arguments:
+            $migrations: '@doctrine.migrations.dependency_factory'
 
     App\DataFixtures\TemplatesFixtures:
         autowire: true
