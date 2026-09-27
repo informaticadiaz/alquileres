@@ -1,0 +1,20 @@
+registrationbook.addreservations: Agregar reservas
+registrationbook.address: Dirección
+registrationbook.appartment: Habitación
+registrationbook.birthday: Fecha de nacimiento
+registrationbook.country: País
+registrationbook.delete.ask: ¿Eliminar este elemento?
+registrationbook.departures: Salida
+registrationbook.entry.skip: Omitir entrada
+registrationbook.firstname: Nombre
+registrationbook.flash.delete.success: La entrada se eliminó correctamente.
+registrationbook.help.message: >-
+  En esta vista se listan todas las entradas que todavía no se transfirieron al
+  libro de registro de huéspedes.
+registrationbook.lastname: Apellido
+registrationbook.noentries: '- No hay entradas disponibles -'
+registrationbook.number: N.º
+registrationbook.period: Período
+registrationbook.stays: Estancias
+registrationbook.year: Año
+reservationbook.flash.add.success: La entrada se agregó correctamente.

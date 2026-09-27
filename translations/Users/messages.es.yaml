@@ -1,0 +1,31 @@
+user.action: Acción
+user.active: Activo
+user.delete.ask: ¿Seguro que quieres eliminar este usuario?
+user.email: Correo electrónico
+user.firstname: Nombre
+user.flash.create.success: El usuario se agregó correctamente.
+user.flash.delete.success: El usuario se eliminó correctamente.
+user.flash.edit.success: El usuario se editó correctamente.
+user.flash.username.na: ¡El nombre de inicio de sesión seleccionado ya está en uso!
+user.lastaction: Última acción
+user.lastname: Apellido
+user.password: Contraseña
+user.password.error: Es posible que tu contraseña sea demasiado corta.
+user.password.hint: La contraseña debe tener al menos 8 caracteres.
+user.role: Rol
+user.username: Nombre de usuario
+ROLE_ADMIN: Administrador
+ROLE_RESERVATIONS: Reservas
+ROLE_CUSTOMERS: Clientes
+ROLE_INVOICES: Facturas
+ROLE_REGISTRATIONBOOK: Libro de registro de huéspedes
+ROLE_STATISTICS: Estadísticas
+ROLE_CASHJOURNAL: Libro de caja
+ROLE_RESERVATIONS_RO: Reservas (solo lectura)
+ROLE_OPERATIONS: Operaciones
+user.oidc.badge: SSO
+user.oidc.unlink: Desvincular cuenta de SSO
+user.oidc.unlink_confirm: >-
+  Se eliminará el vínculo con la cuenta de SSO. El usuario se conserva y se
+  volverá a asociar en el próximo inicio de sesión por SSO.
+user.oidc.flash.unlinked: Se eliminó el vínculo de SSO.

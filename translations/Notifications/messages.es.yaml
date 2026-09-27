@@ -1,0 +1,24 @@
+notification:
+  title: "Notificaciones"
+  empty: "Todo en orden: no hay nada pendiente."
+  reservation_conflict:
+    title: "Revisar %count% importaciones"
+    body_conflicts: "Reservas superpuestas de una importación de calendario."
+    body_reviews: "Reservas importadas sin huésped asignado."
+  calendar_reminder:
+    title: "%count% recordatorios del calendario"
+    body: "Entradas que vencen hoy y todavía deben confirmarse."
+  release_note:
+    title: "Novedades de fewohbee %version%"
+    body: "Mira qué cambió."
+  stored:
+    reservation: "Nueva reserva de %name%: habitación %room% desde el %from%"
+    reservation_multi: "Nueva reserva de %name%: %count% habitaciones desde el %from%"
+    reservation_generic: "Reserva %name%: habitación %room% desde el %from%"
+    reservation_anonymous: "Nueva reserva: habitación %room% desde el %from%"
+    reservation_multi_anonymous: "Nueva reserva: %count% habitaciones desde el %from%"
+    reservation_generic_anonymous: "Reserva: habitación %room% desde el %from%"
+    calendar_import: "Reserva importada de %source%: habitación %room% desde el %from%"
+    invoice: "Factura %number%"
+  mark_all_read: "Marcar todo como leído"
+  mark_read: "Marcar como leído"
