@@ -1,0 +1,295 @@
+# Booking Journal - Settings
+accounting.settings.title: Configuración del libro diario
+accounting.settings.back_to_journal: Volver al libro diario
+accounting.settings.back: Volver a la configuración
+accounting.settings.flash.saved: La configuración se guardó correctamente.
+accounting.settings.flash.preset_invalid: Se seleccionó un plan predefinido no válido.
+accounting.settings.flash.preset_loaded: "Plan predefinido %preset% cargado: se crearon %accounts% cuentas contables, %taxRates% tipos de impuesto y %workflows% flujos de trabajo."
+accounting.settings.flash.preset_stale_account_refs: "Advertencia: %count% precios/componentes todavía hacen referencia a cuentas de ingresos de otro plan predefinido. Revísalos en la configuración de precios."
+
+# Preset
+accounting.settings.preset.title: Plan de cuentas
+accounting.settings.preset.help: "Selecciona un plan predefinido con valores iniciales típicos para Alemania, Austria o Suiza. Las cuentas contables y los tipos de impuesto que falten se agregarán automáticamente; luego todos los valores se pueden ajustar libremente y ampliar con configuraciones adicionales específicas del país si es necesario."
+accounting.settings.preset.label: Plan predefinido
+accounting.settings.preset.load: Cargar plan predefinido
+accounting.settings.preset.confirm: "Al cargar un plan predefinido se agregarán las cuentas contables y los tipos de impuesto que falten. Las entradas existentes no se modificarán. ¿Continuar?"
+accounting.settings.preset.current: "Plan predefinido activo: %preset%"
+accounting.settings.preset.seed_workflows: Crear flujos de trabajo de ejemplo
+accounting.settings.preset.seed_workflows_help: "Crea flujos de trabajo preconfigurados para asientos automáticos al pagarse una factura (efectivo, transferencia bancaria, tarjeta). Los flujos de trabajo existentes del plan predefinido no se duplicarán."
+accounting.settings.preset.skr03: SKR03 (Alemania)
+accounting.settings.preset.skr04: SKR04 (Alemania)
+accounting.settings.preset.ekr_at: EKR (Austria)
+accounting.settings.preset.kmu_ch: KMU (Suiza)
+
+# DATEV settings
+accounting.settings.datev.title: Configuración de exportación DATEV
+accounting.settings.datev.help: "Estos valores son necesarios para la exportación CSV de DATEV. Consulta a tu asesor fiscal los valores correctos."
+accounting.settings.advisor_number: Número de asesor
+accounting.settings.advisor_number.placeholder: p. ej., 29098
+accounting.settings.client_number: Número de cliente
+accounting.settings.client_number.placeholder: p. ej., 55003
+accounting.settings.fiscal_year_start: Inicio del ejercicio fiscal (mes)
+accounting.settings.account_number_length: Longitud del número de cuenta
+accounting.settings.dictation_code: Código de dictado
+
+# Booking journal remark labels
+accounting.settings.remark_labels.title: Etiquetas de observación de asientos
+accounting.settings.remark_labels.intro: "Estas etiquetas solo las usan las acciones de flujos de trabajo (p. ej., asientos automáticos al pagarse una factura)."
+accounting.settings.remark_labels.help: 'Etiquetas opcionales para la observación automática del libro diario. Se separan por servicio principal (posiciones de habitación/principales) y servicios varios. La misma cuenta contable + IVA se agrupan por sección; la etiqueta se combina con el nombre de la cuenta como observación (p. ej., <b>"Alojamiento – Ingresos 7%"</b>). Si está vacía, solo se escribe el nombre de la cuenta.'
+accounting.settings.main_position_label: Servicio principal
+accounting.settings.main_position_label.placeholder: "p. ej., Alojamiento, Alquiler de botes, Tarifa de seminario"
+accounting.settings.misc_position_label: Servicios varios
+accounting.settings.misc_position_label.placeholder: "p. ej., Varios, Extras"
+
+# Invoice number detection for bank import
+accounting.settings.invoice_number_patterns.title: Detectar números de factura
+accounting.settings.invoice_number_patterns.help: 'Al importar extractos bancarios, se buscan en el concepto los números que coincidan con tus rangos de números de factura. Se reconoce exactamente lo que emites.'
+accounting.settings.invoice_number_patterns.intro: "Se reconocen estos rangos de números. Se modifican donde se aplican: globalmente en la configuración y por establecimiento en la administración de establecimientos."
+accounting.settings.invoice_number_patterns.none: "Todavía no hay ningún rango de números configurado. Hasta entonces, los movimientos bancarios no se pueden asociar automáticamente con facturas."
+accounting.settings.invoice_number_patterns.recent: "Tus números de factura emitidos más recientemente:"
+accounting.settings.invoice_number_patterns.scope: Se aplica a
+accounting.settings.invoice_number_patterns.pattern: Patrón
+accounting.settings.invoice_number_patterns.example: Ejemplo
+accounting.settings.invoice_number_patterns.global: Predeterminado
+accounting.settings.invoice_number_patterns.link_global: Editar el rango de números predeterminado
+accounting.settings.invoice_number_patterns.link_branch: Administrar establecimientos
+
+# Opening balance
+accounting.opening_balance.title: Saldo de apertura
+accounting.opening_balance.help: "Ingrésalo una vez por año. El importe se contabiliza automáticamente como asiento de apertura el 1 de enero."
+accounting.opening_balance.year: Año
+accounting.opening_balance.cash: Caja
+accounting.opening_balance.bank: Banco
+accounting.opening_balance.booking_info: "Contabilizado contra: %account%"
+accounting.opening_balance.no_account: "No hay ninguna cuenta de saldo de apertura configurada. Primero carga un plan de cuentas predefinido."
+accounting.opening_balance.flash.saved: Saldo de apertura guardado.
+accounting.opening_balance.flash.no_account: "No hay ninguna cuenta de saldo de apertura configurada: carga un plan predefinido."
+
+# Accounts
+accounting.accounts.title: Cuentas contables
+accounting.accounts.help: "Administra las cuentas contables para los asientos de débito y crédito (p. ej., caja, banco, ingresos)."
+accounting.accounts.add: Agregar cuenta contable
+accounting.accounts.edit: Editar cuenta contable
+accounting.accounts.number: N.º de cuenta
+accounting.accounts.name: Nombre
+accounting.accounts.type: Tipo
+accounting.accounts.system_role: Rol del sistema
+accounting.accounts.cash: Caja
+accounting.accounts.is_cash: Esta es la cuenta de caja
+accounting.accounts.bank: Banco
+accounting.accounts.is_bank: Esta es la cuenta bancaria
+accounting.accounts.opening_balance: Apertura
+accounting.accounts.is_opening_balance: Esta es la cuenta de saldo de apertura
+accounting.accounts.is_auto: Cuenta automática (DATEV)
+accounting.accounts.is_auto.help: "En las cuentas automáticas de DATEV, DATEV deriva el impuesto por sí mismo a partir del plan de cuentas. La clave BU se omite en la exportación siempre que intervenga esta cuenta (en débito o crédito). Típico: SKR03 8300/8400, SKR04 4300/4400, cuentas del §13b."
+accounting.accounts.is_auto.badge: Auto
+accounting.accounts.sachverhalt_lul: Sachverhalt L+L
+accounting.accounts.sachverhalt_lul.help: "Código DATEV para la columna AQ, p. ej., 7 = servicio UE del §13b (Booking.com, Airbnb), 4 = servicio de construcción del §13b, 1 = adquisición intracomunitaria. Déjalo vacío si no es necesario."
+accounting.accounts.funktion_lul: Función ampl. L+L
+accounting.accounts.funktion_lul.help: "Código DATEV para la columna AR (tipo de impuesto + deducción del IVA soportado), p. ej., 190 = 19% con deducción del IVA soportado, 101 = 7% con deducción del IVA soportado. Déjalo vacío si no es necesario."
+accounting.accounts.sort_order: Orden
+accounting.accounts.system_locked: Cuenta del sistema (no se puede eliminar)
+accounting.accounts.empty: No hay cuentas contables configuradas. Carga un plan predefinido para empezar.
+accounting.accounts.delete.ask: ¿Seguro que quieres eliminar esta cuenta contable?
+accounting.accounts.flash.created: La cuenta contable se creó correctamente.
+accounting.accounts.flash.updated: La cuenta contable se actualizó correctamente.
+accounting.accounts.flash.deleted: La cuenta contable se eliminó correctamente.
+accounting.accounts.flash.cannot_delete_system: Las cuentas del sistema no se pueden eliminar.
+accounting.accounts.flash.cannot_delete_in_use: "Esta cuenta contable no se puede eliminar porque todavía se usa en asientos, tipos de impuesto, precios o flujos de trabajo. Primero quita las referencias de configuración; las cuentas usadas en asientos deben conservarse."
+accounting.accounts.type.asset: Activo
+accounting.accounts.type.liability: Pasivo
+accounting.accounts.type.revenue: Ingreso
+accounting.accounts.type.expense: Gasto
+
+# Tax Rates
+accounting.taxrates.manage_link: Administrar tipos de impuesto
+accounting.taxrates.title: Tipos de impuesto
+accounting.taxrates.help: "Administra los tipos de IVA para los asientos. La clave BU de DATEV es necesaria para la exportación."
+accounting.taxrates.add: Agregar tipo de impuesto
+accounting.taxrates.edit: Editar tipo de impuesto
+accounting.taxrates.name_header: Nombre
+accounting.taxrates.name.placeholder: p. ej., 19% IVA
+accounting.taxrates.rate: Tipo
+accounting.taxrates.bukey_short: Clave BU
+accounting.taxrates.bukey.output_abbr: Rep.
+accounting.taxrates.bukey.input_abbr: Sop.
+accounting.taxrates.output_bukey: Clave BU del IVA repercutido
+accounting.taxrates.output_bukey.placeholder: p. ej., 3
+accounting.taxrates.output_bukey.help: "Se usa en los asientos de ingresos. DE: 2 = 7%, 3 = 19%. Déjalo vacío para tipos exentos o si solo se usan cuentas automáticas."
+accounting.taxrates.input_bukey: Clave BU del IVA soportado
+accounting.taxrates.input_bukey.placeholder: p. ej., 9
+accounting.taxrates.input_bukey.help: "Se usa en los asientos de gastos. DE: 8 = 7%, 9 = 19%. Déjalo vacío para tipos exentos."
+accounting.taxrates.valid: Vigencia
+accounting.taxrates.valid_from: Válido desde
+accounting.taxrates.valid_to: Válido hasta
+accounting.taxrates.revenue_account: Cuenta de ingresos
+accounting.taxrates.revenue_account.help: "Se usa como cuenta de crédito para los asientos automáticos con este tipo de impuesto."
+accounting.taxrates.is_default: Tipo predeterminado
+accounting.taxrates.default: Predeterminado
+accounting.taxrates.always_valid: Siempre
+accounting.taxrates.empty: No hay tipos de impuesto configurados. Carga un plan predefinido para empezar.
+accounting.taxrates.delete.ask: ¿Seguro que quieres eliminar este tipo de impuesto?
+accounting.taxrates.flash.created: El tipo de impuesto se creó correctamente.
+accounting.taxrates.flash.updated: El tipo de impuesto se actualizó correctamente.
+accounting.taxrates.flash.deleted: El tipo de impuesto se eliminó correctamente.
+accounting.taxrates.flash.cannot_delete_in_use: "Este tipo de impuesto no se puede eliminar porque ya se usa en asientos del libro diario. Usa los campos de vigencia para impedir su uso futuro."
+accounting.taxrates.flash.cannot_delete_in_workflow: "Este tipo de impuesto no se puede eliminar porque un flujo de trabajo contabiliza con él. Primero elige otro tipo de impuesto en el flujo de trabajo."
+
+# Journal - Batches
+accounting.journal.batch.add: Agregar mes
+accounting.journal.batch.year: Año
+accounting.journal.batch.month: Mes
+accounting.journal.batch.status: Estado
+accounting.journal.batch.entries_count: Asientos
+accounting.journal.batch.closed: Cerrado
+accounting.journal.batch.exported: Exportado
+accounting.journal.batch.open: Abierto
+accounting.journal.batch.new: Crear nuevo mes
+accounting.journal.batch.empty: Todavía no se crearon meses.
+accounting.journal.batch.close: Cerrar mes
+accounting.journal.batch.reopen: Reabrir mes
+accounting.journal.batch.previous_month: 'Mes anterior: %month%'
+accounting.journal.batch.next_month: 'Mes siguiente: %month%'
+
+# Journal - Filter
+accounting.journal.filter.all: Todos los asientos
+accounting.journal.filter.cashbook: Vista de libro de caja
+accounting.journal.filter.bankbook: Vista de banco
+
+# Journal - Cashbook columns
+accounting.journal.cashbook.incomes: Ingreso
+accounting.journal.cashbook.expenses: Egreso
+accounting.journal.cashbook.counter_account: Contrapartida
+
+# Journal - Cashbook balance
+accounting.journal.cashbook.start: Saldo inicial de caja
+accounting.journal.cashbook.end: Saldo final de caja
+accounting.journal.cashbook.start_help: "Saldo de caja al comienzo del mes (solo relevante para la vista de libro de caja)."
+
+# Journal - Bank columns
+accounting.journal.bankbook.incomes: Entradas
+accounting.journal.bankbook.expenses: Salidas
+accounting.journal.bankbook.counter_account: Contrapartida
+accounting.journal.bankbook.start: Saldo inicial del banco
+accounting.journal.bankbook.end: Saldo final del banco
+
+# Journal - Cashbook form
+accounting.journal.cashbook.direction: Tipo
+accounting.journal.cashbook.category: Contrapartida
+
+# Journal - Export
+accounting.journal.export: Exportar
+accounting.journal.export.datev: Lote de asientos DATEV (CSV)
+accounting.journal.export.year: Exportación DATEV anual
+accounting.journal.export.year.help: "Exporta todos los asientos del año seleccionado en un único archivo CSV de DATEV."
+accounting.journal.year_view.title: Lote de asientos
+accounting.journal.year_view.help: "Todos los asientos del año seleccionado en una tabla ordenable."
+accounting.journal.year_view.toggle_filters: Filtros
+accounting.journal.year_view.filter_placeholder: Filtrar …
+accounting.journal.year_view.filter_compare_placeholder_date: "p. ej., >=2026-06-01"
+accounting.journal.year_view.filter_compare_hint_date: "Comparaciones: > < >= <= = != — combínalas para un rango, p. ej., >=2026-06-01 <=2026-08-31 (de lo contrario, búsqueda de texto)"
+accounting.journal.year_view.filter_compare_placeholder_number: "p. ej., > 100"
+accounting.journal.year_view.filter_compare_hint_number: "Comparaciones: > < >= <= = != — combina varias, p. ej., >=100 <=500 (de lo contrario, búsqueda de texto)"
+accounting.journal.year_view.closed_month: 'Mes cerrado: no editable'
+accounting.journal.export.no_batches: "No hay asientos para este año."
+accounting.journal.export.no_settings: "Primero configura la exportación DATEV."
+accounting.journal.export.warn_intro: "Los siguientes asientos están incompletos. La exportación sigue siendo posible: las correcciones se pueden hacer aquí o más tarde en DATEV."
+accounting.journal.export.force: "Exportar de todos modos"
+accounting.journal.export.warn.missing_advisor_number: "falta el número de asesor en la configuración del libro diario."
+accounting.journal.export.warn.missing_client_number: "falta el número de cliente en la configuración del libro diario."
+accounting.journal.export.warn.no_debit: "Asiento #%doc%: falta la cuenta de débito."
+accounting.journal.export.warn.no_credit: "Asiento #%doc%: falta la cuenta de crédito."
+accounting.journal.export.warn.no_output_bukey: "Asiento #%doc%: asiento de ingresos con el tipo de impuesto \"%taxrate%\" – falta la clave BU del IVA repercutido."
+accounting.journal.export.warn.no_input_bukey: "Asiento #%doc%: asiento de gastos con el tipo de impuesto \"%taxrate%\" – falta la clave BU del IVA soportado."
+
+# Journal - Entries
+accounting.journal.entry.add: Agregar asiento
+accounting.journal.entry.edit: Editar asiento
+accounting.journal.entry.duplicate: Duplicar asiento
+accounting.journal.entry.date: Fecha
+accounting.journal.entry.doc_number: N.º comprob.
+accounting.journal.entry.amount: Importe
+accounting.journal.entry.debit: Débito
+accounting.journal.entry.credit: Crédito
+accounting.journal.entry.tax_rate: Tipo de impuesto
+accounting.journal.entry.invoice: N.º de factura
+accounting.journal.entry.requires_document: Comprobante pendiente
+accounting.journal.entry.requires_document_help: El asiento está a la espera de un número de comprobante. El mes no se puede cerrar mientras falte.
+accounting.journal.entry.remark: Observación
+accounting.journal.entry.empty: Todavía no hay asientos.
+accounting.journal.entry.delete_ask: ¿Eliminar este asiento?
+
+accounting.journal.back: Volver al libro diario
+
+# Journal - Flash Messages
+accounting.journal.flash.batch_created: El mes se creó correctamente.
+accounting.journal.flash.batch_closed: Mes cerrado.
+accounting.journal.flash.batch_missing_document_numbers: 'El mes no se puede cerrar: %count% asiento(s) todavía esperan un número de comprobante.'
+accounting.journal.entry.missing_document: Falta comprobante
+accounting.journal.entry.missing_document_hint: Este asiento se contabilizó antes que el comprobante al que se refiere. El mes solo se puede cerrar cuando se haya indicado el número.
+accounting.journal.flash.batch_reopened: Mes reabierto.
+accounting.journal.flash.entry_created: El asiento se creó correctamente.
+accounting.journal.flash.entry_updated: El asiento se actualizó correctamente.
+accounting.journal.flash.entry_deleted: El asiento se eliminó correctamente.
+journal.error.journal.closed: Este mes está cerrado. No se permiten cambios.
+
+# Preset account names
+preset.account.cash: Caja
+preset.account.cash_at: Caja
+preset.account.bank: Banco
+preset.account.receivables: Deudores comerciales
+preset.account.receivables_credit_card: Créditos por tarjetas de crédito
+preset.account.credit_card_settlement: Liquidación de tarjetas de crédito
+preset.account.input_tax: IVA soportado
+preset.account.input_tax_reduced: IVA soportado (tipo reducido)
+preset.account.input_tax_standard: IVA soportado (tipo general)
+preset.account.vat: IVA
+preset.account.vat_reduced: IVA (tipo reducido)
+preset.account.vat_standard: IVA (tipo general)
+preset.account.vat_ch: IVA a pagar
+preset.account.transit: Partidas en tránsito
+preset.account.revenue_accommodation: Ingresos por alojamiento 7%
+preset.account.revenue_accommodation_10: Ingresos por alojamiento 10%
+preset.account.revenue_accommodation_13: Ingresos por alojamiento 13%
+preset.account.revenue_accommodation_ch: Ingresos por alojamiento 3.8%
+preset.account.revenue_standard: Ingresos (tipo general)
+preset.account.revenue_standard_ch: Ingresos 8.1% IVA
+preset.account.service_revenue_ch: Ingresos por servicios
+preset.account.revenue_20: Ingresos 20% IVA
+preset.account.revenue_tax_free: Ingresos exentos
+preset.account.revenue_deductions: Deducciones de ingresos (comisiones)
+preset.account.office_supplies: Material de oficina
+preset.account.other_expenses: Otros gastos
+preset.account.other_operating_expenses: Otros gastos operativos
+preset.account.premises: Gastos de locales
+preset.account.rent_real_estate: Alquiler (inmuebles)
+preset.account.cleaning: Limpieza
+preset.account.insurance: Seguros
+preset.account.maintenance: Mantenimiento
+preset.account.maintenance_cleaning: Mantenimiento / Limpieza
+preset.account.opening_balance: Saldo de apertura
+preset.account.reverse_charge_eu_19: Inversión del sujeto pasivo UE 19% (Booking.com, Airbnb)
+preset.account.advance_payments_7: Anticipos recibidos 7% IVA
+preset.account.advance_payments_19: Anticipos recibidos 19% IVA
+
+# Preset tax rate names
+preset.taxrate.tax_free: 0% exento
+preset.taxrate.de_7: 7% IVA
+preset.taxrate.de_19: 19% IVA
+preset.taxrate.at_10: 10% IVA (alojamiento)
+preset.taxrate.at_13: 13% IVA (alojamiento desde 11/2018)
+preset.taxrate.at_20: 20% IVA
+preset.taxrate.ch_2_6: 2.6% IVA (reducido)
+preset.taxrate.ch_3_8: 3.8% IVA (alojamiento)
+preset.taxrate.ch_8_1: 8.1% IVA
+
+# Preset workflow names
+preset.workflow.booking_cash: "Asiento: pago en efectivo"
+preset.workflow.booking_cash.desc: "Crea automáticamente un asiento (débito: caja) cuando una factura se paga en efectivo."
+preset.workflow.booking_transfer: "Asiento: transferencia bancaria"
+preset.workflow.booking_transfer.desc: "Crea automáticamente un asiento (débito: banco) cuando una factura se paga por transferencia bancaria."
+preset.workflow.booking_card: "Asiento: pago con tarjeta"
+preset.workflow.booking_card.desc: "Crea automáticamente un asiento (débito: liquidación de tarjetas de crédito) cuando una factura se paga con tarjeta."
+
+# General
+journal.action: Acción
