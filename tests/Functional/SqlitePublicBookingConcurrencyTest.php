@@ -10,6 +10,7 @@ use App\Entity\OnlineBookingConfig;
 use App\Entity\Reservation;
 use App\Entity\ReservationOrigin;
 use App\Entity\ReservationStatus;
+use App\Exception\PublicBookingException;
 use App\Kernel;
 use App\Service\OnlineBooking\OnlineBookingConfigService;
 use App\Service\OnlineBooking\PublicAvailabilityService;
@@ -24,6 +25,7 @@ use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Tester\CommandTester;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * A public booking checks availability and persists the reservation later in the same
@@ -121,7 +123,12 @@ final class SqlitePublicBookingConcurrencyTest extends KernelTestCase
         // Writers are serialized: the second one waits for the lock and gives up after
         // busy_timeout instead of booking against a stale availability snapshot.
         self::assertSame('booked', $firstOutcome);
-        self::assertStringContainsString('database is locked', $concurrentOutcome);
+        self::assertSame('rejected: '.PublicBookingException::class.': online_booking.error.booking_busy', $concurrentOutcome);
+        /** @var TranslatorInterface $translator */
+        $translator = self::getContainer()->get(TranslatorInterface::class);
+        foreach (['de', 'en'] as $locale) {
+            self::assertNotSame('online_booking.error.booking_busy', $translator->trans('online_booking.error.booking_busy', [], null, $locale));
+        }
         self::assertSame(1, $manager->getRepository(Customer::class)->count(['firstname' => 'First']));
         self::assertSame(0, $manager->getRepository(Customer::class)->count(['firstname' => 'Concurrent']));
         self::assertSame([], $manager->getConnection()->fetchAllAssociative('PRAGMA foreign_key_check'));

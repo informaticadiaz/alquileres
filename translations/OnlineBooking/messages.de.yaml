@@ -29,6 +29,7 @@ online_booking:
     qty_sum_mismatch: "Die gewählten Zimmermengen passen nicht zur angefragten Zimmeranzahl."
     select_at_least_one_room: "Bitte wählen Sie mindestens ein Zimmer aus."
     room_type_no_longer_available: "Eine ausgewählte Zimmerart ist nicht mehr verfügbar."
+    booking_busy: "Gerade werden viele Buchungen verarbeitet. Bitte versuchen Sie es in einem Moment erneut."
     insufficient_capacity: "Die ausgewählten Zimmer bieten nicht genug Kapazität."
     guest_distribution_invalid: "Die Gästeanzahl kann nicht auf die ausgewählten Zimmer verteilt werden."
     guest_distribution_failed: "Die Verteilung der Gäste auf die Zimmer ist fehlgeschlagen."

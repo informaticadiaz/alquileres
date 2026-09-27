@@ -16,6 +16,7 @@ use App\Repository\AppartmentRepository;
 use App\Repository\CustomerRepository;
 use App\Repository\GuestCategoryRepository;
 use App\Event\OnlineBookingCreatedEvent;
+use Doctrine\DBAL\Exception\LockWaitTimeoutException;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Uid\Uuid;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
@@ -136,7 +137,12 @@ class PublicBookingService
         // concurrent booking cannot claim the same room in between; on SQLite the transaction
         // holds the write lock from its start. A failure also leaves no orphan booker behind.
         $connection = $this->em->getConnection();
-        $connection->beginTransaction();
+        try {
+            $connection->beginTransaction();
+        } catch (LockWaitTimeoutException $exception) {
+            // Another booking held the write lock longer than the busy timeout.
+            throw new PublicBookingException('online_booking.error.booking_busy', 0, $exception);
+        }
         try {
             $selection = $this->normalizeOccupancySelection($occupancySelection);
             $availability = $this->resolveAvailability($calendarRoom, $dateFrom, $dateTo, $persons, $roomsCount, $config, $guestCounts);
@@ -197,6 +203,10 @@ class PublicBookingService
             $connection->commit();
         } catch (\Throwable $exception) {
             $connection->rollBack();
+
+            if ($exception instanceof LockWaitTimeoutException) {
+                throw new PublicBookingException('online_booking.error.booking_busy', 0, $exception);
+            }
 
             throw $exception;
         }

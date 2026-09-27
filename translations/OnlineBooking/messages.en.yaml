@@ -29,6 +29,7 @@ online_booking:
     qty_sum_mismatch: "Selected room quantities do not match the requested room count."
     select_at_least_one_room: "Please select at least one room."
     room_type_no_longer_available: "A selected room type is no longer available."
+    booking_busy: "Many bookings are being processed right now. Please try again in a moment."
     insufficient_capacity: "Selected rooms do not provide enough capacity."
     guest_distribution_invalid: "Guest count cannot be distributed across the selected rooms."
     guest_distribution_failed: "Guest distribution failed."
