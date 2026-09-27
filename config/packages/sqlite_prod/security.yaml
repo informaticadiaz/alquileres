@@ -1,0 +1,8 @@
+security:
+    firewalls:
+        main:
+            # Public exposure: at most 5 failed logins per visitor IP and username
+            # within 15 minutes (the visitor IP comes from the trusted cloudflared proxy).
+            login_throttling:
+                max_attempts: 5
+                interval: '15 minutes'

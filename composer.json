@@ -115,7 +115,7 @@
     },
     "extra": {
         "runtime": {
-            "prod_envs": ["prod"]
+            "prod_envs": ["prod", "sqlite_prod"]
         },
         "symfony": {
             "allow-contrib": false,
