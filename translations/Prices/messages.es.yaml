@@ -1,0 +1,111 @@
+price.abbreviation.alldays: Todos los días
+price.abbreviation.friday: Vi
+price.abbreviation.monday: Lu
+price.abbreviation.saturday: Sá
+price.abbreviation.sunday: Do
+price.abbreviation.thursday: Ju
+price.abbreviation.tuesday: Ma
+price.abbreviation.wednesday: Mi
+price.active: Activo
+price.alldays: Todos los días
+price.appartment: Habitación
+price.appartment.hint: 'Solo se completa si se seleccionó el tipo: precio de habitación.'
+price.breakfast: Desayuno
+price.category: Categoría
+price.category.all: Todas las categorías
+price.category.misc.hint: 'Opcional: sin selección, el precio se aplica a todas las categorías de habitación.'
+price.overview.section.appartment: Precios de habitaciones
+price.overview.section.miscellaneous: Otros precios
+price.category.appartment.hint: 'El precio se aplica a todas las categorías de habitación seleccionadas.'
+price.collapsable.group.1.description: General
+price.collapsable.group.2.description: Información de temporada
+price.collapsable.group.3.description: Específico de la habitación
+price.collapsable.group.4.description: Paquete con varios tipos de impuesto (opcional)
+price.package.enable: Configurar como paquete
+price.package.hint: >-
+  Divide este precio en componentes con distintos tipos de IVA (p. ej., comida
+  7 %, bebidas 19 %). Los componentes se muestran como líneas separadas en la
+  factura.
+price.package.col.description: Descripción
+price.package.col.vat: IVA
+price.package.col.allocation_type: Tipo
+price.package.col.value: Valor
+price.package.col.remainder: Resto
+price.package.col.revenue_account: Cuenta de ingresos
+price.revenue_account: Cuenta de ingresos
+price.revenue_account.default: Predeterminada (según el tipo de impuesto)
+price.revenue_account.help: >-
+  Opcional y solo se usa en flujos de trabajo. Indica a qué cuenta de ingresos
+  se contabiliza este precio en el libro diario. Si está vacía, se usa la
+  cuenta predeterminada del tipo de impuesto (p. ej., 8300 para 7 %, 8400 para
+  19 %). Es útil cuando ciertos ingresos (comida, bebidas, tasa turística)
+  deben ir a cuentas separadas.
+price.package.remainder.help: >-
+  Marca este componente como resto. Su valor se calcula automáticamente con lo
+  que queda después de restar todos los demás componentes del precio total. Es
+  útil cuando se combinan componentes porcentuales y de importe fijo, o para
+  absorber centavos de redondeo. Solo un componente por paquete puede marcarse
+  como resto.
+price.package.add_row: Agregar componente
+price.package.taxrates.empty: No hay tipos de impuesto configurados. Configura los tipos de impuesto en la configuración del libro diario antes de crear componentes de paquete.
+price.package.overview.badge: Paquete (%count%)
+price.package.overview.tooltip: Contiene %count% componentes de paquete.
+price.package.sum_preview: Vista previa de la suma
+price.package.allocation.percent: Porcentaje
+price.package.allocation.amount: Importe
+price.package.error.description_required: Cada componente del paquete requiere una descripción.
+price.package.error.vat_negative: El IVA de un componente del paquete no puede ser negativo.
+price.package.error.value_required: Cada componente del paquete requiere un valor mayor que cero (salvo que esté marcado como resto).
+price.package.error.multiple_remainder: Solo un componente del paquete puede marcarse como resto.
+price.package.error.sum_mismatch: Los componentes del paquete no suman el precio total.
+price.package.error.percent_over_100: Los componentes porcentuales superan el 100 %.
+price.package.error.amount_over_total: Los componentes de importe fijo superan el precio total.
+price.daysinweek: Días de la semana de validez
+price.delete.ask: ¿Seguro que quieres eliminar este precio?
+price.description: Descripción
+price.double: Habitación doble (1 noche)
+price.end: Hasta
+price.flash.create.conflict: >-
+  No se pudo guardar la categoría de precio porque hay conflictos con las
+  siguientes categorías activas:
+price.flash.create.success: El precio se creó correctamente.
+price.flash.delete.success: La categoría de precio se eliminó correctamente.
+price.flash.edit.success: El precio se procesó correctamente.
+price.friday: Viernes
+price.from: Desde
+price.inactive: Inactivo
+price.includesvat: IVA incl.
+price.isflatprice: tarifa plana
+price.perroom: por noche (si no, por persona)
+price.defaultactiveinreservationcreation: activo de forma predeterminada al crear una reserva
+price.bookableonline: Disponible para reserva online
+price.brokered: Incluir en las comisiones del portal
+price.brokered.hint: Determina si el portal cobra una comisión o un cargo por pago por este servicio. Desactívalo para servicios agregados en el lugar, como un desayuno pedido en recepción.
+price.mandatoryonline: Obligatorio en la reserva online
+price.mandatoryonline.hint: El huésped no puede quitar este elemento.
+price.visibility.label: Visibilidad y disponibilidad
+price.calculation_type.label: Tipo de cálculo
+price.calculation_type.flat: Precio fijo (por reserva)
+price.calculation_type.per_person: Por noche, por persona
+price.calculation_type.per_room: Por noche, por habitación
+price.minstay: El precio se aplica a partir de … noches
+price.miscellaneous: Otro precio
+price.monday: Lunes
+price.numberofbeds: Cantidad de camas
+price.numberofpersons: Cantidad de personas
+price.origin: Origen
+price.price: Precio
+price.saturday: Sábado
+price.season: Período
+price.season.hint: Las categorías con un período tienen prioridad sobre las categorías sin período.
+price.seasonend: Fin de temporada
+price.seasonstart: Inicio de temporada
+price.single: Habitación individual (1 noche)
+price.sunday: Domingo
+price.thursday: Jueves
+price.tuesday: Martes
+price.type: Tipo
+price.vat: Impuesto
+price.wednesday: Miércoles
+price.weekdays: Días de la semana
+price.persons: Pers.
