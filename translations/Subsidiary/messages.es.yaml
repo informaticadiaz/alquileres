@@ -1,0 +1,47 @@
+object.action: Acción
+object.check_in: Check-in y check-out
+object.check_in.from: check-in desde
+object.check_in.help: 'Normas de la casa para la llegada y la salida. Se pueden insertar en plantillas de cartas y correos electrónicos con el fragmento "Horarios de check-in del establecimiento" y consultar a través de la API REST. Déjalo vacío para no publicar nada.'
+object.check_in.until: check-in hasta
+object.check_in.value.from: 'Check-in desde las %from%'
+object.check_in.value.window: 'Check-in %from%-%until%'
+object.check_in.window: Check-in
+object.check_in.window.help: 'El segundo campo es el límite superior. Déjalo vacío si también es posible llegar más tarde. Una hora de fin anterior a la de inicio significa que el horario pasa la medianoche, p. ej., 17:00-02:00.'
+object.check_in_note: Nota sobre los horarios de check-in
+object.check_in_note.help: 'Texto libre que se imprime junto con los horarios, para todo lo que no se puede expresar con dos horas.'
+object.check_in_note.placeholder: 'p. ej., llegada más tarde a convenir; solo llámanos'
+object.check_out.until: Check-out hasta
+object.check_out.value: 'Check-out hasta las %until%'
+object.delete.ask: ¿Seguro que quieres eliminar este establecimiento?
+object.description: Descripción
+object.flash.check_in_window.invalid: 'El horario de check-in no es válido. Indica una hora de inicio y una hora de fin distinta, o deja vacío el segundo campo.'
+object.flash.create.success: El establecimiento se creó correctamente.
+object.flash.delete.error.still.in.use: El establecimiento no se puede eliminar porque todavía tiene habitaciones asignadas.
+object.flash.delete.success: El establecimiento se eliminó correctamente.
+object.flash.edit.success: El establecimiento se actualizó correctamente.
+object.flash.opening_hours.incomplete: 'Uno de los rangos del horario de atención está completo solo a medias. Indica "desde" y "hasta", o vacía ambos campos.'
+object.flash.invoice_number_pattern.invalid: El rango de números de factura no es válido. Necesita exactamente un marcador <number> y solo puede usar marcadores conocidos.
+object.invoice_number_pattern: Rango propio de números de factura
+object.invoice_number_pattern.help: 'Déjalo vacío para usar el rango predeterminado de la configuración. Marcadores: <code>&lt;year&gt;</code>, <code>&lt;year2&gt;</code>, <code>&lt;month&gt;</code>, <code>&lt;day&gt;</code>, <code>&lt;number:4&gt;</code>. Las facturas de las habitaciones de este establecimiento tendrán entonces su propio número correlativo.'
+object.invoice_number_pattern.placeholder: 'p. ej., RE-<year>-<number:4>'
+object.name: Establecimiento
+object.opening_hours: Horario de atención
+object.opening_hours.from: desde
+object.opening_hours.help: 'Déjalo vacío si está cerrado. Los horarios se pueden insertar en plantillas de cartas y correos electrónicos con el fragmento "Horario de atención del establecimiento" y consultar a través de la API REST.'
+object.opening_hours_note: Nota sobre el horario de atención
+object.opening_hours_note.help: 'Texto libre que se imprime junto con el horario, para todo lo que no se puede expresar con una grilla semanal.'
+object.opening_hours_note.placeholder: 'p. ej., fuera de este horario a convenir, teléfono 0123 456'
+object.opening_hours.period.1: Período 1
+object.opening_hours.period.2: Período 2
+object.opening_hours.to: hasta
+object.tab.general: General
+object.tab.invoice_data: Datos de facturación
+object.tab.service_times: Horarios de atención
+object.title: Administración de establecimientos
+object.weekday.1: Lunes
+object.weekday.2: Martes
+object.weekday.3: Miércoles
+object.weekday.4: Jueves
+object.weekday.5: Viernes
+object.weekday.6: Sábado
+object.weekday.7: Domingo
