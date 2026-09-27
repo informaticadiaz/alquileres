@@ -1,0 +1,10 @@
+release_notes:
+  page_title: "Novedades"
+  nav: "Novedades"
+  installed_version: "Versión instalada: %version%"
+  current: "Actual"
+  all: "Todos los cambios"
+  got_it: "Entendido"
+  empty: "Esta instalación no incluye notas de versión."
+  announce:
+    title: "Novedades de fewohbee %version%"
