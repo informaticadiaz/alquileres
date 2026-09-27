@@ -2,26 +2,26 @@ login:
   oidc:
     error:
       already_linked: >-
-        Este usuario ya está vinculado a otra cuenta de SSO. Comuníquese con su
+        Este usuario ya está vinculado a otra cuenta de SSO. Comunícate con tu
         administrador.
       ambiguous: >-
         Esta dirección de correo electrónico pertenece a más de un usuario.
-        Comuníquese con su administrador.
+        Comunícate con tu administrador.
       disabled: >-
         El inicio de sesión por SSO no está disponible en este momento.
-        Comuníquese con su administrador.
+        Comunícate con tu administrador.
       email_unverified: >-
-        Su proveedor de identidad no confirmó su dirección de correo
+        Tu proveedor de identidad no confirmó tu dirección de correo
         electrónico, por lo que no es posible iniciar sesión.
       inactive: Esta cuenta de usuario está desactivada.
       no_match: >-
-        No existe un usuario de FewohBee para esta cuenta. Solicite a su
+        No existe un usuario de FewohBee para esta cuenta. Pídele a tu
         administrador que cree uno.
       password_disabled: >-
-        El inicio de sesión con contraseña está deshabilitado. Inicie sesión
+        El inicio de sesión con contraseña está deshabilitado. Inicia sesión
         mediante SSO.
       provider: Se canceló el inicio de sesión.
       state: >-
-        El inicio de sesión expiró o se interrumpió. Vuelva a intentarlo.
+        El inicio de sesión expiró o se interrumpió. Vuelve a intentarlo.
       token: >-
-        No se pudo completar el inicio de sesión. Vuelva a intentarlo.
+        No se pudo completar el inicio de sesión. Vuelve a intentarlo.
