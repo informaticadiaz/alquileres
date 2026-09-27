@@ -1,0 +1,119 @@
+guest_category:
+  title: "Categorías de huésped"
+  description: "Administra las categorías de huésped (p. ej., adultos, niños, huéspedes exentos)"
+  add: "Agregar categoría de huésped"
+  delete:
+    ask: "¿Seguro que quieres eliminar esta categoría de huésped?"
+  system:
+    locked: "Las categorías del sistema no se pueden eliminar."
+  persons_total: "Total de personas (ocupación)"
+  not_in_room_price: "No incluido en el precio de la habitación"
+  not_in_room_price.help: "Los huéspedes de esta categoría no cuentan para la ocupación de la habitación ni forman parte del precio de la habitación: se excluyen automáticamente del cargo por noche. Aquí no se necesita ni tiene efecto un modificador de precio (p. ej., \"gratis\")."
+
+  flag:
+    adult: "Adulto"
+    occupancy: "ocupa una cama de la habitación"
+    no_occupancy: "no ocupa una cama de la habitación"
+
+  warning:
+    no_adult: "Esta reserva no incluye ningún huésped adulto. Activa la excepción de abajo para guardarla de todos modos."
+    over_capacity: "Se alcanzó la capacidad de camas de la habitación."
+
+  field:
+    name: "Nombre"
+    acronym: "Sigla"
+    acronym.help: "Etiqueta corta, p. ej., ADT, C6-16, INF."
+    statistical_group: "Grupo"
+    statistical_group.help: "Define cómo se evalúa esta categoría. Las categorías del grupo \"Adulto\" cumplen la comprobación de que una reserva normalmente necesita al menos un huésped adulto."
+    is_counted_in_occupancy: "Cuenta como cama ocupada"
+    is_counted_in_occupancy.help: "Actívalo cuando los huéspedes de esta categoría ocupen una cama de la habitación. Esta cantidad se resta de las camas disponibles. Desactívalo, por ejemplo, para bebés en cuna."
+    min_age: "Edad mín."
+    max_age: "Edad máx."
+    sort_order: "Orden"
+    active: "Activo"
+    subsidiaries: "Disponible en los establecimientos"
+    subsidiaries.help: "Vacío = disponible globalmente."
+    adult_rule_override: "Permitir esta reserva sin un huésped adulto"
+
+  statistical_group:
+    adult: "Adulto"
+    child: "Niño"
+    infant: "Bebé"
+    other: "Otro"
+
+  col:
+    name: "Nombre"
+    acronym: "Sigla"
+    statistical_group: "Grupo"
+    flags: "Indicadores"
+    age: "Edad"
+    active: "Activo"
+    action: "Acción"
+    count: "Cantidad"
+
+  flash:
+    create:
+      success: "Categoría de huésped creada."
+    edit:
+      success: "Categoría de huésped guardada."
+    delete:
+      success: "Categoría de huésped eliminada."
+      error:
+        system: "Las categorías del sistema no se pueden eliminar."
+
+  default:
+    adult:
+      name: "Adultos"
+      acronym: "ADT"
+    child:
+      name: "Niño 6–17"
+      acronym: "C6-17"
+    infant:
+      name: "Bebé 0–5"
+      acronym: "INF"
+    exempt:
+      name: "Huéspedes exentos"
+      acronym: "NL"
+
+guest_category_modifier:
+  title: "Recargos / descuentos por categoría"
+  description: "Define un recargo, descuento, tarifa fija o \"gratis\" por categoría de huésped sobre la tarifa por noche. La tarifa de adulto sigue siendo el precio base. Los modificadores solo se aplican a tarifas por noche calculadas por persona, no a precios de tarifa plana ni por habitación."
+  threshold_hint: "A partir de qué ocupación se aplican estos modificadores (mínimo de huéspedes con tarifa completa) se configura en cada categoría de habitación; p. ej., para que los niños solo tengan descuento a partir de 3 huéspedes."
+  add: "Agregar modificador"
+  empty: "Todavía no hay modificadores configurados: las tarifas por noche se aplican sin cambios para todas las categorías."
+  delete:
+    ask: "¿Seguro que quieres eliminar este modificador?"
+
+  type:
+    surcharge_absolute: "Recargo (importe)"
+    discount_percent: "Descuento (%)"
+    flat_rate: "Tarifa fija por noche"
+    free: "Gratis"
+
+  field:
+    category: "Categoría de huésped"
+    category.help: "Solo se listan las categorías sobre las que puede actuar un modificador: ninguna categoría de adultos (son la tarifa base) y solo las categorías que cuentan para la ocupación de la habitación. Los huéspedes que no ocupan cama (p. ej., bebés en cuna) no se facturan en la línea de la habitación."
+    type: "Tipo de modificador"
+    type.help: "El recargo suma un importe a la tarifa de adulto. El descuento resta un porcentaje. La tarifa fija reemplaza la tarifa de adulto. Gratis = 0.00."
+    value: "Valor"
+    value.help: "Importe en la moneda configurada para recargo/tarifa fija, porcentaje para descuento. Se ignora para \"Gratis\"."
+    valid_from: "Válido desde"
+    valid_to: "Válido hasta"
+    sort_order: "Orden"
+    active: "Activo"
+
+  col:
+    category: "Categoría de huésped"
+    type: "Tipo"
+    value: "Valor"
+    validity: "Vigencia"
+    active: "Activo"
+    action: "Acción"
+
+  flash:
+    create:
+      success: "Modificador creado."
+    edit:
+      success: "Modificador guardado."
+    delete:
+      success: "Modificador eliminado."
