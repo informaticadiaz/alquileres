@@ -1,0 +1,19 @@
+# Operational SQLite profile. Upstream production settings are inherited through
+# the when@sqlite_prod aliases of the when@prod blocks in config/packages/.
+imports:
+    - { resource: '../../sqlite/doctrine.yaml' }
+    - { resource: '../../sqlite/doctrine_migrations.yaml' }
+
+parameters:
+    # Persistent database outside the repository, e.g. ~/.local/share/fewohbee/fewohbee.sqlite.
+    fewohbee.sqlite_path: '%env(FEWOHBEE_SQLITE_PATH)%'
+
+framework:
+    session:
+        # A user service cannot rely on the system session directory: it is only cleaned
+        # by the distribution's php-fpm/Apache job, and PHP CLI disables its own GC.
+        handler_id: 'session.handler.native_file'
+        save_path: '%kernel.project_dir%/var/sessions/%kernel.environment%'
+        gc_probability: 1
+        gc_divisor: 100
+        gc_maxlifetime: 86400

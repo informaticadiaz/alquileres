@@ -1,23 +1,7 @@
-doctrine:
-    dbal:
-        # SQLite compares dates as text; see App\Doctrine\SqliteDateType.
-        types:
-            date: App\Doctrine\SqliteDateType
-            date_immutable: App\Doctrine\SqliteDateImmutableType
-        connections:
-            default:
-                driver: 'pdo_sqlite'
-                url: 'sqlite:///%kernel.project_dir%/var/sqlite-test/fewohbee.sqlite'
-                server_version: null
-                charset: null
-                default_table_options: []
-                # Both connections share one file: skip the profile bookkeeping tables
-                # (no entity mapping) and the table owned by the geo connection.
-                schema_filter: '~^(?!(fewohbee_sqlite_baseline_metadata|fewohbee_sqlite_migration_versions|postal_code_data)$)~'
-            geo:
-                driver: 'pdo_sqlite'
-                url: 'sqlite:///%kernel.project_dir%/var/sqlite-test/fewohbee.sqlite'
-                server_version: null
-                charset: null
-                default_table_options: []
-                schema_filter: '~^postal_code_data$~'
+imports:
+    - { resource: '../../sqlite/doctrine.yaml' }
+    - { resource: '../../sqlite/doctrine_migrations.yaml' }
+
+parameters:
+    # Ephemeral fixture used by the SQLite functional tests.
+    fewohbee.sqlite_path: '%kernel.project_dir%/var/sqlite-test/fewohbee.sqlite'

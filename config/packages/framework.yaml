@@ -119,8 +119,11 @@ when@dev:
             not_compromised_password:
                 enabled: false
 
-when@prod:
+when@prod: &when_prod
     framework:
         validation:
             not_compromised_password:
                 enabled: '%env(bool:USE_PASSWORD_BLACKLIST)%'
+
+# FewohBee SQLite market-validation profile: same production settings.
+when@sqlite_prod: *when_prod

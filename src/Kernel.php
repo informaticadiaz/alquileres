@@ -29,7 +29,7 @@ class Kernel extends BaseKernel
     protected function build(ContainerBuilder $container): void
     {
         // The SQLite market-validation profile must never see the MySQL migration history.
-        if ('sqlite_test' === $this->environment) {
+        if (\in_array($this->environment, ['sqlite_test', 'sqlite_prod'], true)) {
             $container->addCompilerPass(new SqliteMigrationLinePass());
         }
     }

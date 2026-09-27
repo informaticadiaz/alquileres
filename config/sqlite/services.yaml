@@ -1,0 +1,18 @@
+# Shared services of the SQLite profiles (sqlite_test, sqlite_prod).
+services:
+    App\Doctrine\SqliteConnectionPragmaMiddleware:
+        tags:
+            - { name: doctrine.middleware, connection: default }
+            - { name: doctrine.middleware, connection: geo }
+
+    App\Sqlite\SqliteBaselineInitializer:
+        autowire: true
+        public: true
+        arguments:
+            $migrations: '@doctrine.migrations.dependency_factory'
+
+    # First run seeds local templates instead of downloading them.
+    App\DataFixtures\TemplatesFixtures:
+        autowire: true
+        arguments:
+            $useSqliteLocalTemplates: true

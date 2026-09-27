@@ -5,7 +5,10 @@ framework:
             - assets/
         missing_import_mode: strict
 
-when@prod:
+when@prod: &when_prod
     framework:
         asset_mapper:
             missing_import_mode: warn
+
+# FewohBee SQLite market-validation profile: same production settings.
+when@sqlite_prod: *when_prod

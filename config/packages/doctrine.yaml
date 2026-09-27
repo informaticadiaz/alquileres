@@ -103,7 +103,7 @@ when@test:
                     url: '%env(resolve:DATABASE_URL)%'
                     dbname_suffix: '_test%env(default::TEST_TOKEN)%'
 
-when@prod:
+when@prod: &when_prod
     doctrine:
         orm:
             query_cache_driver:
@@ -120,3 +120,6 @@ when@prod:
                     adapter: cache.app
                 doctrine.system_cache_pool:
                     adapter: cache.system
+
+# FewohBee SQLite market-validation profile: same production settings.
+when@sqlite_prod: *when_prod

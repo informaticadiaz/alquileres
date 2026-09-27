@@ -1,0 +1,27 @@
+# Shared Doctrine settings of the SQLite profiles (sqlite_test, sqlite_prod).
+# Each profile imports this file and defines the fewohbee.sqlite_path parameter.
+doctrine:
+    dbal:
+        # SQLite compares dates as text; see App\Doctrine\SqliteDateType.
+        types:
+            date: App\Doctrine\SqliteDateType
+            date_immutable: App\Doctrine\SqliteDateImmutableType
+        connections:
+            default:
+                driver: 'pdo_sqlite'
+                url: null
+                path: '%fewohbee.sqlite_path%'
+                server_version: null
+                charset: null
+                default_table_options: []
+                # Both connections share one file: skip the profile bookkeeping tables
+                # (no entity mapping) and the table owned by the geo connection.
+                schema_filter: '~^(?!(fewohbee_sqlite_baseline_metadata|fewohbee_sqlite_migration_versions|postal_code_data)$)~'
+            geo:
+                driver: 'pdo_sqlite'
+                url: null
+                path: '%fewohbee.sqlite_path%'
+                server_version: null
+                charset: null
+                default_table_options: []
+                schema_filter: '~^postal_code_data$~'

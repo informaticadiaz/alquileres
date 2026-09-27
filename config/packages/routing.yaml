@@ -8,7 +8,10 @@ framework:
         # See https://symfony.com/doc/current/routing.html#generating-urls-in-commands
         default_uri: '%env(DEFAULT_URI)%'
 
-when@prod:
+when@prod: &when_prod
     framework:
         router:
             strict_requirements: null
+
+# FewohBee SQLite market-validation profile: same production settings.
+when@sqlite_prod: *when_prod
