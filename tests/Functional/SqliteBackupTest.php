@@ -101,6 +101,44 @@ final class SqliteBackupTest extends KernelTestCase
         self::assertSame('ok', $manager->getConnection()->fetchOne('PRAGMA integrity_check'));
     }
 
+    public function testScheduledBackupsKeepOnlyTheNewestVerifiedCopies(): void
+    {
+        self::bootKernel(['environment' => 'sqlite_test']);
+        $this->prepareInstallation();
+
+        $directory = dirname($this->backupPath);
+        mkdir($directory, 0700, true);
+        // Files that do not follow the backup naming scheme are never touched.
+        file_put_contents($directory.'/notes.txt', 'keep me');
+
+        $created = [];
+        for ($run = 1; $run <= 3; ++$run) {
+            $tester = new CommandTester((new Application(self::$kernel))->find('app:sqlite:backup'));
+            self::assertSame(Command::SUCCESS, $tester->execute(['--dir' => $directory, '--keep' => 2]), $tester->getDisplay());
+            $created[] = $this->latestBackupIn($directory);
+        }
+
+        $remaining = glob($directory.'/fewohbee-*.sqlite') ?: [];
+        sort($remaining);
+        self::assertSame([$created[1], $created[2]], $remaining);
+        self::assertFileExists($directory.'/notes.txt');
+        self::assertSame('0600', substr(sprintf('%o', fileperms($created[2])), -4));
+
+        // The target argument and --dir are mutually exclusive; --keep needs --dir.
+        $invalid = new CommandTester((new Application(self::$kernel))->find('app:sqlite:backup'));
+        self::assertSame(Command::INVALID, $invalid->execute(['target' => $this->backupPath, '--dir' => $directory]));
+        self::assertSame(Command::INVALID, $invalid->execute(['target' => $this->backupPath, '--keep' => 2]));
+    }
+
+    private function latestBackupIn(string $directory): string
+    {
+        $files = glob($directory.'/fewohbee-*.sqlite') ?: [];
+        sort($files);
+        self::assertNotSame([], $files);
+
+        return end($files);
+    }
+
     private function prepareInstallation(): void
     {
         /** @var SqliteBaselineInitializer $baseline */
@@ -146,8 +184,12 @@ final class SqliteBackupTest extends KernelTestCase
                 unlink($path);
             }
         }
-        if (is_dir(dirname($this->backupPath))) {
-            rmdir(dirname($this->backupPath));
+        $directory = dirname($this->backupPath);
+        if (is_dir($directory)) {
+            foreach (glob($directory.'/*') ?: [] as $file) {
+                unlink($file);
+            }
+            rmdir($directory);
         }
     }
 }

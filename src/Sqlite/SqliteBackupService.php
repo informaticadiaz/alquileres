@@ -24,6 +24,37 @@ final class SqliteBackupService
     {
     }
 
+    private const SCHEDULED_PREFIX = 'fewohbee-';
+    private const SCHEDULED_SUFFIX = '.sqlite';
+
+    /**
+     * Writes a timestamped backup into $directory and, once it is verified, removes the
+     * oldest scheduled backups beyond $keep. Only files following the backup naming
+     * scheme are ever removed.
+     *
+     * @return string path of the new backup
+     *
+     * @throws \RuntimeException when the backup cannot be written or fails verification
+     */
+    public function backupToDirectory(string $directory, int $keep): string
+    {
+        if ($keep < 1) {
+            throw new \RuntimeException('At least one backup must be kept.');
+        }
+
+        $now = new \DateTimeImmutable();
+        $target = sprintf('%s/%s%s%s', rtrim($directory, '/'), self::SCHEDULED_PREFIX, $now->format('Ymd-His-u'), self::SCHEDULED_SUFFIX);
+        $this->backup($target);
+
+        $existing = glob(sprintf('%s/%s*%s', rtrim($directory, '/'), self::SCHEDULED_PREFIX, self::SCHEDULED_SUFFIX)) ?: [];
+        sort($existing);
+        foreach (\array_slice($existing, 0, max(0, \count($existing) - $keep)) as $outdated) {
+            unlink($outdated);
+        }
+
+        return $target;
+    }
+
     /**
      * @throws \RuntimeException when the target exists, cannot be written or fails verification
      */
@@ -39,7 +70,7 @@ final class SqliteBackupService
         }
 
         $directory = \dirname($target);
-        if (!is_dir($directory) && !mkdir($directory, 0770, true) && !is_dir($directory)) {
+        if (!is_dir($directory) && !mkdir($directory, 0700, true) && !is_dir($directory)) {
             throw new \RuntimeException(sprintf('Could not create backup directory "%s".', $directory));
         }
 
@@ -58,6 +89,9 @@ final class SqliteBackupService
 
             throw new \RuntimeException(sprintf('Backup "%s" failed verification and was removed: %s', $target, $exception->getMessage()), 0, $exception);
         }
+
+        // Backups contain guest data: readable by the service user only.
+        chmod($target, 0600);
     }
 
     private function verify(string $path): void
