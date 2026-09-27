@@ -1,0 +1,190 @@
+invoice.action: Acción
+invoice.add.another.reservation: Agregar otra reserva
+invoice.appartment: Posiciones de habitación
+invoice.appartment.persons: '{1} %count% persona|]1,Inf] %count% personas'
+invoice.appartment.position.beds: Camas
+invoice.appartment.position.category: Categoría
+invoice.appartment.position.description: Descripción
+invoice.appartment.position.enddate: Hasta
+invoice.appartment.position.number: Habitación
+invoice.appartment.position.person: Persona
+invoice.appartment.position.persons: Personas
+invoice.appartment.position.price: Precio
+invoice.appartment.position.pricecategory: Categoría de precio
+invoice.appartment.position.startdate: Desde
+invoice.appartment.position.vat: Impuesto
+invoice.brutto: Bruto
+invoice.company: Empresa
+invoice.containing.vat: IVA incluido
+invoice.customer.recommendation: Preselección
+invoice.customer.section.contact: Contacto
+invoice.customer.section.address: Dirección
+invoice.customer.section.communication: Teléfono y correo electrónico
+invoice.customer.section.einvoice: Datos de factura electrónica
+invoice.customer.section.payment: Datos de pago
+invoice.customer.einvoice.hint: Solo es necesario al enviar facturas electrónicas a organismos públicos (XRechnung). Los huéspedes particulares y las empresas normalmente no necesitan estos campos.
+invoice.customer.payment.hint: Solo es necesario para pago con tarjeta o débito directo SEPA.
+invoice.date: Fecha de factura
+invoice.date2: Fecha
+invoice.delete.ask: ¿Eliminar esta factura?
+invoice.description: Administración de facturas
+invoice.details: Detalles de la factura
+invoice.enddate: Hasta
+invoice.flash.create.success: La factura se creó correctamente.
+invoice.flash.delete.not.possible: No se pudo eliminar la factura.
+invoice.flash.delete.success: La factura se eliminó correctamente.
+invoice.flash.edit.success: La factura se procesó correctamente.
+invoice.guest: Huésped
+invoice.id: ID de factura
+invoice.id.last: 'Última: '
+invoice.number.missing.error: Ingresa un número de factura antes de continuar.
+invoice.number.duplicate.error: Este número de factura ya está en uso. Elige otro.
+invoice.number.range.hint: 'Rango de números: %range%'
+invoice.number.range.global: Predeterminado
+invoice.lastname: Apellido
+invoice.miscellaneous: Varios
+invoice.miscellaneous.position.amount: Cantidad
+invoice.miscellaneous.position.amount.flat_help: 'Tarifa plana: 1 vez por reserva'
+invoice.netto: Neto
+invoice.number: Número de factura
+invoice.number.short: N.º fact.
+invoice.einvoice: Factura electrónica
+invoice.open.reservations.filter.customer: Buscar reservas por cliente
+invoice.open.reservations.filter.time: Buscar reservas en un período
+invoice.position.add.appartment: Agregar posición de habitación
+invoice.position.add.miscellaneous: Agregar posición varia
+invoice.position.additional: Servicios adicionales
+invoice.position.amount: Cantidad
+invoice.position.appartment: Habitación
+invoice.position.service: Servicio
+invoice.position.stays: Pernoctaciones
+invoice.price.single: Precio unitario
+invoice.price.total: Total
+invoice.remark: Observaciones
+invoice.reservation: Reserva
+invoice.select.customer.search.input.placeholder: Apellido del cliente
+invoice.select.open.reservation: Seleccionar reserva sin factura
+invoice.startdate: Desde
+invoice.status: Estado
+invoice.status.canceled: anulada
+invoice.status.unpaid: Pendiente
+invoice.status.paid: Pagada
+invoice.status.prepaid: pagada parcialmente
+invoice.template: Seleccionar plantilla de factura
+invoice.title: Administración de facturas
+invoice.vat: IVA
+invoice.vatwarning: >-
+  Usas categorías de precio con IVA incluido y sin IVA. Esta combinación puede
+  generar listados incoherentes. Se recomienda usar categorías de precio
+  uniformes.
+invoice.settings.text: Configuración
+invoice.settings.no_settings: No hay más configuraciones disponibles. Agrega una.
+invoice.settings.add: Agregar nueva configuración
+invoice.settings.companyName: Nombre de la empresa
+invoice.settings.taxNumber: Número fiscal
+invoice.settings.vatID: Número de IVA
+invoice.settings.vatID.hint: Para las facturas electrónicas se requiere un número de IVA o un número de registro (un número fiscal por sí solo no es suficiente).
+invoice.settings.registrationNumber: Número de registro
+invoice.settings.registrationNumber.hint: p. ej., número del registro mercantil (HRB/HRA). Alternativa al número de IVA para las facturas electrónicas.
+invoice.settings.selleridentifier.required: 'Ingresa un número de IVA o un número de registro: las facturas electrónicas requieren uno de ellos (un número fiscal por sí solo no es suficiente).'
+invoice.settings.contactName: Nombre de contacto
+invoice.settings.contactDepartment: Departamento
+invoice.settings.contactPhone: Número de teléfono
+invoice.settings.contactMail: Correo electrónico
+invoice.settings.companyInvoiceMail: Correo electrónico de facturación
+invoice.settings.companyAddress: Dirección
+invoice.settings.companyPostCode: Código postal
+invoice.settings.companyCity: Ciudad
+invoice.settings.companyCountry: País
+invoice.settings.accountIBAN: IBAN
+invoice.settings.accountName: Titular de la cuenta
+invoice.settings.accountBIC: BIC
+invoice.settings.paymentTerms: Condiciones de pago
+invoice.settings.paymentDueDays: Días de plazo de pago
+invoice.settings.einvoiceProfile: Perfil de factura electrónica
+invoice.settings.einvoiceProfile.xrechnung: XRechnung (B2G)
+invoice.settings.einvoiceProfile.en16931: ZUGFeRD (EN 16931) – recomendado
+invoice.settings.einvoiceProfile.help: ZUGFeRD es suficiente para la mayoría de las empresas y los huéspedes. Elige XRechnung solo si lo necesitas específicamente (p. ej., B2G).
+invoice.settings.profile.hint.en16931: 'ZUGFeRD: tus facturas en PDF contienen automáticamente datos de factura electrónica legibles por máquina. No se requieren más datos que los campos de abajo.'
+invoice.settings.profile.hint.xrechnung: 'XRechnung: el nombre de contacto, el teléfono y el correo electrónico son obligatorios, y cada factura necesita una referencia del comprador (Leitweg-ID) y un medio de pago.'
+invoice.settings.section.profile: Perfil de factura electrónica
+invoice.settings.section.company: Empresa
+invoice.settings.section.contact: Contacto
+invoice.settings.section.tax: Impuestos
+invoice.settings.section.payment: Pago
+invoice.settings.xrechnung.contact.error: Este campo es obligatorio para el perfil XRechnung.
+invoice.settings.form.error: No se guardó nada. Corrige los campos resaltados abajo.
+invoice.settings.xrechnung.required.hint: '* Estos campos son obligatorios para el perfil XRechnung (B2G).'
+invoice.settings.help.general: La información ingresada aquí es necesaria para la exportación digital de facturas (factura electrónica).
+invoice.settings.help.invoiceMail: Indica la dirección de correo electrónico a la que se puede enviar la respuesta a una factura.
+invoice.settings.flash.create.success: La nueva configuración se agregó correctamente.
+invoice.settings.flash.edit.success: La configuración se editó correctamente.
+invoice.settings.flash.delete.success: La configuración se eliminó correctamente.
+invoice.settings.title.einvoice: Factura electrónica
+invoice.settings.title.template: Plantilla de factura
+invoice.settings.active.error: No hay datos de facturación configurados para esta factura. Crea un registro predeterminado, o uno para su establecimiento, en la configuración de facturas.
+invoice.settings.section.scope: Alcance
+invoice.settings.scope: Estos datos de facturación se aplican a
+invoice.settings.scope.help: Estos datos se usan solo para la factura electrónica (XML). Lo que aparece en la factura en PDF proviene de la plantilla de factura y no se ve afectado. Si administras varios establecimientos con distintas empresas, crea un registro por establecimiento.
+invoice.settings.scope.default: Predeterminado – todos los establecimientos sin datos de facturación propios
+invoice.settings.scope.unused: Sin uso
+invoice.settings.no_default.hint: Ningún registro está marcado como predeterminado. Por eso, los establecimientos sin datos de facturación propios – y las facturas sin establecimiento – no pueden generar una factura electrónica.
+invoice.settings.scope.new: Nuevos datos de facturación
+invoice.settings.subsidiary.taken: Este establecimiento ya tiene datos de facturación asignados. Solo puede haber un registro por establecimiento.
+invoice.settings.creditorReference.label: ID de acreedor
+invoice.settings.creditorReference.hint: El identificador único para el débito directo SEPA
+invoice.settings.paymentterm.error: Se debe completar al menos uno de los campos "Condiciones de pago" o "Días de plazo de pago".
+invoice.einvoice.violation.invoiceNumber: Falta el número de factura (editar factura)
+invoice.einvoice.violation.invoiceDate: Falta la fecha de factura (editar factura)
+invoice.einvoice.violation.buyerName: Falta el nombre o la empresa del destinatario (editar factura)
+invoice.einvoice.violation.buyerStreet: Falta la dirección del destinatario (editar factura)
+invoice.einvoice.violation.buyerCountry: Falta el país del destinatario (editar factura)
+invoice.einvoice.violation.buyerPostCodeCity: Falta el código postal o la ciudad del destinatario (editar factura)
+invoice.einvoice.violation.buyerEmail: Falta la dirección de correo electrónico del destinatario (editar factura)
+invoice.einvoice.violation.buyerReference: Falta la referencia del comprador (Leitweg-ID) (editar factura)
+invoice.einvoice.violation.paymentMeans: No se seleccionó ningún medio de pago (editar factura)
+invoice.einvoice.violation.paymentTerms: No se definieron condiciones de pago ni días de plazo de pago (editar configuración)
+invoice.einvoice.violation.sellerName: Falta el nombre de la empresa (editar configuración)
+invoice.einvoice.violation.sellerAddress: La dirección de la empresa (calle, código postal, ciudad, país) está incompleta (editar configuración)
+invoice.einvoice.violation.sellerIdentifier: Falta el número de IVA o el número de registro; un número fiscal por sí solo no es suficiente para las facturas electrónicas (editar configuración)
+invoice.einvoice.violation.sellerElectronicAddress: Falta el correo electrónico de facturación de la empresa (dirección electrónica) (editar configuración)
+invoice.einvoice.violation.sellerContact: Falta el nombre de contacto, el teléfono o el correo electrónico (editar configuración)
+invoice.einvoice.violation.accountIBAN: Falta el IBAN (editar configuración)
+invoice.einvoice.violation.accountIBANBIC: Falta el IBAN o el BIC (editar configuración)
+invoice.einvoice.violation.cardNumber: Falta el número de tarjeta para el pago con tarjeta (editar factura)
+invoice.einvoice.violation.customerIBAN: Falta el IBAN del cliente para el débito directo (editar factura)
+invoice.einvoice.violation.mandateReference: 'Falta la referencia del mandato para el débito directo (obligatoria para XRechnung; editar factura)'
+invoice.einvoice.violation.creditorReference: Falta el ID de acreedor para el débito directo (editar configuración)
+invoice.einvoice.violation.positions: La factura no tiene posiciones
+invoice.einvoice.fixlocation.invoice: se puede corregir en la factura
+invoice.einvoice.fixlocation.settings: se puede corregir en la configuración de facturas
+invoice.einvoice.status.ready: 'Factura electrónica lista: la descarga en PDF incluye datos de factura electrónica legibles por máquina'
+invoice.einvoice.ready.short: Factura electrónica lista
+invoice.einvoice.notready.short: 'Factura electrónica: faltan datos'
+invoice.einvoice.status.missing: 'Todavía no es posible la factura electrónica, falta información'
+invoice.einvoice.status.notconfigured: La facturación electrónica no está configurada
+invoice.einvoice.export.fallback: No se pudo crear la factura electrónica; en su lugar se generó un PDF simple.
+invoice.einvoice.attach.auto: Se adjuntará como factura electrónica (PDF con XML incrustado)
+invoice.paymentmeans.label: Medio de pago
+CASH: Pago en efectivo
+CHEQUE: Cheque
+CREDIT_TRANSFER: Transferencia bancaria (no SEPA)
+CARD_PAYMENT: Pago con tarjeta
+CREDIT_CARD_PAYMENT: Pago con tarjeta de crédito
+SEPA_CREDIT_TRANSFER: Transferencia bancaria SEPA
+SEPA_DIRECT_DEBIT: Débito directo SEPA
+invoice.misc.package.hint: Este paquete se dividirá en varias líneas al guardar.
+invoice.tourist_tax.heading: Tasa turística
+invoice.apartment_modifier.heading: Recargos / descuentos
+invoice.apartment_modifier.position: '%category% — %modifier% (%nights% × %count%)'
+invoice.apartment_modifier.label.surcharge_absolute: 'Recargo %value%'
+invoice.apartment_modifier.label.discount_percent: 'Descuento %value%%'
+invoice.apartment_modifier.label.flat_rate: 'Tarifa fija %value%'
+invoice.apartment_modifier.label.free: Gratis
+invoice.tourist_tax.position: '%tax% — %category% (%nights% × %count%)'
+invoice.tourist_tax.position.percent_per_room: '%tax% (%percent% %% del precio por noche, %nights%)'
+invoice.tourist_tax.position.nights: '{0} %count% noches|{1} %count% noche|]1,Inf] %count% noches'
+invoice.tourist_tax.position.persons: '{0} %count% personas|{1} %count% persona|]1,Inf] %count% personas'
+invoice.tourist_tax.no_positions: No se calcularon líneas de tasa turística para esta reserva.
+invoice.payment_qr.remittance: Factura %number%
+invoice.payment_due_date: Pagadera hasta el
