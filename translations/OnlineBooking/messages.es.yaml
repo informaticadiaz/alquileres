@@ -58,7 +58,7 @@ online_booking:
     status_enabled: "Activada"
     status_disabled: "Desactivada"
     reservation_origin: "Origen de la reserva"
-    reservation_origin_help: "Recomendado: crea un origen específico, como <code>Website</code>, para poder filtrar claramente las reservas online."
+    reservation_origin_help: "Recomendado: crea un origen específico, como <code>Sitio web</code>, para poder filtrar claramente las reservas online."
     reservation_origin_ready: "Origen de la reserva configurado"
     reservation_origin_missing_short: "Falta el origen de la reserva"
     subsidiaries_mode: "Establecimientos"

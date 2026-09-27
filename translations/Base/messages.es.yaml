@@ -106,3 +106,6 @@ nav.user.overview: Resumen de usuarios
 nav.utilization: Ocupación
 nav.welcome: Hola, %user%
 nav.profile: Perfil
+# Labels Symfony derives from form field names without an explicit label.
+Name: Nombre
+Email: Correo electrónico

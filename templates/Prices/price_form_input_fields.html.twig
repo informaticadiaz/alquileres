@@ -220,7 +220,7 @@
                         {% for pricePeriod in price.pricePeriods %}
                             <div class="price-period float-start">
                                 <span class="badge rounded-pill bg-info fw-normal">{{ pricePeriod.start|date('d.m.Y') }} - {{ pricePeriod.end|date('d.m.Y') }}
-                                    <button type="button" class="btn-close btn-close-white" aria-label="Close">&nbsp;</button>
+                                    <button type="button" class="btn-close btn-close-white" aria-label="{{ 'button.close'|trans }}">&nbsp;</button>
                                 </span>                                 
                                 <input type="hidden" name="periodstart-{{ pricePeriod.id }}[]" value="{{ pricePeriod.start|date('Y-m-d') }}" />
                                 <input type="hidden" name="periodend-{{ pricePeriod.id }}[]" value="{{ pricePeriod.end|date('Y-m-d') }}" />
@@ -490,7 +490,7 @@
 <div id="pricePeriodTemplate" class="d-none">
     <div class="price-period float-start">
         <span class="badge rounded-pill bg-info fw-normal"><span class="period-text"></span>
-             <button type="button" class="btn-close btn-close-white" aria-label="Close">&nbsp;</button>
+             <button type="button" class="btn-close btn-close-white" aria-label="{{ 'button.close'|trans }}">&nbsp;</button>
         </span> 
         <input type="hidden" name="periodstart-new[]" value="" disabled />
         <input type="hidden" name="periodend-new[]" value="" disabled />        

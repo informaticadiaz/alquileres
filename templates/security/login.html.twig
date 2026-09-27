@@ -35,7 +35,7 @@
     {% endif %}
     <div id="login-error" data-login-target="error" class="alert alert-danger mt-3 d-none alert-dismissible" role="alert">
         {{ 'login.webauthn.failure'|trans }}
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="{{ 'button.close'|trans }}"></button>
     </div>
     {# With OIDC_ENFORCE the password form is gone entirely - there is deliberately
        no query parameter that brings it back. PasswordLoginGuardSubscriber also

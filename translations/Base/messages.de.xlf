@@ -426,7 +426,14 @@
                 <source>first.templates</source>
                 <target>Vorlagen hinzufügen:</target>
             </trans-unit>
-
+            <trans-unit id="Name">
+                <source>Name</source>
+                <target>Name</target>
+            </trans-unit>
+            <trans-unit id="Email">
+                <source>Email</source>
+                <target>E-Mail</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

@@ -38,6 +38,7 @@ templates.correspondence.delete.ok: La entrada se eliminó correctamente.
 templates.correspondence.name: Nombre
 templates.correspondence.notfound: No se encontró la entrada.
 templates.default: Plantilla predeterminada
+templates.column.default: Predeterminada
 templates.hidden: Plantilla incrustada
 templates.hidden.tooltip: "Activo: la plantilla no aparece en la selección de plantillas."
 templates.delete.ask: ¿Seguro que quieres eliminar la plantilla?
