@@ -1,0 +1,24 @@
+# systemd user unit: install to ~/.config/systemd/user/ and run
+#   systemctl --user enable --now fewohbee.service
+# Enable lingering (loginctl enable-linger USER) to start it at boot.
+[Unit]
+Description=FewohBee SQLite profile on 127.0.0.1:8080
+ConditionPathExists=%h/.config/fewohbee/fewohbee.env
+ConditionPathExists=%h/.local/share/fewohbee/app/public/index.php
+
+[Service]
+Type=simple
+# A dedicated deploy checkout, never the development checkout.
+WorkingDirectory=%h/.local/share/fewohbee/app
+EnvironmentFile=%h/.config/fewohbee/fewohbee.env
+# The PHP built-in server can fork request workers on Linux.
+Environment=PHP_CLI_SERVER_WORKERS=4
+# EGPCS exposes the service environment in $_ENV so the repository .env never overrides it.
+ExecStart=/usr/bin/php -d variables_order=EGPCS -d opcache.enable_cli=1 -S 127.0.0.1:8080 -t public
+Restart=on-failure
+RestartSec=5
+NoNewPrivileges=yes
+UMask=0077
+
+[Install]
+WantedBy=default.target
