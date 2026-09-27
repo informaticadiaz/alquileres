@@ -23,6 +23,9 @@ final class ImportedReservationSynchronizer
 {
     private const MAX_UID_LENGTH = 255;
 
+    /** @var list<Reservation> Created in the current transaction; announced after commit. */
+    private array $createdReservations = [];
+
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
         private readonly EventDispatcherInterface $eventDispatcher,
@@ -38,6 +41,34 @@ final class ImportedReservationSynchronizer
      * Updates preserve local room moves and check conflicts in the reservation's current room.
      */
     public function synchronize(CalendarSyncImport $import, IcsOccurrence $event): ReservationImportOutcome
+    {
+        // Lookup by UID, conflict check and save run in one transaction so a concurrent
+        // sync of the same feed cannot import the same portal booking again in between.
+        // On SQLite the transaction holds the write lock from its start.
+        $connection = $this->entityManager->getConnection();
+        $connection->beginTransaction();
+        try {
+            $outcome = $this->synchronizeEvent($import, $event);
+            $connection->commit();
+        } catch (\Throwable $exception) {
+            $connection->rollBack();
+            $this->createdReservations = [];
+
+            throw $exception;
+        }
+
+        // Listeners (workflows, e-mails) must only see committed reservations and should
+        // not run while the write lock is held.
+        $created = $this->createdReservations;
+        $this->createdReservations = [];
+        foreach ($created as $reservation) {
+            $this->eventDispatcher->dispatch(new CalendarImportBookingCreatedEvent($reservation));
+        }
+
+        return $outcome;
+    }
+
+    private function synchronizeEvent(CalendarSyncImport $import, IcsOccurrence $event): ReservationImportOutcome
     {
         $uid = $this->normalizeUid($event->uid);
         if ('' === $uid) {
@@ -204,7 +235,7 @@ final class ImportedReservationSynchronizer
         $this->entityManager->flush();
 
         if ($isNew) {
-            $this->eventDispatcher->dispatch(new CalendarImportBookingCreatedEvent($reservation));
+            $this->createdReservations[] = $reservation;
         }
 
         return ReservationImportOutcome::Synchronized;
