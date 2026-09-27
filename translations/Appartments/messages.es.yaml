@@ -1,0 +1,154 @@
+apartment:
+  multiple:
+    occupancy:
+      hint: Es posible la ocupación por distintos huéspedes.
+      text: Ocupación múltiple
+appartment:
+  active: Activa
+  active.hint: Las habitaciones inactivas no se muestran en las reservas, la reserva online ni la sincronización de calendarios.
+  active.yes: Activa
+  active.no: Inactiva
+  action: Acción
+  bedsmax: Máx. personas
+  bedsmin: Ocupación normal
+  category: Categoría de habitación
+  delete:
+    ask: ¿Seguro que quieres eliminar esta habitación?
+  description: Descripción
+  flash:
+    create:
+      success: La habitación se creó correctamente.
+    delete:
+      error:
+        still:
+          in:
+            use: La habitación no se puede eliminar porque ya fue reservada.
+      success: La habitación se eliminó correctamente.
+    edit:
+      success: La habitación se procesó correctamente.
+  number: Número de habitación
+  number.short: 'N.º'
+  object: Establecimiento
+calendar:
+  sync:
+    export:
+      tab: Exportar
+      access:
+        last: último acceso
+        public:
+          hint: Activa o desactiva el acceso público a este calendario.
+          label: público
+        title: Acceso
+        url:
+          hint: >-
+            Con esta dirección puedes acceder a este calendario desde otras
+            aplicaciones.
+          title: Dirección pública en formato iCal
+        private_url:
+          hint: >-
+            Esta dirección funciona incluso sin compartir públicamente. El
+            acceso requiere un token de API (permiso "Leer calendarios") que
+            puedes crear en tu perfil; p. ej., en aplicaciones de calendario
+            como contraseña junto con tu nombre de usuario.
+          title: Dirección privada en formato iCal
+      hint: >-
+        Comparte el plan de reservas de esta habitación con otras aplicaciones
+        que admitan la llamada importación iCal (sincronizar calendario).
+      option:
+        guestname:
+          hint: >-
+            El título de la entrada de calendario exportada contiene el nombre
+            del huésped.
+          label: Exportar el nombre del huésped
+        status:
+          hint: Solo se exportarán las reservas con el estado indicado.
+        title: Opciones de exportación
+    import:
+      tab: Importar
+      hint: Configura los calendarios iCal remotos que deben importarse para esta habitación.
+      list:
+        title: Importaciones existentes
+        empty: Todavía no hay importaciones configuradas.
+      create:
+        title: Agregar importación
+        button: Agregar importación
+      name:
+        label: Nombre
+        hint: Nombre que se muestra en la vista general de reservas.
+      url:
+        label: URL
+        hint: URL del feed iCal remoto.
+      active:
+        label: activa
+        hint: Activa o desactiva esta importación.
+      conflict:
+        label: Manejo de conflictos
+        hint: Elige cómo se deben manejar las reservas superpuestas.
+        option:
+          skip: Omitir las entradas en conflicto
+          overwrite: Sobrescribir la reserva existente
+          mark: Importar y marcar como conflicto
+      origin:
+        label: Origen de la reserva
+        hint: Origen asignado a las reservas importadas.
+      status:
+        label: Estado predeterminado
+        hint: Estado asignado a las reservas importadas.
+      last_sync:
+        label: última sincronización
+      last_error:
+        label: último error de sincronización
+      delete:
+        confirm: ¿Eliminar esta configuración de importación?
+        title: Eliminar importación
+        hint: Esta configuración de importación se eliminará de forma permanente.
+      actions:
+        label: Acciones
+      edit:
+        title: Editar importación
+      flash:
+        create:
+          success: Configuración de importación creada.
+        edit:
+          success: Configuración de importación actualizada.
+        delete:
+          success: Configuración de importación eliminada. Las reservas importadas no se eliminaron.
+      preview:
+        title: Revisa el calendario antes de importarlo
+        hint: A veces los portales incluyen, además de las reservas, sus propios períodos bloqueados o reglas de reserva. Esta revisión muestra qué entradas son realmente reservas.
+        share:
+          label: Usar las mismas reglas para todas las importaciones de calendario de este portal
+          hint: Si está activado, esta importación de calendario adopta las reglas existentes sobre qué entradas cuentan como reservas, incluso sin revisar antes el calendario. Los cambios se comparten con las importaciones de calendario existentes y futuras del mismo portal que también tengan esta opción activada.
+        button: Revisar calendario
+        loading: Revisando el calendario
+        configured: 'Reglas de exclusión guardadas: %count%. Si vuelves a revisar el calendario, puedes compararlas con sus entradas actuales.'
+        question: ¿Qué entradas deben importarse como reservas?
+        labels_hint: Las etiquetas que se muestran provienen directamente del portal. Puedes desmarcar la casilla para los períodos bloqueados u otras entradas que no sean reservas reales.
+        labels_explanation: El portal asigna a cada entrada del calendario una etiqueta, como “Reservado” o “No disponible”. FewohBee agrupa las etiquetas idénticas. Las fechas y la cantidad facilitan identificarlas.
+        default_safety: Al principio todas las entradas están activadas, para no pasar por alto una reserva real por accidente.
+        count_title: Períodos encontrados
+        similar:
+          title: Excluir también etiquetas similares
+          hint: Si un portal cambia ligeramente una etiqueta, puedes ingresar una parte común del texto.
+          placeholder: p. ej., No disponible
+          add: Agregar
+          remove: Quitar regla
+        existing_hint: Las reservas importadas existentes no se modifican ni se eliminan automáticamente.
+        empty_summary: Sin etiqueta
+        error:
+          generic: No se pudo revisar el calendario. Vuelve a intentarlo.
+          invalid_request: Esta solicitud venció. Debes volver a abrir la ventana.
+          invalid_url: Primero debes ingresar una URL de calendario válida.
+        result:
+          empty: El calendario es accesible, pero no contiene entradas actuales ni futuras.
+          success: 'Calendario revisado: se encontraron %count% períodos actuales o futuros.'
+          success_with_skipped: 'Calendario revisado: se encontraron %count% períodos actuales o futuros; se omitieron %skipped% entradas ilegibles.'
+      error:
+        http_status: El calendario remoto devolvió una respuesta no válida.
+        unreachable: No se puede acceder a la URL del calendario remoto.
+        too_large: El calendario remoto supera los 2 MB.
+        invalid_ical: El calendario remoto no es un feed iCal válido.
+        skipped:
+          summary: >-
+            Eventos omitidos: faltan campos obligatorios (%missing%), conflictos (%conflict%).
+    title: Sincronizar tu calendario
