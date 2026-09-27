@@ -1,0 +1,75 @@
+tourist_tax:
+  title: "Tasa turística"
+  description: "Definiciones versionables de la tasa turística por establecimiento, con tarifas por categoría de huésped."
+  add: "Agregar tasa turística"
+  empty: "Todavía no hay definiciones de tasa turística."
+  delete:
+    ask: "¿Seguro que quieres eliminar esta definición de tasa turística?"
+  subsidiaries:
+    global: "Todos los establecimientos"
+
+  field:
+    name: "Nombre"
+    tax_rate: "Tipo de impuesto"
+    tax_rate.help: "Solo se muestra para el plan de cuentas activo o para entradas sin plan de cuentas."
+    revenue_account: "Cuenta de ingresos"
+    revenue_account.help: >-
+      Opcional. Cuenta contable para los ingresos por tasa turística en el libro diario.
+      Debería ser una cuenta propia, separada de los ingresos por alojamiento, para que
+      la tasa turística pueda declararse y transferirse al municipio por separado.<br><br>
+      Déjala vacía para usar la cuenta de ingresos predeterminada del tipo de impuesto elegido.
+    includes_vat: "Bruto (IVA incluido)"
+    includes_vat.help: "Si está activado, la tarifa se considera un importe bruto."
+    applies_only_to_adult: "Solo pagan los adultos"
+    applies_only_to_adult.help: "P. ej., como la tasa de alojamiento suiza: se excluyen niños y bebés."
+    valid_from: "Válido desde"
+    valid_to: "Válido hasta"
+    sort_order: "Orden"
+    active: "Activo"
+    subsidiaries: "Disponible en los establecimientos"
+    subsidiaries.help: "Vacío = global. Las tasas limitadas a establecimientos aparecen en cuanto se vincula al menos un establecimiento."
+    rates: "Tarifas por categoría de huésped"
+    calculation_mode: "Cálculo"
+    calculation_mode.help: "El modo fijo usa la tabla por categoría de abajo. Los modos porcentuales se aplican al precio por noche de la habitación e ignoran la tabla."
+    percentage_rate: "Porcentaje"
+    percentage_rate.help: "Porción del precio por noche, p. ej., 5.00 para 5 %."
+    percentage_base: "Base"
+    percentage_base.help: "Precio por noche neto o bruto como base de cálculo (según la normativa municipal)."
+
+  calculation_mode:
+    per_night_flat: "Importe fijo por persona y noche (p. ej., tasa turística)"
+    percent_per_room: "Porcentaje del precio por noche (p. ej., impuesto municipal)"
+
+  percentage_base:
+    net: "Precio por noche neto"
+    gross: "Precio por noche bruto"
+
+  rates:
+    heading: "Tarifas por categoría de huésped"
+    help: "Ingresa la tarifa por noche para cada categoría de huésped. Una tarifa 0 con un grupo de informe marca los grupos exentos. Importes en la moneda configurada (%symbol%)."
+    add: "Agregar tarifa"
+    empty: "Sin tarifas"
+
+  rate:
+    field:
+      category: "Categoría de huésped"
+      price_per_night: "Tarifa por noche"
+      report_group: "Grupo de informe"
+      report_group.help: "Opcional. Etiqueta libre (p. ej., \"Adultos\", \"Niños de 6 a 16\", \"Personas exentas\") que se usa como nombre de fila en el informe mensual oficial. Las tarifas con el mismo texto de grupo de informe se combinan en una sola fila del informe, lo que es útil para agrupar estudiantes, militares y estancias gratuitas en una única fila \"Personas exentas\". Déjalo vacío para usar el nombre de la categoría."
+
+  col:
+    name: "Nombre"
+    subsidiaries: "Establecimiento"
+    validity: "Vigencia"
+    applies_only_to_adult: "Solo adultos"
+    rates: "Tarifas"
+    active: "Activo"
+    action: "Acción"
+
+  flash:
+    create:
+      success: "Definición de tasa turística creada."
+    edit:
+      success: "Definición de tasa turística guardada."
+    delete:
+      success: "Definición de tasa turística eliminada."
