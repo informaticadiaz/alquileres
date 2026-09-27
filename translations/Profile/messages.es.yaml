@@ -1,0 +1,79 @@
+profile:
+  personal_data:
+    title: Datos personales
+    subtitle: Actualiza tus datos personales aquí mismo.
+    submit: Guardar cambios
+    saving: Guardando...
+    updated: Tus datos se actualizaron.
+    password_help: Déjala vacía para conservar tu contraseña actual.
+  theme:
+    label: Modo de color
+    help: Elige claro, oscuro o sigue la configuración de tu sistema.
+    auto: Automático (sistema)
+    dark: Oscuro
+    light: Claro (predeterminado)
+  apitokens:
+    title: Acceso a la API
+    subtitle: Crea tokens de acceso personales para consultar datos mediante la API REST o aplicaciones de calendario.
+    name: Nombre
+    token: Token
+    created_at: Creado el
+    last_used: Último uso
+    never: nunca
+    actions: Acciones
+    none: Todavía no hay tokens de API.
+    create: Crear token de API
+    submit: Crear
+    created: Se creó el token de API.
+    deleted: Se eliminó el token de API.
+    created_once_hint: 'Tu nuevo token: se muestra solo una vez. Cópialo ahora y guárdalo de forma segura.'
+    openapi: Descargar la descripción de la API
+    openapi_hint: >-
+      : describe todos los endpoints y se puede importar en herramientas como
+      Postman o editor.swagger.io. Con un token también está disponible
+      directamente en /api/v1/openapi.yaml.
+    copy: Copiar
+    copied: ¡Copiado!
+    usage_hint: 'Uso: como encabezado "Authorization: Bearer <token>" o en aplicaciones de calendario (p. ej., Thunderbird) como contraseña junto con tu nombre de usuario.'
+    expiry:
+      label: Vencimiento
+      never: ilimitado
+      days30: 30 días
+      days90: 90 días
+      year1: 1 año
+    scopes:
+      label: Permisos
+      min: Selecciona al menos un permiso.
+      reservations_read: Leer reservas
+      calendar_read: Leer calendarios (exportación iCal, días festivos, calendarios propios)
+      statistics_read: Leer estadísticas
+      invoices_read: Leer facturas
+      prices_read: Leer precios (lista de precios, presupuesto, calendario de tarifas)
+      tourist_tax_read: Leer tasa turística (configuración e informe mensual)
+      subsidiaries_read: Leer establecimientos (datos maestros y horario de atención)
+  passkeys:
+    title: Inicio de sesión sin contraseña (Passkeys)
+    create: Agregar Passkey
+    device: Dispositivo
+    created_at: Creada el
+    public_key: Clave pública
+    actions: Acciones
+    unknown: desconocido
+    none: No hay Passkeys registradas.
+    delete: La Passkey se eliminó correctamente.
+    error:
+      already_registered: Este dispositivo ya está registrado como Passkey.
+      registration_failed: No se pudo crear la Passkey.
+      save_failed: No se pudo guardar la Passkey.
+      unauthorized: No autorizado.
+      no_registration_in_progress: No hay ningún registro de Passkey en curso.
+      invalid_response_type: Respuesta del autenticador no válida.
+  oidc:
+    title: Inicio de sesión único
+    linked: Tu cuenta está vinculada al proveedor de inicio de sesión único.
+    not_linked: >-
+      Tu cuenta todavía no está vinculada. El vínculo se crea automáticamente la
+      primera vez que inicias sesión mediante SSO.
+    issuer: Proveedor
+    subject: Identificador
+    linked_at: Vinculada el
