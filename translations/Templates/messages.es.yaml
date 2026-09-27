@@ -1,0 +1,255 @@
+TEMPLATE_CASHJOURNAL_PDF: Libro diario en PDF
+TEMPLATE_FILE_PDF: Archivo PDF
+TEMPLATE_GDPR_PDF: PDF para exportación RGPD
+TEMPLATE_GENERAL_EMAIL: Plantilla general de correo electrónico
+TEMPLATE_NEWSLETTER_EMAIL: Boletín por correo electrónico
+TEMPLATE_INVOICE_EMAIL: Plantilla de correo electrónico para facturas
+TEMPLATE_INVOICE_PDF: Factura en PDF
+TEMPLATE_RESERVATION_EMAIL: Plantilla de correo electrónico para reservas
+TEMPLATE_RESERVATION_PDF: Plantilla PDF para reservas
+TEMPLATE_OPERATIONS_PDF: Plantilla PDF para informes de operaciones
+TEMPLATE_REGISTRATION_PDF: Formulario de registro en PDF
+templates.editor.operations.header_footer: Encabezado y pie del informe
+templates.editor.operations.header_footer.desc: Encabezado/pie estándar con período y filtros
+templates.editor.operations.reservations_table: Todas las reservas del rango
+templates.editor.operations.reservations_table.desc: Tabla mínima con habitación, huésped, personas y período
+templates.editor.operations.housekeeping_day: Tabla diaria de limpieza
+templates.editor.operations.housekeeping_day.desc: Vista diaria con ocupación, estado, asignación y notas
+templates.editor.operations.housekeeping_week: Tabla semanal de limpieza
+templates.editor.operations.housekeeping_week.desc: Cuadrícula semanal con ocupación, estado y cantidad de huéspedes
+templates.operations.housekeeping_day: Vista diaria de limpieza
+templates.operations.housekeeping_week: Vista semanal de limpieza
+templates.operations.frontdesk_checklist: Lista de control de recepción
+templates.operations.meals_checklist: Lista de control de comidas
+templates.operations.management_monthly_summary: Resumen mensual de gestión
+templates.operations.tourist_tax_monthly: Informe mensual de tasa turística
+templates.operations.import.title: No hay plantillas para informes de operaciones.
+templates.operations.import.text: Puedes importar ahora las plantillas de informes predeterminadas.
+templates.operations.import.button: Importar plantillas
+templates.operations.import.success: Plantillas importadas.
+templates.operations.import.failed: No se pudo importar ninguna plantilla.
+templates.operations.import.already_present: Ya existen plantillas de informes de operaciones.
+templates.operations.import.missing_type: No se encontró el tipo de plantilla para informes de operaciones.
+templates.add: Agregar una plantilla
+templates.attachment: Adjunto
+templates.attachment.notfound: No se encontró el adjunto.
+templates.correspondence.created: Fecha
+templates.correspondence.delete.ok: La entrada se eliminó correctamente.
+templates.correspondence.name: Nombre
+templates.correspondence.notfound: No se encontró la entrada.
+templates.default: Plantilla predeterminada
+templates.hidden: Plantilla incrustada
+templates.hidden.tooltip: "Activo: la plantilla no aparece en la selección de plantillas."
+templates.delete.ask: ¿Seguro que quieres eliminar la plantilla?
+templates.description: Plantillas para correos electrónicos, facturas, etc.
+templates.edit: Editar plantilla
+templates.editor.address: Dirección
+templates.editor.appartment.positions: Posiciones de habitación
+templates.editor.appartment.positions.desc: >-
+  Inserta una tabla con todas las posiciones de habitación, incluidas las fechas
+  de la estancia, la cantidad, el precio unitario, el IVA y el precio total.
+templates.editor.brutto: Total bruto
+templates.editor.brutto.desc: Muestra el total bruto de la factura.
+templates.editor.city: Ciudad
+templates.editor.company: Empresa
+templates.editor.firstname: Nombre
+templates.editor.footer: Pie de página
+templates.editor.footer.desc: Agrega un pie que aparece en la parte inferior de cada página.
+templates.editor.invoice.date: Fecha de la factura
+templates.editor.invoice.date.desc: Muestra la fecha de la factura en formato día-mes-año.
+templates.editor.invoice.number: Número de factura
+templates.editor.invoice.number.desc: Muestra el número de factura.
+templates.editor.lastname: Apellido
+templates.editor.misc.positions: Posiciones varias
+templates.editor.misc.positions.desc: >-
+  Inserta una tabla con todas las posiciones varias de la factura. Se excluyen
+  las tasas turísticas, los recargos y los descuentos porque tienen sus propios
+  fragmentos.
+templates.editor.apartment_modifier.positions: Posiciones de recargo / descuento
+templates.editor.apartment_modifier.positions.desc: >-
+  Inserta una tabla con todas las posiciones de recargo / descuento de habitación. La tabla solo se genera cuando
+  existen esas posiciones en la factura.
+templates.editor.origin_name: Origen de la reserva (nombre)
+templates.editor.origin_commission: Comisión OTA
+templates.editor.origin_payment_fee: Cargo por pago OTA
+templates.editor.tourist_tax.positions: Posiciones de tasa turística
+templates.editor.opening_hours: Horario de atención del establecimiento
+templates.editor.check_in_times: Horarios de check-in del establecimiento
+templates.editor.check_in_times.desc: >-
+  Imprime el horario de check-in y la hora de check-out del establecimiento en una sola línea, p. ej.,
+  "Check-in 17:00-20:00 - Check-out hasta las 10:00". Son normas de la casa, no la hora de llegada
+  de esta reserva en particular. El párrafo se omite cuando no hay horarios configurados.
+templates.editor.opening_hours.desc: 'Imprime el horario de atención semanal del establecimiento en una sola línea, p. ej., "Lu–Vi 08:00–12:00, 16:00–19:00". El párrafo se omite cuando no hay horarios configurados.'
+templates.editor.payment_qr: Código QR de pago (GiroCode)
+templates.editor.payment_qr.desc: >-
+  Inserta un código QR que completa una transferencia SEPA en la aplicación
+  bancaria del pagador. El número es la resolución de la imagen en píxeles; el
+  tamaño con que aparece en la página es el ancho propio de la imagen, que se
+  ajusta con el control de redimensionado. El código solo aparece cuando los
+  datos bancarios están configurados en la configuración de facturas y la
+  instalación funciona en euros.
+templates.editor.payment_due_date: Fecha de vencimiento del pago
+templates.editor.payment_due_date.desc: >-
+  Inserta el día en que vence el pago, tomado del plazo de pago de la
+  configuración de facturas, para que la fecha impresa y la factura electrónica
+  siempre coincidan. La línea se omite cuando la configuración no indica un
+  plazo.
+templates.editor.tourist_tax.positions.desc: >-
+  Inserta una tabla con todas las posiciones de tasa turística / impuesto de
+  alojamiento. La tabla solo se genera cuando existen esas posiciones en la
+  factura.
+templates.editor.misc.total: Precio total de todos los demás elementos
+templates.editor.misc.total.desc: Devuelve el precio total de todos los demás elementos.
+templates.editor.netto: Total neto
+templates.editor.netto.desc: Muestra el total neto de la factura.
+templates.editor.phone: Teléfono
+templates.editor.price.sum: Precio total
+templates.editor.price.sum.desc: Muestra el precio total de todas las habitaciones y elementos varios.
+templates.editor.price.total: Precio total de todas las habitaciones
+templates.editor.price.total.desc: Devuelve el precio total de todas las habitaciones.
+templates.editor.remarks: Observaciones
+templates.editor.vat: IVA incluido.
+templates.editor.vat.desc: Inserta una tabla que desglosa los importes netos por tipo de IVA.
+templates.editor.zip: Código postal
+templates.flash.create.success: La plantilla se creó correctamente.
+templates.flash.delete.inuse.reservations: La plantilla no se puede eliminar porque se usa en reservas existentes.
+templates.flash.delete.success: La plantilla se eliminó correctamente.
+templates.flash.edit.success: La plantilla se actualizó correctamente.
+templates.name: Nombre
+templates.notfound: No se encontró ninguna plantilla. Asegúrate de que exista una plantilla para la acción seleccionada.
+templates.params: Diseño del PDF
+templates.params.help: Orientación y márgenes de los PDF generados (todos los márgenes en mm).
+templates.params.orientation: Orientación
+templates.params.orientation.portrait: Vertical (P)
+templates.params.orientation.landscape: Horizontal (L)
+templates.params.format: Formato de página
+templates.params.margin_top: Margen superior (mm)
+templates.params.margin_bottom: Margen inferior (mm)
+templates.params.margin_left: Margen izquierdo (mm)
+templates.params.margin_right: Margen derecho (mm)
+templates.params.margin_header: Margen del encabezado (mm)
+templates.params.margin_footer: Margen del pie (mm)
+templates.preview: Vista previa
+templates.preview.context: Contexto de la vista previa
+templates.preview.render: Generar vista previa
+templates.preview.render.error.generic: No se pudo generar la plantilla. Revisa los marcadores y la lógica de la plantilla.
+templates.preview.render.error.syntax: Error de sintaxis en la plantilla. Revisa los bucles, las condiciones y los marcadores.
+templates.preview.render.error.variable: "No se encontró la variable \"%variable%\"."
+templates.preview.render.error.filter: "El filtro \"%filter%\" no está disponible."
+templates.preview.render.error.property: "No se encontró el atributo \"%property%\" en \"%class%\"."
+templates.preview.result: Resultado de la vista previa
+templates.preview.empty: Selecciona un contexto y genera la vista previa.
+templates.preview.noprovider: No hay ningún proveedor de vista previa disponible para este tipo de plantilla.
+templates.preview.noprovider.help: La vista previa todavía no está disponible para este tipo de plantilla.
+templates.preview.invoice.number: Número de factura
+templates.preview.invoice.number.placeholder: p. ej., 2026-0001
+templates.preview.invoice.number.help: Ingresa un número de factura existente o déjalo vacío para usar datos de ejemplo.
+templates.preview.invoice.notfound: "No se encontró la factura \"%value%\". Se muestran datos de ejemplo."
+templates.preview.reservation: ID de reservas
+templates.preview.reservation.placeholder: p. ej., 101, 102
+templates.preview.reservation.help: Ingresa uno o más ID de reserva (separados por comas) o déjalo vacío para usar datos de ejemplo.
+templates.preview.reservation.notfound: "No se encontraron las reservas \"%value%\". Se muestran datos de ejemplo."
+templates.preview.date_start: Fecha de inicio
+templates.preview.date_end: Fecha de fin
+templates.preview.subsidiary: Establecimiento
+templates.preview.subsidiary.all: Todos los establecimientos
+templates.preview.occupancy: Tipos de ocupación
+templates.preview.cashjournal.year: Año del libro
+templates.preview.cashjournal.year.placeholder: p. ej., 2026
+templates.preview.cashjournal.year.help: Ingresa el año del libro como número.
+templates.preview.cashjournal.month: Mes del libro
+templates.preview.cashjournal.month.placeholder: '1-12'
+templates.preview.cashjournal.month.help: Ingresa el mes del libro como número del 1 al 12.
+templates.preview.cashjournal.notfound: "No se encontró el período del libro \"%value%\". Se muestran datos de ejemplo."
+templates.preview.gdpr.customer_id: ID de cliente
+templates.preview.gdpr.customer_id.placeholder: p. ej., 42
+templates.preview.gdpr.customer_id.help: Ingresa un ID de cliente existente o déjalo vacío para usar los datos más recientes o de ejemplo.
+templates.preview.gdpr.customer_notfound: "No se encontró el cliente \"%value%\". Se muestran datos de ejemplo."
+templates.preview.download_pdf: Descargar PDF
+templates.preview.snippet.booker_firstname: Nombre del titular de la reserva
+templates.preview.snippet.booker_lastname: Apellido del titular de la reserva
+templates.preview.snippet.reservation_dates: Fechas de la reserva
+templates.preview.snippet.reservation_total: Total de la reserva
+templates.preview.snippet.reservation_loop: Bloque repetido de reservas
+templates.preview.snippet.reservation_apartment_positions_row: Tabla de posiciones de habitación de la reserva
+templates.preview.snippet.reservation_misc_positions_line: Línea de posiciones varias de la reserva
+templates.preview.snippet.invoice_number: Número de factura
+templates.preview.snippet.invoice_date: Fecha de factura
+templates.preview.snippet.invoice_totals: Totales de la factura
+templates.preview.snippet.invoice_positions: Tabla de posiciones de la factura
+templates.preview.snippet.invoice_appartments: Tabla de habitaciones de la factura
+templates.preview.snippet.operations_period: Período del informe
+templates.preview.snippet.operations_dayviews: Bloque repetido de vista diaria
+templates.preview.snippet.bookingjournal.month: Mes del libro
+templates.preview.snippet.bookingjournal.year: Año del libro
+templates.preview.snippet.bookingjournal.period: Período del libro
+templates.preview.snippet.bookingjournal.entries_count: Cantidad de asientos
+templates.preview.snippet.bookingjournal.positions: Tabla de asientos
+templates.preview.snippet.gdpr.general_name: Nombre del cliente
+templates.preview.snippet.gdpr.general_birthday: Fecha de nacimiento del cliente
+templates.preview.snippet.gdpr.general_remark: Observación del cliente
+templates.preview.snippet.gdpr.addresses: Bloque de direcciones (repetido)
+templates.preview.snippet.gdpr.reservations: Bloque de pernoctaciones (repetido)
+templates.preview.snippet.pdf_header: Bloque de encabezado del PDF
+templates.preview.snippet.pdf_footer: Bloque de pie del PDF
+templates.editor.toolbar.bold: Negrita
+templates.editor.toolbar.italic: Cursiva
+templates.editor.toolbar.underline: Subrayado
+templates.editor.toolbar.bullets: Lista con viñetas
+templates.editor.toolbar.ordered: Lista numerada
+templates.editor.toolbar.link: Insertar enlace
+templates.editor.toolbar.table: Insertar tabla
+templates.editor.toolbar.image: Insertar imagen
+templates.editor.toolbar.table_row_add: Agregar fila
+templates.editor.toolbar.table_row_delete: Eliminar fila
+templates.editor.toolbar.table_col_add: Agregar columna
+templates.editor.toolbar.table_col_delete: Eliminar columna
+templates.editor.toolbar.table_delete: Eliminar tabla
+templates.editor.toolbar.font_family: Fuente
+templates.editor.toolbar.font_size: Tamaño de fuente
+templates.editor.toolbar.align_left: Alinear a la izquierda
+templates.editor.toolbar.align_center: Centrar
+templates.editor.toolbar.align_right: Alinear a la derecha
+templates.editor.toolbar.beautify: Formatear código
+templates.editor.toolbar.code: Código
+templates.editor.toolbar.visual: Visual
+templates.editor.toolbar.variable: Insertar variable
+templates.editor.variable_picker.title: Insertar variable
+templates.editor.variable_picker.insert_loop: Insertar bucle
+templates.editor.alert.protected_content: Esta plantilla contiene sintaxis Twig o directivas avanzadas y solo se puede editar en modo código.
+templates.editor.row.repeat_toggle: Repetir fila
+templates.editor.row.repeat_collection: Colección (p. ej., apartmentPositions)
+templates.editor.row.repeat_as: Variable del elemento (p. ej., position)
+templates.editor.row.repeat_key: Variable de clave (opcional)
+templates.editor.row.repeat_clear: Quitar repetición
+templates.editor.row.repeat_hint: Configura la repetición de la fila de tabla seleccionada.
+templates.editor.row.if_toggle: Fila condicional
+templates.editor.row.if_condition: Condición (p. ej., reservation.persons > 1)
+templates.editor.row.if_clear: Quitar condición
+templates.editor.snippets.placeholder: Insertar fragmento
+templates.editor.snippets.insert: Insertar
+templates.editor.snippets.sidebar: Bloques de construcción
+templates.editor.tab.edit: Editar
+templates.editor.tab.preview: Vista previa
+templates.recipient: Destinatario
+templates.savefile.success: El archivo se guardó correctamente.
+templates.select.reservations: Seleccionar reserva
+templates.select.template: Seleccionar plantilla
+templates.sendemail.preview: Enviar mensaje
+templates.sendemail.success: El mensaje se envió correctamente.
+templates.subject: Asunto
+templates.subject.help: 'Se admiten marcadores como [[ reservation1.booker.lastname ]]. Si se deja vacío, se usa el nombre como asunto.'
+templates.title: Plantillas
+templates.editor.template_includes: Plantillas
+templates.include.error.circular: "Se detectó una inclusión circular de plantillas (ID: %id%)"
+templates.include.error.notfound: "No se encontró la plantilla incluida (ID: %id%)"
+templates.include.error.incompatible: "La plantilla \"%name%\" (%type%) no es compatible con este tipo de plantilla"
+templates.type: Tipo de plantilla
+templates.journal.name: Libro diario
+
+templates.preview.snippet.pdf_header.desc: Agrega un encabezado que aparece en la parte superior de cada página del PDF.
+templates.preview.snippet.bookingjournal.positions.desc: Inserta una tabla con todos los asientos del mes seleccionado, incluidas las cuentas contables, los importes y los comprobantes.
+templates.preview.snippet.gdpr.addresses.desc: Inserta un bloque por cada dirección guardada del cliente con los datos postales y de contacto.
+templates.preview.snippet.gdpr.reservations.desc: Inserta un bloque por reserva con la estancia, el origen de la reserva, la cantidad de huéspedes y las facturas.
+templates.editor.reservation.appartment_positions.desc: Inserta una tabla con todas las habitaciones reservadas, las fechas de la estancia, la cantidad de huéspedes y los precios.
+templates.editor.reservation.misc_positions.desc: Inserta todas las posiciones adicionales de la reserva, línea por línea, con descripción y precio total.
