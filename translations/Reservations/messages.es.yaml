@@ -1,0 +1,194 @@
+nav.customer.search: Buscar
+nav.reservation.add: Agregar reserva
+reservation.add.another.appartment: Agregar habitaciones
+reservation.appartment: Seleccionar habitación
+reservation.appartment.available: Habitaciones disponibles
+reservation.appartment.name: Habitación
+reservation.arrivalTime: Llegada
+reservation.button.change.customer: Cambiar huésped
+reservation.button.changeBooker: Cambiar titular de la reserva
+reservation.button.create.invoice: Crear una factura
+reservation.button.show.invoice: Ver factura
+reservation.confirm: Confirmada
+reservation.correspondences: Correspondencia
+reservation.correspondences.available: Correspondencia disponible
+reservation.correspondences.reservation: Correspondencia de esta reserva
+reservation.customer: Seleccionar huésped
+reservation.custumer.selected: 'Huéspedes seleccionados:'
+reservation.days: Días
+reservation.departureTime: Salida
+reservation.delete.ask: ¿Seguro que quieres eliminar esta reserva?
+reservation.details: Detalles de la reserva
+reservation.edit.change.appartment: Asignar nueva habitación
+reservation.enddate: Hasta
+reservation.flash.create.success: La reserva se agregó correctamente.
+reservation.flash.delete.customer.success: El huésped se quitó correctamente de la habitación.
+reservation.flash.delete.not.possible: La reserva ya no se puede eliminar (¿ya tiene una factura?).
+reservation.flash.delete.success: La reserva se eliminó correctamente.
+reservation.flash.update.conflict: >-
+  Ajusta el período. El período seleccionado entra en conflicto con otra
+  reserva de esta habitación.
+reservation.flash.update.conflict.persons: >-
+  Ajusta la cantidad de personas. La cantidad de personas entra en conflicto con
+  otra reserva en el período seleccionado.
+reservation.flash.update.customeralreadyinlist: El huésped ya se agregó a la habitación.
+reservation.flash.update.success: La reserva se actualizó correctamente.
+reservation.flash.update.toomuchcustomers: ¡No se pueden asignar más huéspedes!
+reservation.move.success: La reserva se movió correctamente.
+reservation.move.error: No se pudo mover la reserva.
+reservation.move.capacity: La habitación seleccionada no tiene suficientes camas para esta reserva.
+reservation.move.hint: Arrastra la reserva a una celda libre para moverla.
+reservation.invoice: Factura
+reservation.invoices: Facturas
+reservation.new.reservation.appartments.addmore: Agregar habitaciones a la reserva
+reservation.new.reservation.appartments.selected.heading: Habitaciones seleccionadas
+reservation.no.selected.appartments: No hay ninguna reserva seleccionada.
+reservation.objects.all: Todos los establecimientos
+reservation.option: Opción
+reservation.origin: Origen
+reservation.person: Persona
+reservation.persons: Personas
+reservation.period.invalid_dates: Ingresa fechas de llegada y salida válidas.
+reservation.period.end_before_start: La fecha de salida no puede ser anterior a la fecha de llegada.
+reservation.period.too_long: El período de reserva seleccionado es demasiado largo.
+reservation.preview.appartments.selected: Habitación seleccionada
+reservation.preview.booker: Reservado por
+reservation.preview.contact: Contacto
+reservation.preview.customer: Huésped
+reservation.preview.customer.address: Dirección
+reservation.preview.customer.inroom: Huéspedes en esta habitación
+reservation.preview.customer.name: Nombre
+reservation.price: Precio
+reservation.prices.misc: Precios adicionales
+reservation.prices.preliminary: >-
+  Los precios que se muestran aquí son provisionales y pueden diferir de los de
+  la factura.
+reservation.prices.title: Opciones de reserva
+reservation.select.customer.search.input.placeholder: Apellido
+reservation.startdate: Desde
+reservation.status: Estado
+reservation.table.calendarweek: Sem.
+reservation.table.reload: Actualizar
+reservation.table.settings.all: todos
+reservation.table.settings.country: País
+reservation.table.settings.displayMonth: Mostrar nombres de los meses
+reservation.table.settings.displayWeek: Mostrar semana del calendario
+reservation.table.settings.displayWeekday: Mostrar nombres de los días de la semana
+reservation.table.settings.general: General
+reservation.table.settings.holidays: Configuración de visualización de días festivos
+reservation.table.settings.showCanceledOnly: Mostrar solo reservas canceladas/no presentadas
+reservation.table.settings.showCalendarEntries: Mostrar entradas del calendario
+reservation.table.settings.subdivision: Región
+reservation.table.settings.title: Configuración de la tabla
+reservation.table.view.table: Vista de tabla
+reservation.table.view.yearly: Vista anual
+reservation.table.view.yearly.multiple.hint: >-
+  Esta vista no está optimizada para habitaciones con ocupación múltiple. Usa la
+  vista de tabla.
+reservation.table.weekday.monday: Lun
+reservation.table.weekday.tuesday: Mar
+reservation.table.weekday.wednesday: Mié
+reservation.table.weekday.thursday: Jue
+reservation.table.weekday.friday: Vie
+reservation.table.weekday.saturday: Sáb
+reservation.table.weekday.sunday: Dom
+reservation.templates.availableprices: facturas existentes
+reservation.conflict.button: Revisar importaciones
+reservation.conflict.title: Revisar importaciones
+reservation.conflict.section.title: Conflictos
+reservation.conflict.hint: Las reservas en conflicto deben resolverse manualmente antes de poder importarse. La lista muestra las reservas que se superponen con otras existentes.
+reservation.conflict.empty: No hay conflictos pendientes.
+reservation.conflict.table.room: Habitación
+reservation.conflict.table.period: Período
+reservation.conflict.table.source: Origen
+reservation.conflict.table.actions: Acciones
+reservation.conflict.action.ignore: Ignorar
+reservation.conflict.action.ignore.title: Ignorar conflicto
+reservation.conflict.action.resolve: Aceptar
+reservation.conflict.action.resolve.title: Aceptar conflicto
+reservation.conflict.ignore.confirm: Este conflicto se ignorará de forma permanente.
+reservation.conflict.resolve.failed: El conflicto todavía se superpone con otra reserva.
+reservation.review.section.title: Por revisar
+reservation.review.hint: Las reservas importadas sin huésped deben revisarse.
+reservation.review.empty: No hay reservas por revisar.
+reservation.review.table.todo: Pendiente
+reservation.review.table.actions: Acciones
+reservation.review.todo: Agrega un huésped y confirma la cantidad de personas.
+reservation.booker.missing.short: Sin huésped asignado
+reservation.import.booker.missing: Todavía no hay ningún huésped asignado. Agrega un huésped y ajusta la cantidad de personas si es necesario.
+reservation.kurtaxe.waived: Eximir de la tasa turística
+reservation.kurtaxe.waived.help: Actívalo si esta reserva está exenta de la tasa turística (p. ej., estancia de negocios con exención).
+roomblock.title: Bloquear habitaciones
+roomblock.list.title: Bloqueos
+roomblock.list.empty: No hay bloqueos en el período seleccionado.
+roomblock.filter.year: Año
+roomblock.filter.month: Mes
+roomblock.filter.all_months: Todo el año
+roomblock.filter.subsidiary: Establecimiento
+roomblock.filter.all_subsidiaries: Todos los establecimientos
+roomblock.instead: Bloquear en su lugar
+roomblock.rooms: Habitaciones
+roomblock.select_all: Seleccionar todas
+roomblock.search.placeholder: Buscar habitaciones…
+roomblock.room: Habitación
+roomblock.period: Período
+roomblock.from: Bloqueada desde
+roomblock.to: Bloqueada hasta
+roomblock.to.hint: La habitación vuelve a estar disponible este día (como un día de salida).
+roomblock.nights: Noches
+roomblock.reason: Motivo
+roomblock.note: Nota
+roomblock.createdby: Creado por
+roomblock.actions: Acciones
+roomblock.submit: Bloquear
+roomblock.source.manual: Manual
+roomblock.flash.create.success: Se creó el bloqueo.
+roomblock.flash.update.success: Se actualizó el bloqueo.
+roomblock.flash.delete.success: Se eliminó el bloqueo.
+roomblock.flash.bulk_delete.success: Se quitaron los bloqueos seleccionados.
+roomblock.bulk.selected: seleccionados
+roomblock.bulk.delete: Quitar seleccionados
+roomblock.bulk.confirm: ¿Seguro que quieres quitar los bloqueos seleccionados?
+roomblock.bulk.confirm.yes: "Sí, quitar"
+roomblock.delete.ask: ¿Seguro que quieres eliminar este bloqueo?
+roomblock.conflict.heading: 'No es posible bloquear: existen los siguientes conflictos:'
+roomblock.conflict.reservation.line: 'Habitación %room%: reserva del %from% al %end%'
+roomblock.conflict.block.line: 'Habitación %room%: bloqueo existente "%reason%" del %from% al %end%'
+roomblock.error.period: Ingresa un período válido de al menos una noche.
+roomblock.error.reason: Ingresa un motivo.
+roomblock.error.rooms: Selecciona al menos una habitación.
+reservation.calendar_reminder.button: Recordatorios
+reservation.calendar_reminder.title: Recordatorios del calendario
+reservation.calendar_reminder.section.title: Confirmar entradas
+reservation.calendar_reminder.hint: "Las entradas confirmadas se conservan de forma permanente."
+reservation.calendar_reminder.today: Hoy
+reservation.calendar_reminder.empty: No hay recordatorios del calendario pendientes.
+reservation.calendar_reminder.table.date: Fecha
+reservation.calendar_reminder.table.entry: Entrada
+reservation.calendar_reminder.table.actions: Acciones
+reservation.calendar_reminder.action.confirm.title: Confirmar
+calendar_entry.title_edit: Editar entrada del calendario
+calendar_entry.title_new: Agregar entrada del calendario
+calendar_entry.modal.title: Entrada del calendario
+calendar_entry.calendar: Calendario
+calendar_entry.form.calendar: Calendario
+calendar_entry.form.date: Fecha
+calendar_entry.form.date_to: Hasta
+calendar_entry.form.date_to_help: "Hasta: una entrada por día"
+calendar_entry.form.date_to_too_far: "El rango no puede abarcar más de %max% días."
+calendar_entry.form.end_time: Hora de fin
+calendar_entry.form.end_time_before_start: "La hora de fin debe ser posterior a la hora de inicio. Se permite 00:00 como fin del día."
+calendar_entry.form.end_time_midnight_without_start: "Una hora de fin 00:00 significa el fin del día y, por lo tanto, requiere una hora de inicio. Si no la tiene, deja la entrada como de todo el día."
+calendar_entry.form.end_time_help: "Opcional"
+calendar_entry.form.time: Hora
+calendar_entry.form.time_help: "Vacío = todo el día"
+calendar_entry.time.range: "%start% - %end%"
+calendar_entry.time.until: "- %end%"
+calendar_entry.form.title: Título
+calendar_entry.popover.new: + Nueva entrada
+calendar_entry.confirmed_at: "Recordatorio confirmado el %datetime%"
+calendar_entry.sync_warning: "Esta entrada proviene de un origen ICS. Hasta que se confirme, su fecha y su título se restablecen al valor del origen en cada sincronización."
+calendar_entry.delete: Eliminar
+calendar_entry.unconfirm: Deshacer confirmación
+calendar_entry.flash.saved: Entrada del calendario guardada.
+calendar_entry.flash.deleted: Entrada del calendario eliminada.
