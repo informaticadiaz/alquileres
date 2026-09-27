@@ -1,0 +1,45 @@
+login:
+  copy: FewohBee
+  description: Inicia sesión
+  oidc: Iniciar sesión con SSO
+  password:
+    placeholder: Contraseña
+  pwforgotten:
+    button: Solicitar contraseña
+    description: >-
+      Si olvidaste tu contraseña, puedes solicitar una nueva en esta página.
+    email: Correo electrónico
+    flash:
+      error: Ingresa tu dirección de correo electrónico.
+    hint: Ingresa tu dirección de correo electrónico y te enviaremos una nueva contraseña.
+    link: ¿Olvidaste tu contraseña?
+    mail:
+      end: FewohBee
+      greeting: Estimado usuario de FewohBee:
+      subject: Tu solicitud de restablecimiento de contraseña
+      text1: para restablecer tu contraseña, visita el siguiente enlace.
+      valid: Este enlace vencerá en %validity%.
+    reset:
+      button: Restablecer contraseña
+      description: Restablecer contraseña
+      password: Nueva contraseña
+      passwordrepeat: Repetir contraseña
+      title: Restablecer contraseña
+    sent:
+      back: volver al inicio de sesión
+      description: >-
+        Si tu dirección de correo electrónico está registrada, se envió un
+        correo a la dirección indicada. Ese correo contiene un enlace que te
+        permite restablecer tu contraseña.
+      hint: Si no recibes el correo, revisa tu carpeta de spam.
+      title: Nueva contraseña enviada
+    title: Solicitar nueva contraseña
+  rememberme: Recordarme
+  submit:
+    value: Iniciar sesión
+  title: Iniciar sesión
+  username:
+    placeholder: Nombre de usuario
+  passkey: Iniciar sesión con Passkey
+  webauthn:
+    failure: No se pudo iniciar sesión
