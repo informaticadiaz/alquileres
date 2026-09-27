@@ -1,0 +1,26 @@
+reservationorigin.add: Agregar origen
+reservationorigin.business: Empresa
+reservationorigin.color: Color
+reservationorigin.color.enable: Mostrar indicador de color
+reservationorigin.color.help: El color se muestra como indicador en las reservas de la vista general de reservas.
+reservationorigin.delete.ask: ¿Seguro que quieres eliminar el origen de la reserva?
+reservationorigin.description: Origen de la reserva
+reservationorigin.flash.create.check_prices: Revisa tus categorías de precios y asegúrate de que también se apliquen a este nuevo origen de la reserva.
+reservationorigin.flash.create.success: El origen de la reserva se creó correctamente.
+reservationorigin.flash.delete.inuse.reservations: El origen de la reserva no se puede eliminar porque se usa en reservas existentes.
+reservationorigin.flash.delete.success: El origen de la reserva se eliminó correctamente.
+reservationorigin.flash.edit.success: El origen de la reserva se procesó correctamente.
+reservationorigin.flash.edit.ota_fees_enabled: Si cada servicio se incluye en las comisiones del portal se define en cada precio mediante “Incluir en las comisiones del portal”. Revisa los precios existentes.
+reservationorigin.flash.surcharge_invalid: La comisión y el cargo por pago deben ser porcentajes entre 0 y 100 con dos decimales como máximo.
+reservationorigin.flash.surcharge_required: Con las comisiones OTA activadas, se requiere al menos una comisión o un cargo por pago.
+reservationorigin.name: Descripción
+reservationorigin.guest_surcharge_enabled: Comisiones OTA
+reservationorigin.commission_percent: Comisión
+reservationorigin.payment_fee_percent: Cargo por pago
+reservationorigin.payment_collection: Pago cobrado por
+reservationorigin.tourist_tax_collection: ¿Quién cobra la tasa turística?
+reservationorigin.tourist_tax_collection.hint: Elige “Establecimiento” si el huésped paga la tasa turística en el lugar. Elige “Portal” si el portal la cobra junto con el precio de la reserva. Esto determina si el cargo por pago del portal también se aplica a la tasa turística.
+reservationorigin.collection.property: Establecimiento
+reservationorigin.collection.portal: Portal
+reservationorigin.private: Particular
+reservationorigin.title: Origen de la reserva

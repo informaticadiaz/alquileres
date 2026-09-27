@@ -1,0 +1,30 @@
+status:
+  action: Acción
+  add: Agregar estado de la reserva
+  color: Color
+  confirmed: Confirmada
+  delete:
+    ask: ¿Seguro que quieres eliminar este estado de la reserva?
+  description: Administración de estados de la reserva
+  flash:
+    create:
+      success: El estado se creó correctamente.
+    delete:
+      error:
+        still:
+          in:
+            use: >-
+              El estado no se puede eliminar porque todavía tiene reservas
+              asociadas.
+        system: Los estados del sistema no se pueden eliminar.
+      success: El estado se eliminó correctamente.
+    edit:
+      error:
+        system: Los estados del sistema no se pueden editar.
+      success: El estado se procesó correctamente.
+  canceled_noshow: Cancelada / No se presentó
+  name: Nombre
+  option: Opción
+  system:
+    locked: Estado del sistema
+  title: Estado de la reserva
