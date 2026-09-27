@@ -8,11 +8,11 @@ use App\Sqlite\SqliteBaselineInitializer;
 use Doctrine\Migrations\DependencyFactory;
 use Doctrine\Migrations\Exception\AbortMigration;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\Tools\SchemaTool;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Tester\ApplicationTester;
 use Symfony\Component\Console\Tester\CommandTester;
 
 /**
@@ -72,6 +72,21 @@ final class SqliteMigrationsTest extends KernelTestCase
         self::assertSame(Command::SUCCESS, $status->execute([]), $status->getDisplay());
     }
 
+    public function testBaselineMigrationStateSurvivesAFreshProcess(): void
+    {
+        self::bootKernel(['environment' => 'sqlite_test']);
+        /** @var SqliteBaselineInitializer $baseline */
+        $baseline = self::getContainer()->get(SqliteBaselineInitializer::class);
+        $baseline->initialize();
+
+        // A new kernel stands for the next process: nothing may be remembered in memory.
+        self::ensureKernelShutdown();
+        self::bootKernel(['environment' => 'sqlite_test']);
+
+        $upToDate = new CommandTester((new Application(self::$kernel))->find('doctrine:migrations:up-to-date'));
+        self::assertSame(Command::SUCCESS, $upToDate->execute([]), $upToDate->getDisplay());
+    }
+
     public function testMigrationLineRefusesADatabaseNotCreatedByTheBaseline(): void
     {
         self::bootKernel(['environment' => 'sqlite_test']);
@@ -98,14 +113,17 @@ final class SqliteMigrationsTest extends KernelTestCase
         $baseline = self::getContainer()->get(SqliteBaselineInitializer::class);
         $baseline->initialize();
 
+        // Same check an operator runs. It must go through Application::run(): the
+        // migrations bundle hides its own table from schema commands on the console event.
+        $application = new Application(self::$kernel);
+        $application->setAutoExit(false);
         foreach (['default', 'geo'] as $name) {
-            /** @var ManagerRegistry $registry */
-            $registry = self::getContainer()->get(ManagerRegistry::class);
-            $manager = $registry->getManager($name);
-            self::assertInstanceOf(EntityManagerInterface::class, $manager);
-
-            $pending = (new SchemaTool($manager))->getUpdateSchemaSql($manager->getMetadataFactory()->getAllMetadata());
-            self::assertSame([], $pending, sprintf('Schema drift on the "%s" connection.', $name));
+            $validate = new ApplicationTester($application);
+            self::assertSame(
+                Command::SUCCESS,
+                $validate->run(['command' => 'doctrine:schema:validate', '--em' => $name, '--skip-mapping' => true, '-v' => true]),
+                sprintf('Schema drift on the "%s" connection: %s', $name, $validate->getDisplay()),
+            );
         }
     }
 

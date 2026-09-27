@@ -14,9 +14,11 @@ doctrine:
                 server_version: null
                 charset: null
                 default_table_options: []
-                # Both connections share one file: skip the profile bookkeeping tables
-                # (no entity mapping) and the table owned by the geo connection.
-                schema_filter: '~^(?!(fewohbee_sqlite_baseline_metadata|fewohbee_sqlite_migration_versions|postal_code_data)$)~'
+                # Both connections share one file: skip the baseline bookkeeping table
+                # (no entity mapping) and the table owned by the geo connection. The
+                # migrations table must stay visible: Doctrine Migrations checks for it
+                # through this filter, and its bundle hides it from schema commands itself.
+                schema_filter: '~^(?!(fewohbee_sqlite_baseline_metadata|postal_code_data)$)~'
             geo:
                 driver: 'pdo_sqlite'
                 url: null
