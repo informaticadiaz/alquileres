@@ -1,0 +1,53 @@
+statistics:
+  origin:
+    description: Origen
+    monthly: Resumen mensual por origen
+    title: Origen
+    yearly: Resumen anual por origen
+  turnover:
+    description: Facturación
+    help: >-
+      La facturación se basa en las facturas (importe bruto) con fecha de
+      factura en el mes correspondiente y el siguiente estado:
+    monthly: facturación mensual
+    title: Facturación
+    yearly: facturación anual
+  utilization:
+    description: Ocupación
+    monthly: Ocupación mensual
+    title: Ocupación
+    yearly: Resumen anual de ocupación
+  tourism:
+    title: Turismo
+    description: Turismo
+    arrivals: Llegadas
+    arrivals_by_country: Llegadas por país
+    beds_total: Camas
+    by_country_table: Llegadas y pernoctaciones por país
+    country: País
+    no_warnings: Sin advertencias
+    overnights: Pernoctaciones
+    overnights_by_country: Pernoctaciones por país
+    regenerate: Recalcular instantánea
+    rooms_total: Habitaciones
+    summary: Resumen
+    turnover: Facturación
+    utilization: Ocupación
+    warnings: Notas/Advertencias
+    room_label: Habitación
+    show_by_state: Mostrar por estado/provincia
+    state: Estado/Provincia
+    by_state_table: Llegadas y pernoctaciones por estado/provincia
+    arrivals_by_state: Llegadas por estado/provincia
+    overnights_by_state: Pernoctaciones por estado/provincia
+    no_state_data: No hay datos por estado disponibles. Completa la tabla PostalCodeData para habilitar las estadísticas por estado. Consulta las <a href="https://github.com/developeregrem/fewohbee/wiki/City-Lookup" target="_blank">instrucciones</a>.
+    guest_category: Categoría de huésped
+    overnights_by_guest_category: Pernoctaciones por categoría de huésped
+    by_country_and_category_table: 'Pernoctaciones: país × categoría de huésped'
+    no_category_data: No hay datos de categorías de huésped disponibles.
+    total: Total
+    last_calculated: 'Último cálculo:'
+  snapshot:
+    warning:
+      persons_mismatch: La cantidad de personas difiere de la cantidad de huéspedes; verifica que la reserva esté completa.
+statistics.blocked.room_days: Días de habitación bloqueados
