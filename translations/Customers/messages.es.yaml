@@ -1,0 +1,63 @@
+CUSTOMER_ADDRESS_TYPE_ADDITIONAL: otra
+CUSTOMER_ADDRESS_TYPE_BUSINESS: Empresa
+CUSTOMER_ADDRESS_TYPE_PRIVATE: Particular
+customer.action: Acción
+customer.additional: Adicional
+customer.address: Dirección
+customer.address.add: Agregar nueva dirección
+customer.address.delete: Quitar dirección
+customer.addresstype: Tipo
+customer.birthday: Fecha de nacimiento
+customer.city: Ciudad
+customer.company: Empresa
+customer.contact: Contacto
+customer.contactdata: Datos de contacto
+customer.count.books: Cantidad de reservas
+customer.country: País
+customer.delete.ask: >-
+  ¿Confirmas que quieres eliminar este huésped? Nota: todas las reservas
+  anteriores figurarán a nombre de un huésped "eliminado".
+customer.details: Datos del huésped
+customer.email: Correo electrónico
+family: Familia
+customer.fax: Fax
+customer.firstname: Nombre
+customer.flash.create.success: El huésped se creó correctamente.
+customer.flash.delete.error.still.in.use: >-
+  El huésped no se puede eliminar porque todavía se usa en una reserva actual
+  o futura.
+customer.flash.delete.success: El huésped se eliminó correctamente.
+customer.flash.edit.success: El huésped se editó correctamente.
+customer.id.number: Número de documento
+customer.id.type.driving_licence: Licencia de conducir
+customer.id.type.name: Tipo de documento de identidad
+customer.id.type.national_id: Documento de identidad
+customer.id.type.passport: Pasaporte
+customer.lastname: Apellido
+customer.mobilephone: Teléfono móvil
+Mr: Sr.
+Ms: Sra.
+customer.person: Persona
+customer.phone: Teléfono
+customer.remark: Observación
+customer.salutation: Tratamiento
+customer.search.addresses: Buscar direcciones...
+customer.template: Plantilla
+customer.zip: Código postal
+customer.buyerVatId: Número de IVA (comprador)
+customer.buyerReference.label: Referencia del cliente
+customer.buyerReference.placeholder: p. ej., Leitweg-ID
+customer.buyerReference.hint: >-
+  Una designación asignada por el huésped y usada para fines de control interno, también conocida como Leitweg-ID.
+customer.cardNumber: Número de tarjeta
+customer.cardNumber.hint: >-
+  Ingresa solo los últimos 4 a 6 dígitos del número de tarjeta, nunca el número completo.
+customer.cardHolder.label: Titular de la tarjeta
+customer.cardHolder.hint: >-
+  Los campos Titular de la tarjeta (opcional) y Número de tarjeta (obligatorio) forman parte del medio de pago con tarjeta.
+customer.accountIBAN.label: IBAN
+customer.accountIBAN.hint: >-
+  Para el medio de pago por débito directo se deben completar el IBAN y el número de referencia del mandato.
+customer.mandateReference.label: Número de referencia del mandato
+customer.reservation.history: "Historial de reservas"
+customer.reservation.history.empty: "No se encontraron reservas."
