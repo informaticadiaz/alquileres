@@ -1,0 +1,436 @@
+accounting:
+  accounts:
+    iban: IBAN de esta cuenta bancaria
+    iban.help: Permite la asignación automática al importar extractos bancarios.
+
+  bank_import:
+    title: Importación de extractos bancarios
+    subtitle: Lee los movimientos bancarios y conviértelos en asientos del libro diario.
+
+    drafts:
+      title: Importaciones abiertas
+      file: Archivo
+      account: Cuenta bancaria
+      period: Período
+      lines: Líneas
+      created: Subido
+      open: Abrir
+      discard: Descartar
+      account_missing: (La cuenta bancaria se eliminó)
+
+    draft:
+      not_found: No se encontró este borrador de importación (es posible que la sesión haya vencido).
+      account_missing: La cuenta bancaria de este borrador ya no existe; se descartó el borrador.
+      discarded: Borrador descartado.
+      session_required: Los borradores de importación bancaria requieren una sesión HTTP activa.
+
+    parser:
+      warning:
+        row_skipped: 'Fila %line% omitida: %message%'
+        entry_skipped: 'Entrada de %file% omitida: %message%'
+        camt_non_booked_skipped: 'Se omitieron %count% entradas camt.052 no contabilizadas en %file%.'
+        camt_unknown_version: 'No se pudo leer la versión camt del espacio de nombres en %file%; se importa de la mejor manera posible.'
+        camt_newer_version: 'camt.%type%.001.%version% es más reciente que las versiones probadas; se importa de la mejor manera posible.'
+        encoding_mismatch: 'El archivo no es %encoding% válido, aunque esa codificación está seleccionada en el perfil CSV. Codificación detectada: %detected%. La vista previa se convirtió a UTF-8; corrige el perfil CSV.'
+      error:
+        profile_required: El analizador CSV genérico requiere un perfil CSV.
+        file_read_failed: 'No se pudo leer el archivo: %path%'
+        temp_stream_failed: No se pudo abrir el flujo de memoria temporal.
+        invalid_date: 'Fecha no válida "%value%" (se esperaba: %format%).'
+        amount_parse_failed: No se pudo interpretar el importe.
+        required_column: 'El perfil requiere una asignación de columna para "%field%".'
+        required_separate_columns: Un perfil con columnas separadas requiere "amountDebit" y "amountCredit".
+        format_not_registered: 'No hay ningún analizador registrado para el formato "%format%". Disponibles: %available%'
+        none_available: ninguno
+        camt_invalid_xml: No se pudo leer el archivo XML.
+        camt_unsupported_message: Solo se admiten camt.052 y camt.053.
+        camt_no_statements: El archivo camt no contiene informes de cuenta ni extractos.
+        camt_version_too_old: 'camt.%type%.001.%version% no es compatible; exporta la versión 08 o posterior.'
+        camt_multiple_accounts: Los archivos camt seleccionados contienen IBAN de cuentas diferentes.
+        camt_missing_date: Falta la fecha contable o la fecha valor.
+        camt_missing_amount: Falta el importe.
+        camt_missing_direction: Falta el indicador de crédito/débito.
+
+    upload:
+      title: Subir un nuevo extracto bancario
+      submit: Analizar archivo
+      bank_account: Cuenta bancaria
+      bank_account.placeholder: Elige…
+      bank_account.help: |
+        Los asientos se contabilizarán contra esta cuenta contable. Para los
+        importes entrantes se completa automáticamente como cuenta de débito y
+        para los salientes, como cuenta de crédito. Solo tienes que asignar la
+        otra parte.
+      format: Formato
+      format.placeholder: Elige…
+      format.camt: 'XML: camt.052/053 desde v08'
+      format.csv_profile: 'CSV: %profile%'
+      file: Archivo(s) de extracto bancario
+      file.invalid_type: Sube archivos CSV o XML.
+      multiple_files_name: '%count% archivos XML'
+      flash:
+        invalid: Datos incompletos; revisa todos los campos.
+        csv_profile_missing: No se encontró el perfil CSV seleccionado.
+        csv_requires_single_file: Para las importaciones CSV, sube exactamente un archivo.
+        parse_failed: 'No se pudo analizar el archivo: %message%'
+        no_lines: No se encontraron líneas de movimientos reconocibles; ¿el formato elegido corresponde al archivo?
+        iban_mismatch: 'Advertencia: el IBAN del archivo (%file%) difiere del de la cuenta bancaria registrada (%account%).'
+
+    preview:
+      title: Vista previa del extracto bancario
+      empty: No hay movimientos en este archivo.
+      warnings: Notas encontradas durante el análisis
+      remark_placeholder: Observación
+      toggle_ignore: Excluir esta línea de la importación
+      select_all: Seleccionar todas las filas visibles
+      update_failed: Falló la actualización.
+      save_failed: Falló el guardado.
+      force_duplicate: Importar de todos modos
+      force_duplicate_help: Volver a importar deliberadamente esta línea duplicada.
+      force_duplicate_confirm: Esta línea bancaria ya se importó. Se volverá a contabilizar al confirmar.
+      error_prefix: 'Error: %message%'
+      filter:
+        all: Todas
+        pending: Pendientes
+        ready: Listas
+        duplicate: Duplicadas
+        ignored: Ignoradas
+        rule: Con regla
+        invoice: Con factura
+      bulk:
+        ignore: Ignorar seleccionadas
+        unignore: Volver a incluir seleccionadas
+        account_placeholder: Elegir cuenta
+        assign_debit: → Establecer cuenta de débito
+        assign_credit: → Establecer cuenta de crédito
+        selected_count: '%count% seleccionadas'
+      col:
+        status: Estado
+        date: Fecha
+        counterparty: Contraparte
+        purpose: Concepto
+        amount: Importe
+        invoice_number: N.º comprob.
+        debit: Cuenta de débito
+        credit: Cuenta de crédito
+        tax_rate: Tipo de impuesto
+        remark: Observación
+      invoice_number_placeholder: N.º comprob.
+      duplicate:
+        help: Ya se confirmó en una importación anterior.
+      duplicate_forced:
+        help: Esta línea duplicada se marcó deliberadamente para volver a importarse.
+      ignored:
+        help: Excluida de la importación.
+      ready:
+        help: Lista para contabilizar.
+      pending:
+        help: Todavía sin asignar.
+      matched_invoice: Factura detectada a partir del concepto.
+      invoice_matching_disabled:
+        title: La asociación automática de facturas está desactivada.
+        help: Todavía no hay ningún rango de números de factura configurado. Define un rango predeterminado en Configuración → General para que las facturas se puedan detectar en el concepto del pago.
+      invoice_accounts:
+        label: de la factura
+        help: Las cuentas de crédito se derivan de las posiciones de la factura, los tipos de impuesto y las cuentas de ingresos.
+      invoice_tax_rate:
+        label: de la factura
+        help: Los tipos de impuesto se toman de las posiciones de la factura.
+      invoice_remark:
+        label: de la factura
+        help: La observación se toma del asiento generado para la factura.
+      overlap_warning:
+        message: 'Advertencia: esta cuenta bancaria ya tiene %count% importación(es) confirmada(s) que se superponen del %from% al %to%: %imports%%more%'
+        import: '%from%-%to% (confirmada el %committedAt%, %committed% líneas contabilizadas)'
+        more: ' y %count% más'
+      reapply_rules:
+        button: Volver a aplicar reglas
+        confirm: Las filas completadas por reglas en esta vista previa se restablecerán y se evaluarán con las reglas activas actualmente. Las duplicadas, las ignoradas y las filas editadas manualmente sin regla no cambian. ¿Continuar?
+        flash:
+          done: 'Se volvieron a evaluar %count% filas completadas por reglas.'
+
+    commit:
+      button: Confirmar ahora
+      confirm: 'Se contabilizarán %count% líneas en el libro diario. ¿Continuar?'
+      summary:
+        ready: listas
+        pending: todavía pendientes
+        ignored: ignoradas
+        duplicate: duplicadas
+      flash:
+        done: 'Listo: %committed% contabilizadas, %redated% con nueva fecha, %ignored% ignoradas, %duplicates% duplicadas.'
+        failed: 'Falló la contabilización: %message%'
+
+    split:
+      title: Dividir asiento
+      intro: |
+        Divide este movimiento en varios asientos, p. ej., cuando el concepto
+        contiene varios elementos (intereses, comisiones, cargos).
+      original_amount: Importe de la línea bancaria
+      purpose: Concepto
+      assigned_sum: Suma asignada
+      add_row: Agregar otra división
+      mode:
+        amount: Importe fijo
+        percent: Porcentaje
+        remainder: Resto
+      delta:
+        remainder: 'Resto: %amount%'
+        too_much: '%amount% de más'
+        open: '+ %amount% pendiente'
+
+    rule:
+      title: Guardar como regla
+      intro: |
+        Guarda la asignación de cuentas de esta línea como regla: en la próxima
+        importación, las líneas coincidentes se completarán automáticamente.
+      name: Nombre de la regla
+      default_name: Regla
+      name.placeholder: p. ej., gastos de PayPal
+      save: Guardar regla
+      remark_template: Observación del asiento
+      remark_template.placeholder: 'p. ej., {counterparty} – pago'
+      remark_template.help: |
+        Marcadores: {counterparty} {purpose} {date} {invoiceNumber}
+      priority: Prioridad
+      priority.help: Mayor = se comprueba primero. 50 es un valor predeterminado razonable.
+      scope_to_account: Aplicar solo a esta cuenta bancaria
+      validation:
+        condition_required: Elige al menos una condición.
+        name_required: Ingresa un nombre.
+        split_marker_required: Los importes de división dinámicos requieren un marcador.
+        split_regex_required: Los importes de división dinámicos mediante regex requieren una regex.
+      section:
+        conditions: ¿Cuándo debe activarse la regla?
+        action: ¿Qué debe ocurrir?
+        scope: Otros
+      cond:
+        counterparty: La contraparte contiene
+        iban: El IBAN es
+        direction: La dirección es
+        purpose: El concepto contiene
+        purpose.placeholder: 'p. ej., "factura", "sueldo"'
+      direction:
+        in: Entrante
+        out: Saliente
+      rule_applied:
+        help: Una regla completó automáticamente esta línea.
+      warning:
+        line: 'Línea %line%: %message%'
+        split_marker_missing: 'No se encontró en el concepto el importe de división para el marcador "%marker%".'
+        split_regex_missing: 'No se encontró el importe de división con la regex "%pattern%".'
+        split_regex_invalid: 'La regex del importe de división no es válida: "%pattern%".'
+        invoice_marker_missing: 'No se encontró en el concepto el número de comprobante para el marcador "%marker%".'
+        invoice_regex_missing: 'No se encontró el número de comprobante con la regex "%pattern%".'
+        invoice_regex_invalid: 'La regex del número de comprobante no es válida: "%pattern%".'
+      split:
+        help: Dividir en varios asientos.
+      invoice_extraction:
+        label: Detectar n.º de comprobante
+        help: |
+          Opcional: lee del concepto un número externo de proveedor, comprobante o factura.
+        mode:
+          none: No detectar
+          marker: Marcador antes del n.º de comprobante
+          regex: Regex
+        marker:
+          placeholder: p. ej., Factura
+        regex:
+          placeholder: p. ej., Factura\s+([A-Z0-9-]+)
+        found: 'Encontrado: %number%'
+        missing: No se encontró n.º de comprobante
+      split_source:
+        help: |
+          En las divisiones recurrentes, los importes se leen del concepto actual.
+          Elige un marcador inmediatamente antes de cada importe o marca una división como resto.
+        current_amount: Importe de ejemplo
+        source: Detección
+        purpose_marker: Marcador antes del importe
+        purpose_regex: Regex
+        marker: Marcador antes del importe
+        pattern: Marcador / regex
+        found: 'Encontrado: %amount%'
+        missing: No se encontró ningún importe
+        invalid: Regex no válida
+        remainder_preview: Se calcula como resto.
+      count:
+        total: total
+        pending: pendientes
+        ready: listas
+        duplicate: duplicadas
+        ignored: ignoradas
+
+    rules:
+      title: Reglas de importación
+      subtitle: |
+        Las reglas completan automáticamente las líneas bancarias coincidentes en
+        la próxima importación. Las reglas nuevas se crean a partir de una línea
+        real en la vista previa mediante "Guardar como regla".
+      empty: Todavía no hay reglas guardadas.
+      edit: Editar regla
+      edit.help: |
+        Ajusta aquí el nombre, la prioridad y el alcance, así como los valores
+        que usan sus condiciones y su acción.
+      edit.recreate_hint: |
+        Cómo se construye una regla (qué condiciones comprueba, qué acción
+        ejecuta, cuántas partes de división tiene) se decide en la vista previa
+        de la importación. Para cambiarlo, elimina la regla y vuelve a crearla a
+        partir de una línea bancaria.
+      and: Y
+      conditions_empty: 'Sin condiciones: la regla se activa en cada línea.'
+      create_hint: |
+        Las reglas nuevas se crean directamente en la importación, haciendo clic
+        en "Guardar como regla" en la vista previa.
+      scope:
+        global: Todas las cuentas bancarias
+      col:
+        priority: Prio.
+        name: Nombre
+        scope: Cuenta bancaria
+        conditions: Condiciones
+        action: Acción
+        actions: Acciones
+      action:
+        assign: Asignar
+        ignore: Ignorar
+        ignore_help: Las líneas coincidentes se omiten durante la importación.
+        split: Dividir (%count% partes)
+        split_marker: 'después de "%marker%"'
+        enable: Activar
+        disable: Desactivar
+      field:
+        name: Nombre
+        description: Descripción
+        priority: Prioridad
+        priority.help: Mayor = se comprueba primero. 50 es un valor predeterminado razonable.
+        enabled: Activa
+        bank_account: Cuenta bancaria
+        bank_account.help: |
+          Déjalo vacío para que la regla se aplique a todas las cuentas
+          bancarias, o elige una para limitarla a esa cuenta.
+        bank_account.global: Todas las cuentas bancarias (global)
+      field_label:
+        counterparty_name: Contraparte
+        counterparty_iban: IBAN
+        purpose: Concepto
+        amount: Importe
+        direction: Dirección
+      op:
+        contains: contiene
+        not_contains: no contiene
+        equals: es igual a
+        regex: coincide con el patrón
+        gt: es mayor que
+        lt: es menor que
+        between: está entre
+      section:
+        basics: Datos básicos
+        conditions: Condiciones
+        action: Acción
+      flash:
+        updated: Regla actualizada.
+        deleted: Regla eliminada.
+
+    profile:
+      title: Perfiles CSV
+      subtitle: |
+        Describe para cada banco cómo es su exportación CSV: columnas, formato
+        de fecha y de números. Estos perfiles se eligen al subir un archivo.
+      add: Agregar perfil
+      edit: Editar perfil
+      empty: Todavía no hay perfiles CSV.
+      actions: Acciones
+
+      name: Nombre
+      description: Descripción
+      delimiter: Delimitador
+      enclosure: Delimitador de texto
+      encoding: Codificación
+      header_skip: Filas de preámbulo
+      header_skip.help: Líneas sobre el encabezado de columnas (datos de la cuenta, período, …).
+      has_header_row: Tiene fila de encabezado
+      date_format: Formato de fecha
+      date_format.help: 'd=día, m=mes, Y=año de 4 dígitos, y=año de 2 dígitos. Ejemplo: d.m.Y → 24.04.2026'
+      amount_decimal_separator: Sep. decimal
+      amount_thousands_separator: Sep. de miles
+      direction_mode: Signo
+      direction_mode.help: |
+        "Con signo" = entradas positivas y salidas negativas en una columna.
+        "Columnas separadas" = una columna para los importes de débito y otra para los de crédito.
+      direction:
+        signed: Con signo (una columna)
+        separate_columns: Columnas separadas (débito/crédito)
+      iban_source_line: Línea del IBAN de la cuenta
+      iban_source_line.help: Índice de línea basado en 0; vacío si no existe.
+      period_source_line: Línea del período
+      period_source_line.help: Índice de línea basado en 0; vacío si no existe.
+
+      help:
+        intro: |
+          Describe cómo es la exportación CSV de tu banco. El ejemplo de la
+          derecha usa un extracto para ilustrar para qué se usa cada campo.
+
+      section:
+        basics: Datos básicos
+        csv: Formato CSV
+        values: Formato de valores
+        header: Preámbulo (opcional)
+        header.help: |
+          Algunos bancos incluyen el IBAN de la cuenta y el período del extracto
+          al principio del archivo. Si el tuyo lo hace, ingresa los números de
+          línea correspondientes (basados en 0); de lo contrario, déjalos vacíos.
+        columns: Asignación de columnas
+        columns.help: |
+          Para cada campo, ingresa la letra de columna (A, B, C …) tal como la
+          muestra tu programa de hojas de cálculo (p. ej., Excel o LibreOffice
+          Calc), o bien el índice de columna basado en 0 (0, 1, 2 …).
+          La fecha contable y el importe (o las columnas de débito/crédito, si
+          tu banco usa columnas separadas) son obligatorios. Deja los campos
+          vacíos cuando la columna no exista.
+
+      example:
+        title: Ejemplo de cuenta corriente
+        intro: |
+          Una exportación CSV típica. Los resaltados muestran qué valores se
+          leen de cada fila o columna.
+        iban: IBAN de la cuenta (inicio del archivo)
+        period: Período del extracto
+        dates: Fecha contable y fecha valor
+        context: Contraparte y concepto
+        amount: Importe (con signo)
+        signed_hint: con signo
+        header_skip: Preámbulo
+        header_skip.help: |
+          Cuatro filas de metadatos, luego la fila de encabezado de columnas y
+          después los movimientos propiamente dichos.
+
+      col:
+        invalid: Ingresa una letra de columna (A, B, …) o un número de columna (0, 1, …).
+        group:
+          required: Obligatorio
+          separate: Solo si tu banco usa columnas separadas de débito/crédito
+          context: Recomendado (se usa para la vista previa y las reglas)
+          optional: Campos opcionales
+        book_date: Fecha contable
+        value_date: Fecha valor
+        counterparty_name: Contraparte (nombre)
+        counterparty_iban: Contraparte (IBAN)
+        purpose: Concepto
+        amount: Importe
+        amount_debit: Importe de débito
+        amount_credit: Importe de crédito
+        end_to_end_id: Referencia del cliente
+        mandate_reference: Referencia del mandato
+        creditor_id: ID de acreedor
+
+      flash:
+        created: Perfil creado.
+        updated: Perfil actualizado.
+        deleted: Perfil eliminado.
+      form_load_failed: No se pudo cargar el formulario.
+
+    settings:
+      title: Configuración de la importación bancaria
+      subtitle: Configura cómo se detectan los números de factura en el concepto durante la importación.
+      flash:
+        saved: La configuración se guardó correctamente.
