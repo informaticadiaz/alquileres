@@ -155,6 +155,37 @@ class BookingJournalService
         ?\DateTimeInterface $bookingDate = null,
         string $sourceType = BookingEntry::SOURCE_WORKFLOW,
     ): array {
+        // The month batch lookup-or-create, the entries and the year renumbering form one
+        // unit: without a surrounding transaction two concurrent writers could each create
+        // a batch for the same new month. On SQLite the transaction holds the write lock
+        // from its start, so the lookup already sees the other writer's batch.
+        $connection = $this->em->getConnection();
+        $connection->beginTransaction();
+        try {
+            $entries = $this->persistEntriesFromInvoice($invoice, $debitAccount, $creditAccount, $remark, $bookingDate, $sourceType);
+            $connection->commit();
+        } catch (\Throwable $exception) {
+            $connection->rollBack();
+            // A batch created inside the rolled back transaction must not be reused.
+            $this->batchCache = [];
+
+            throw $exception;
+        }
+
+        return $entries;
+    }
+
+    /**
+     * @return BookingEntry[]
+     */
+    private function persistEntriesFromInvoice(
+        Invoice $invoice,
+        ?AccountingAccount $debitAccount,
+        ?AccountingAccount $creditAccount,
+        ?string $remark,
+        ?\DateTimeInterface $bookingDate,
+        string $sourceType,
+    ): array {
         $bookingDate = null !== $bookingDate
             ? \DateTime::createFromInterface($bookingDate)
             : new \DateTime();
