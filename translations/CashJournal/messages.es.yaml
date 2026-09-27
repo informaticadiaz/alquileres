@@ -1,0 +1,44 @@
+journal.action: Acción
+journal.add: Agregar libro de caja
+journal.cash.booked: Contabilizado
+journal.cash.closed: Cerrado
+journal.cash.end: Saldo final
+journal.cash.end.desc: Muestra el saldo final.
+journal.cash.end.info: >-
+  El saldo final se calcula automáticamente y no es necesario completarlo.
+journal.cash.start: Saldo inicial
+journal.cash.start.desc: Muestra el saldo inicial.
+journal.delete.ask: ¿Quieres eliminar el libro de caja con todas sus entradas?
+journal.description: Libro de caja
+journal.edit: Editar entrada
+journal.entry.add: Agregar entrada
+journal.entry.counteraccount: Contrapartida
+journal.entry.date: Fecha
+journal.entry.delete.ask: ¿Seguro que quieres eliminar la entrada?
+journal.entry.documentnumber: N.º comprob.
+journal.entry.edit: Editar entrada
+journal.entry.expenses: Egresos
+journal.entry.flash.create.success: La entrada se agregó correctamente.
+journal.entry.flash.delete.success: La entrada se eliminó correctamente.
+journal.entry.flash.edit.success: La entrada se actualizó correctamente.
+journal.entry.incomes: Ingresos
+journal.entry.inventory: Saldo
+journal.entry.invoicenumber: 'N.º fact. '
+journal.entry.number: '#'
+journal.entry.remark: Observación
+journal.flash.create.success: El libro de caja se agregó correctamente
+journal.flash.edit.status.success: El estado se cambió correctamente.
+journal.flash.edit.status.warning: No se pudo cambiar el estado.
+journal.flash.edit.success: La entrada se procesó correctamente.
+journal.month: Mes
+journal.month.desc: Mes del libro de caja
+journal.positions: Posiciones
+journal.positions.desc: >-
+  Agrega una tabla con todas las líneas del libro de caja. Al exportar se
+  muestran todas las filas, pero aquí, en la plantilla, solo se ve una.
+journal.single: Libro de caja
+journal.template: Seleccionar plantilla de exportación
+journal.title: Libro de caja
+journal.year: Año
+journal.year.desc: Año del libro de caja
+journal.error.journal.closed: 'El libro de caja %month%/%year% está cerrado. No se pudo agregar la entrada.'
