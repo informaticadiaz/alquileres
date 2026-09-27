@@ -27,6 +27,7 @@ Symfony environments: `sqlite_test` (functional tests) and `sqlite_prod`
 | First run | Local technical templates instead of downloading them. |
 | Backups | `app:sqlite:backup` writes a consistent, verified single-file copy with `VACUUM INTO`; `--dir`/`--keep` for scheduled runs with retention. |
 | Operation | `sqlite_prod` inherits upstream `when@prod` settings, runs with debug disabled, stores sessions under `var/sessions/`, throttles logins (5 per 15 min) and sends basic security headers. |
+| Spanish | A Spanish interface translated from the English files (`translations/**/*.es.yaml`), enabled as locale `es` with English as its fallback. Select it with `LOCALE=es`. |
 
 Known limitations:
 
@@ -64,6 +65,18 @@ reinstall dependencies, clear the cache, compile assets, run
 
 Restoring: stop the service, remove the database file and its `-wal`/`-shm`
 files, copy the backup in place and start the service again.
+
+## Spanish translation
+
+Set `LOCALE=es` to use it. Every `*.en.yaml` has a `*.es.yaml` sibling;
+`tests/Unit/Translation/SpanishTranslationParityTest.php` fails when keys,
+placeholders, plural intervals or HTML tags differ, so new upstream English
+keys must be translated before they pass. Style: neutral Spanish addressing
+the user informally (tú).
+
+Not covered yet: e-mail and PDF templates created by users, the default
+customer salutations stored in the settings, and texts outside
+`translations/`.
 
 ## Tests
 

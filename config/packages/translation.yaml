@@ -1,6 +1,8 @@
 framework:
     default_locale: '%locale%'
-    enabled_locales: ['de', 'en']
+    # es: Spanish translation of this fork, made from the English files.
+    enabled_locales: ['de', 'en', 'es']
     translator:
-        fallbacks: ['de']
+        # English first so Spanish falls back to its source language; English still falls back to German.
+        fallbacks: ['en', 'de']
         default_path: '%kernel.project_dir%/translations'
