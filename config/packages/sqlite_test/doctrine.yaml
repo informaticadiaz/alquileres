@@ -1,5 +1,9 @@
 doctrine:
     dbal:
+        # SQLite compares dates as text; see App\Doctrine\SqliteDateType.
+        types:
+            date: App\Doctrine\SqliteDateType
+            date_immutable: App\Doctrine\SqliteDateImmutableType
         connections:
             default:
                 driver: 'pdo_sqlite'

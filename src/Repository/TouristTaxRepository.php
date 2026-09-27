@@ -8,6 +8,7 @@ use App\Entity\Subsidiary;
 use App\Entity\TouristTax;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\DBAL\Types\Types;
 
 /**
  * @extends ServiceEntityRepository<TouristTax>
@@ -34,8 +35,8 @@ class TouristTaxRepository extends ServiceEntityRepository
             ->andWhere('t.validFrom IS NULL OR t.validFrom <= :end')
             ->andWhere('t.validTo IS NULL OR t.validTo >= :start')
             ->setParameter('active', true)
-            ->setParameter('start', $start->format('Y-m-d'))
-            ->setParameter('end', $end->format('Y-m-d'))
+            ->setParameter('start', \DateTimeImmutable::createFromInterface($start), Types::DATE_IMMUTABLE)
+            ->setParameter('end', \DateTimeImmutable::createFromInterface($end), Types::DATE_IMMUTABLE)
             ->orderBy('t.sortOrder', 'ASC')
             ->addOrderBy('t.id', 'ASC');
 

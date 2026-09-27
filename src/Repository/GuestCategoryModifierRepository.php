@@ -8,6 +8,7 @@ use App\Entity\GuestCategory;
 use App\Entity\GuestCategoryModifier;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\DBAL\Types\Types;
 
 /**
  * @extends ServiceEntityRepository<GuestCategoryModifier>
@@ -33,7 +34,7 @@ class GuestCategoryModifierRepository extends ServiceEntityRepository
             ->andWhere('m.validFrom IS NULL OR m.validFrom <= :date')
             ->andWhere('m.validTo IS NULL OR m.validTo >= :date')
             ->setParameter('active', true)
-            ->setParameter('date', $date->format('Y-m-d'))
+            ->setParameter('date', \DateTimeImmutable::createFromInterface($date), Types::DATE_IMMUTABLE)
             ->orderBy('m.sortOrder', 'ASC')
             ->addOrderBy('m.id', 'ASC')
             ->getQuery()

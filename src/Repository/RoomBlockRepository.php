@@ -11,6 +11,7 @@ use App\Entity\Subsidiary;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\DBAL\Types\Types;
 
 /**
  * Repository for room blocks (out-of-order periods); endDate is exclusive.
@@ -34,8 +35,8 @@ class RoomBlockRepository extends ServiceEntityRepository
             ->andWhere('b.startDate < :end')
             ->andWhere('b.endDate > :start')
             ->setParameter('apartment', $apartment)
-            ->setParameter('start', $start->format('Y-m-d'))
-            ->setParameter('end', $end->format('Y-m-d'))
+            ->setParameter('start', \DateTimeImmutable::createFromInterface($start), Types::DATE_IMMUTABLE)
+            ->setParameter('end', \DateTimeImmutable::createFromInterface($end), Types::DATE_IMMUTABLE)
             ->addOrderBy('b.startDate', 'ASC');
 
         if (null !== $ignore && null !== $ignore->getId()) {
@@ -66,8 +67,8 @@ class RoomBlockRepository extends ServiceEntityRepository
             ->andWhere('b.startDate <= :end')
             ->andWhere('b.endDate >= :start')
             ->setParameter('apartments', $apartments)
-            ->setParameter('start', $start->format('Y-m-d'))
-            ->setParameter('end', $end->format('Y-m-d'))
+            ->setParameter('start', \DateTimeImmutable::createFromInterface($start), Types::DATE_IMMUTABLE)
+            ->setParameter('end', \DateTimeImmutable::createFromInterface($end), Types::DATE_IMMUTABLE)
             ->addOrderBy('b.startDate', 'ASC')
             ->getQuery()
             ->getResult();
@@ -91,8 +92,8 @@ class RoomBlockRepository extends ServiceEntityRepository
             ->andWhere('b.startDate < :end')
             ->andWhere('b.endDate > :start')
             ->setParameter('ids', $apartmentIds, ArrayParameterType::INTEGER)
-            ->setParameter('start', $start->format('Y-m-d'))
-            ->setParameter('end', $end->format('Y-m-d'))
+            ->setParameter('start', \DateTimeImmutable::createFromInterface($start), Types::DATE_IMMUTABLE)
+            ->setParameter('end', \DateTimeImmutable::createFromInterface($end), Types::DATE_IMMUTABLE)
             ->getQuery()
             ->getResult();
 
@@ -117,8 +118,8 @@ class RoomBlockRepository extends ServiceEntityRepository
             ->join('b.appartment', 'a')
             ->andWhere('b.startDate < :periodEnd')
             ->andWhere('b.endDate > :periodStart')
-            ->setParameter('periodStart', $periodStart->format('Y-m-d'))
-            ->setParameter('periodEnd', $periodEnd->format('Y-m-d'))
+            ->setParameter('periodStart', \DateTimeImmutable::createFromInterface($periodStart), Types::DATE_IMMUTABLE)
+            ->setParameter('periodEnd', \DateTimeImmutable::createFromInterface($periodEnd), Types::DATE_IMMUTABLE)
             ->addOrderBy('b.startDate', 'DESC')
             ->addOrderBy('b.endDate', 'DESC')
             ->addOrderBy('a.number', 'ASC');
@@ -161,8 +162,8 @@ class RoomBlockRepository extends ServiceEntityRepository
             ->join('b.appartment', 'a')
             ->andWhere('b.startDate < :end')
             ->andWhere('b.endDate > :start')
-            ->setParameter('start', $start->format('Y-m-d'))
-            ->setParameter('end', $end->format('Y-m-d'));
+            ->setParameter('start', \DateTimeImmutable::createFromInterface($start), Types::DATE_IMMUTABLE)
+            ->setParameter('end', \DateTimeImmutable::createFromInterface($end), Types::DATE_IMMUTABLE);
 
         if ('all' !== $objectId) {
             $qb->andWhere('a.object = :objectId')
