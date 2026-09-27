@@ -19,6 +19,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
@@ -39,6 +40,8 @@ class ProcessScheduledWorkflowsCommand extends Command
         private readonly EntityManagerInterface $em,
         private readonly LoggerInterface $logger,
         private readonly RequestStack $requestStack,
+        #[Autowire('%kernel.project_dir%/var/lock/workflow-process-scheduled.lock')]
+        private readonly string $lockFile,
     ) {
         parent::__construct();
     }
@@ -52,6 +55,56 @@ class ProcessScheduledWorkflowsCommand extends Command
     {
         $io = new SymfonyStyle($input, $output);
         $dryRun = (bool) $input->getOption('dry-run');
+
+        if ($dryRun) {
+            return $this->processWorkflows($io, true);
+        }
+
+        // Actions run before their success is logged, so a cron pass that starts while
+        // the previous one is still sending would execute the same workflows again.
+        $lock = $this->acquireLock();
+        if (null === $lock) {
+            $io->note('Scheduled workflows are already running; skipping this pass.');
+
+            return Command::SUCCESS;
+        }
+
+        try {
+            return $this->processWorkflows($io, false);
+        } finally {
+            flock($lock, \LOCK_UN);
+            fclose($lock);
+        }
+    }
+
+    /**
+     * Non-blocking exclusive lock on a local file; null when another pass holds it.
+     *
+     * @return resource|null
+     */
+    private function acquireLock()
+    {
+        $directory = \dirname($this->lockFile);
+        if (!is_dir($directory) && !mkdir($directory, 0770, true) && !is_dir($directory)) {
+            throw new \RuntimeException(sprintf('Could not create lock directory "%s".', $directory));
+        }
+
+        $lock = fopen($this->lockFile, 'c');
+        if (false === $lock) {
+            throw new \RuntimeException(sprintf('Could not open lock file "%s".', $this->lockFile));
+        }
+
+        if (!flock($lock, \LOCK_EX | \LOCK_NB)) {
+            fclose($lock);
+
+            return null;
+        }
+
+        return $lock;
+    }
+
+    private function processWorkflows(SymfonyStyle $io, bool $dryRun): int
+    {
 
         // Some services (e.g. ReservationService::getTotalPricesForTemplate) use the session
         // as a temporary store. In CLI context there is no request/session, so we push a
