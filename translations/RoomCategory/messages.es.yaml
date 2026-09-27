@@ -1,0 +1,81 @@
+category:
+  acronym: Sigla
+  action: Acción
+  delete:
+    ask: ¿Seguro que quieres eliminar esta categoría?
+  details: Detalles / descripción pública
+  description: Administración de categorías de habitación
+  min_full_payers: Mínimo de huéspedes con tarifa completa
+  min_full_payers.help: >-
+    Cantidad de huéspedes que siempre pagan la tarifa completa por persona antes
+    de que se apliquen los ajustes de precio por categoría (p. ej., descuentos
+    para niños). Ejemplo: 2 → los descuentos solo se aplican a partir de 3
+    huéspedes. 0 = sin mínimo.
+  double: Habitación doble
+  flash:
+    create:
+      success: La categoría se creó correctamente.
+    delete:
+      error:
+        still:
+          in:
+            use: >-
+              La categoría no se puede eliminar porque todavía tiene habitaciones
+              o rangos de precios asociados.
+      success: La categoría se eliminó correctamente.
+    edit:
+      success: La categoría se procesó correctamente.
+  name: Descripción
+  single: Habitación individual
+  title: Administración de categorías de habitación
+  tab:
+    general: General
+    amenities: Servicios
+    images: Imágenes
+  amenity_group:
+    room: Habitación
+    bathroom: Baño
+    kitchen: Cocina
+    outdoor: General
+    other: Otros
+  images:
+    save_first: Guarda la categoría antes de subir imágenes.
+    upload: Subir imágenes
+    set_primary: Establecer como imagen principal
+    delete: Eliminar imagen
+    no_images: Todavía no se subieron imágenes.
+    hint: "Formatos permitidos: JPEG, PNG, WebP. Máximo 10 MB y 20 megapíxeles; el ancho y el alto no pueden superar los 8.000 píxeles cada uno. Se recomienda la orientación horizontal."
+    validation:
+      invalid: No se pudo procesar la imagen. Selecciona un archivo de imagen válido.
+      file_size: El archivo de imagen es demasiado grande. El tamaño máximo permitido es 10 MB.
+      format: Archivo de imagen no válido. Los formatos permitidos son JPEG, PNG y WebP.
+      resolution: La resolución de la imagen es demasiado alta. El máximo es 20 megapíxeles; el ancho y el alto no pueden superar los 8.000 píxeles cada uno. Reduce el tamaño de la imagen antes de subirla.
+
+amenity:
+  wifi: Wi-Fi
+  tv: TV
+  air_conditioning: Aire acondicionado
+  heating: Calefacción
+  safe: Caja fuerte
+  desk: Escritorio
+  balcony: Balcón
+  terrace: Terraza
+  view_mountain: Vista a la montaña
+  view_lake: Vista al lago
+  view_garden: Vista al jardín
+  private_bathroom: Baño privado
+  shower: Ducha
+  bathtub: Bañera
+  hairdryer: Secador de pelo
+  towels: Toallas
+  washing_machine: Lavadora
+  kitchenette: Cocina pequeña
+  fridge: Refrigerador
+  coffee_machine: Cafetera
+  kettle: Hervidor
+  dishwasher: Lavavajillas
+  parking: Estacionamiento
+  pets_allowed: Se admiten mascotas
+  non_smoking: No fumadores
+  accessible: Accesible
+  crib_available: Cuna disponible
