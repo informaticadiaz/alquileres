@@ -132,62 +132,74 @@ class PublicBookingService
         $config = $this->configService->getConfig();
         $this->assertConfigReady($config);
 
-        $selection = $this->normalizeOccupancySelection($occupancySelection);
-        $availability = $this->resolveAvailability($calendarRoom, $dateFrom, $dateTo, $persons, $roomsCount, $config, $guestCounts);
-        $this->validateOccupancySelectionAgainstAvailability($selection, $availability, $persons, $roomsCount);
+        // Availability is re-checked and the booking persisted in one transaction so that a
+        // concurrent booking cannot claim the same room in between; on SQLite the transaction
+        // holds the write lock from its start. A failure also leaves no orphan booker behind.
+        $connection = $this->em->getConnection();
+        $connection->beginTransaction();
+        try {
+            $selection = $this->normalizeOccupancySelection($occupancySelection);
+            $availability = $this->resolveAvailability($calendarRoom, $dateFrom, $dateTo, $persons, $roomsCount, $config, $guestCounts);
+            $this->validateOccupancySelectionAgainstAvailability($selection, $availability, $persons, $roomsCount);
 
-        $assignedRoomsWithPersons = $this->assignRoomsWithOccupancy($availability, $selection);
-        $reservations = $this->buildTransientReservationsWithExplicitPersons($assignedRoomsWithPersons, $dateFrom, $dateTo);
-        $this->distributeGuestCounts($reservations, $guestCounts);
+            $assignedRoomsWithPersons = $this->assignRoomsWithOccupancy($availability, $selection);
+            $reservations = $this->buildTransientReservationsWithExplicitPersons($assignedRoomsWithPersons, $dateFrom, $dateTo);
+            $this->distributeGuestCounts($reservations, $guestCounts);
 
-        // Resolve selected extras against the concrete booked composition. Category-bound extras
-        // get their quantity from the booked rooms of that category; mandatory ones are forced on.
-        $composition = $this->buildExtrasComposition($assignedRoomsWithPersons);
-        $resolvedExtras = $this->pricingService->resolveExtras(
-            $composition['buckets'],
-            $dateFrom,
-            $dateTo,
-            $composition['totalPersons'],
-            $composition['totalRooms'],
-            $selectedExtras,
-        );
+            // Resolve selected extras against the concrete booked composition. Category-bound extras
+            // get their quantity from the booked rooms of that category; mandatory ones are forced on.
+            $composition = $this->buildExtrasComposition($assignedRoomsWithPersons);
+            $resolvedExtras = $this->pricingService->resolveExtras(
+                $composition['buckets'],
+                $dateFrom,
+                $dateTo,
+                $composition['totalPersons'],
+                $composition['totalRooms'],
+                $selectedExtras,
+            );
 
-        $status = OnlineBookingConfig::BOOKING_MODE_BOOKING === $config->getBookingMode()
-            ? $this->configService->getBookingStatus($config)
-            : $this->configService->getInquiryStatus($config);
-        if (!$status instanceof ReservationStatus) {
-            throw new PublicBookingException('online_booking.error.invalid_status_config');
-        }
-
-        $origin = $this->configService->getReservationOrigin($config);
-        if (null === $origin) {
-            throw new PublicBookingException('online_booking.error.reservation_origin_missing');
-        }
-
-        $customer = $this->findOrCreateBookerCustomer(
-            $booker
-        );
-        $publicComment = self::sanitize($booker['comment'] ?? '', 2000);
-
-        $bookingGroupUuid = Uuid::v4();
-        foreach ($reservations as $reservation) {
-            $reservation->setReservationOrigin($origin);
-            $reservation->setReservationStatus($status);
-            $reservation->setBooker($customer);
-            $reservation->setUuid(Uuid::v4());
-            $reservation->setBookingGroupUuid($bookingGroupUuid);
-            if ('' !== $publicComment) {
-                $reservation->setRemark($publicComment);
+            $status = OnlineBookingConfig::BOOKING_MODE_BOOKING === $config->getBookingMode()
+                ? $this->configService->getBookingStatus($config)
+                : $this->configService->getInquiryStatus($config);
+            if (!$status instanceof ReservationStatus) {
+                throw new PublicBookingException('online_booking.error.invalid_status_config');
             }
-        }
 
-        // Attach extras to the matching reservations (category-aware, calc-type-aware).
-        $this->attachExtrasToReservations($reservations, $resolvedExtras);
+            $origin = $this->configService->getReservationOrigin($config);
+            if (null === $origin) {
+                throw new PublicBookingException('online_booking.error.reservation_origin_missing');
+            }
 
-        foreach ($reservations as $reservation) {
-            $this->em->persist($reservation);
+            $customer = $this->findOrCreateBookerCustomer(
+                $booker
+            );
+            $publicComment = self::sanitize($booker['comment'] ?? '', 2000);
+
+            $bookingGroupUuid = Uuid::v4();
+            foreach ($reservations as $reservation) {
+                $reservation->setReservationOrigin($origin);
+                $reservation->setReservationStatus($status);
+                $reservation->setBooker($customer);
+                $reservation->setUuid(Uuid::v4());
+                $reservation->setBookingGroupUuid($bookingGroupUuid);
+                if ('' !== $publicComment) {
+                    $reservation->setRemark($publicComment);
+                }
+            }
+
+            // Attach extras to the matching reservations (category-aware, calc-type-aware).
+            $this->attachExtrasToReservations($reservations, $resolvedExtras);
+
+            foreach ($reservations as $reservation) {
+                $this->em->persist($reservation);
+            }
+            $this->em->flush();
+            $connection->commit();
+        } catch (\Throwable $exception) {
+            $connection->rollBack();
+
+            throw $exception;
         }
-        $this->em->flush();
 
         $pricing = $this->calculateRoomTotal($reservations);
         $extrasResult = $this->summarizeExtras($resolvedExtras);
