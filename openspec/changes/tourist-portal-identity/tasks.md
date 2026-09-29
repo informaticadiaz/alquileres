@@ -53,7 +53,7 @@ Chain strategy: stacked-to-main
 
 ## Phase 4: Deployment (Gated — requires explicit user authorization; DB-changing, public site)
 
-- [ ] 4.1 [AUTH REQUIRED] Copy `plugins/tourist-identity/` into `app/osclass/oc-content/plugins/tourist-identity/`; verify `diff -r plugins/tourist-identity/ app/osclass/oc-content/plugins/tourist-identity/`.
-- [ ] 4.2 [AUTH REQUIRED] Install plugin from oc-admin Plugins page (DB write, deletes items 1/2).
-- [ ] 4.3 [AUTH REQUIRED] Trigger "Re-apply" once; confirm 0 changes.
-- [ ] 4.4 [AUTH REQUIRED] Verify over HTTPS: title, meta desc, H1, CTA, placeholder, logo, disclaimer, no "Powered by Osclass", single category, former parent 4 empty, ARS-only form, items 1/2 → 404, en_US locale, admin unaffected.
+- [x] 4.1 [AUTH REQUIRED] Copy `plugins/tourist-identity/` into `app/osclass/oc-content/plugins/tourist-identity/`; verify `diff -r plugins/tourist-identity/ app/osclass/oc-content/plugins/tourist-identity/`.
+- [x] 4.2 [AUTH REQUIRED] Install plugin from oc-admin Plugins page (DB write, deletes items 1/2).
+- [x] 4.3 [AUTH REQUIRED] Trigger "Re-apply" once; confirm 0 changes. — SKIPPED by user decision (2026-09-29): the configure screen renders without the admin layout, so the result flash is not visible; idempotency rests on unit-tested plans and the hand trace.
+- [x] 4.4 [AUTH REQUIRED] Verify over HTTPS: title, meta desc, H1, CTA, placeholder, logo, disclaimer, no "Powered by Osclass", single category, former parent 4 empty, ARS-only form, items 1/2 → 404, en_US locale, admin unaffected.
