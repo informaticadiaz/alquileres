@@ -26,12 +26,12 @@ Chain strategy: stacked-to-main
 
 ## Phase 1: Pure Lib Contracts (RED → GREEN) — PR 1
 
-- [ ] 1.1 RED: add failing assertions in `tests/test_tourist_showcase.php` for `tourist_identity_version()`, `tourist_identity_target_prefs()`, `tourist_identity_override_map()`, `tourist_identity_override_text()` (incl. `OC_ADMIN` guard).
-- [ ] 1.2 RED: add assertions for `tourist_identity_category_plan()` (changed-rows-only, empty on 2nd pass) and currency helpers.
-- [ ] 1.3 RED: add assertions for `tourist_identity_build_snapshot()` (null-vs-empty pref) and `tourist_identity_restore_plan()` (round-trip, invalid-JSON throw).
-- [ ] 1.4 RED: add assertions for `tourist_identity_disclaimer()` (es_ES/en_US) and `tourist_identity_configure_url()`.
-- [ ] 1.5 GREEN: create `plugins/tourist-identity/tourist-identity-lib.php` implementing all contracts (design §Interfaces/Contracts) until tests pass.
-- [ ] 1.6 Lint `plugins/tourist-identity/tourist-identity-lib.php` with `php -l`.
+- [x] 1.1 RED: add failing assertions in `tests/test_tourist_showcase.php` for `tourist_identity_version()`, `tourist_identity_target_prefs()`, `tourist_identity_override_map()`, `tourist_identity_override_text()` (incl. `OC_ADMIN` guard).
+- [x] 1.2 RED: add assertions for `tourist_identity_category_plan()` (changed-rows-only, empty on 2nd pass) and currency helpers.
+- [x] 1.3 RED: add assertions for `tourist_identity_build_snapshot()` (null-vs-empty pref) and `tourist_identity_restore_plan()` (round-trip, invalid-JSON throw).
+- [x] 1.4 RED: add assertions for `tourist_identity_disclaimer()` (es_ES/en_US) and `tourist_identity_configure_url()`.
+- [x] 1.5 GREEN: create `plugins/tourist-identity/tourist-identity-lib.php` implementing all contracts (design §Interfaces/Contracts) until tests pass.
+- [x] 1.6 Lint `plugins/tourist-identity/tourist-identity-lib.php` with `php -l`.
 
 ## Phase 2: Osclass-Bound Plugin Wiring — PR 2
 
