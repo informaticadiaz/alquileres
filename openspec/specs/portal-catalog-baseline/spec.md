@@ -60,5 +60,5 @@ The system MUST delete items 1 and 2 through the native Item manager during setu
 
 - GIVEN identity setup has completed
 - WHEN a visitor requests the public detail page for item 1 or item 2 over HTTPS
-- THEN the server returns HTTP 404
+- THEN the server returns HTTP 404 or 410 (Osclass returns 410 Gone for deleted items)
 - AND neither item appears in public search results

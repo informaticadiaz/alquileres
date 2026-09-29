@@ -65,5 +65,5 @@ The system MUST expose its applied state so that success is verifiable entirely 
 
 - GIVEN identity setup has completed
 - WHEN an operator checks the public HTTPS site
-- THEN title, H1, placeholder, logo, disclaimer, single category, ARS-only currency, and items 1/2 returning 404 are all observable from HTTP responses alone
+- THEN title, H1, placeholder, logo, disclaimer, single category, ARS-only currency, and items 1/2 returning 404 or 410 (Osclass returns 410 Gone for deleted items) are all observable from HTTP responses alone
 - AND "Powered by Osclass" does not appear anywhere on the page
