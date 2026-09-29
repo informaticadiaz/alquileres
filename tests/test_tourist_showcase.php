@@ -153,6 +153,23 @@ $snapshot_prefs = array(
 $snapshot_categories = array(array('pk_i_id' => 47, 'b_enabled' => 1, 'fk_i_parent_id' => 4));
 $snapshot_currencies = array(array('pk_c_code' => 'USD', 'b_enabled' => 1));
 
+$snapshot_keys = tourist_identity_snapshot_pref_keys();
+expect_true(
+  in_array(array('sigma', 'logo'), $snapshot_keys, true),
+  'the snapshot also captures the sigma logo preference so uninstall can restore the original logo'
+);
+foreach (tourist_identity_target_prefs() as $target_pref) {
+  expect_true(
+    in_array(array($target_pref[0], $target_pref[1]), $snapshot_keys, true),
+    'every target preference is part of the snapshot keys'
+  );
+}
+$logo_snapshot = json_decode(tourist_identity_build_snapshot(array('sigma.logo' => 'sigma_logo.png'), array(), array()), true);
+expect_true(
+  $logo_snapshot['prefs']['sigma.logo'] === 'sigma_logo.png',
+  'the original logo filename is preserved in the snapshot'
+);
+
 $snapshot_json = tourist_identity_build_snapshot($snapshot_prefs, $snapshot_categories, $snapshot_currencies);
 expect_true(is_string($snapshot_json) && $snapshot_json !== '', 'the snapshot is serialized as a non-empty JSON string');
 
@@ -208,5 +225,44 @@ expect_true(
     === 'https://example.test/oc-admin/index.php?page=plugins&action=admin&plugin=tourist-identity%2Findex.php',
   'the configure form posts back to the admin hook with the subfolder plugin path relative to the plugins directory'
 );
+
+// --- tourist-identity: Phase 2.1 - pref plan (changed-rows-only, null-vs-string aware, idempotent) ---
+
+$pref_target = array(
+  array('osclass', 'pageTitle', 'Alquileres Temporarios'),
+  array('sigma', 'keyword_placeholder', 'Buscá por ciudad, provincia o tipo de alojamiento'),
+);
+
+$pref_current_before = array(
+  'osclass.pageTitle' => 'Osclass Anuncios Clasificados',
+  'sigma.keyword_placeholder' => null,
+);
+$pref_plan = tourist_identity_pref_plan($pref_current_before, $pref_target);
+expect_true(count($pref_plan) === 2, 'both differing prefs appear in the plan');
+expect_true(
+  $pref_plan['osclass.pageTitle'] === array('section' => 'osclass', 'name' => 'pageTitle', 'value' => 'Alquileres Temporarios'),
+  'a changed pref plans its section/name/value for osc_set_preference'
+);
+expect_true(
+  $pref_plan['sigma.keyword_placeholder'] === array('section' => 'sigma', 'name' => 'keyword_placeholder', 'value' => 'Buscá por ciudad, provincia o tipo de alojamiento'),
+  'a pref absent before (null) is included since null !== the target string'
+);
+
+$pref_current_after = array(
+  'osclass.pageTitle' => 'Alquileres Temporarios',
+  'sigma.keyword_placeholder' => 'Buscá por ciudad, provincia o tipo de alojamiento',
+);
+expect_true(
+  tourist_identity_pref_plan($pref_current_after, $pref_target) === array(),
+  'a second pass against already-applied pref state produces an empty plan'
+);
+
+// --- tourist-identity: showcase category linkage decision ---
+
+expect_true(tourist_identity_showcase_link_needed(array(), 47) === true, 'an empty showcase linkage must be relinked to the kept category');
+expect_true(tourist_identity_showcase_link_needed(array(47), 47) === false, 'a linkage already pointing only at the kept category needs no change');
+expect_true(tourist_identity_showcase_link_needed(array('47'), 47) === false, 'string category ids from preferences are compared as integers');
+expect_true(tourist_identity_showcase_link_needed(array(47, 44), 47) === true, 'extra linked categories are replaced by the kept category only');
+expect_true(tourist_identity_showcase_link_needed(array(44), 47) === true, 'a linkage to another category is replaced');
 
 echo "Tourist showcase checks passed.\n";

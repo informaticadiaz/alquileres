@@ -112,11 +112,39 @@ function tourist_identity_currency_plan(array $rows, $target) {
   return $plan;
 }
 
+function tourist_identity_pref_plan(array $current, array $target_prefs) {
+  $plan = array();
+
+  foreach ($target_prefs as $target_pref) {
+    list($section, $name, $value) = $target_pref;
+    $key = $section . '.' . $name;
+    $existing = array_key_exists($key, $current) ? $current[$key] : null;
+
+    if ($existing === null || (string)$existing !== (string)$value) {
+      $plan[$key] = array('section' => $section, 'name' => $name, 'value' => $value);
+    }
+  }
+
+  return $plan;
+}
+
+// Preferences captured before install: every target preference plus the sigma
+// logo, which the install replaces outside the target preference plan.
+function tourist_identity_snapshot_pref_keys() {
+  $keys = array();
+  foreach (tourist_identity_target_prefs() as $target_pref) {
+    $keys[] = array($target_pref[0], $target_pref[1]);
+  }
+  $keys[] = array('sigma', 'logo');
+
+  return $keys;
+}
+
 function tourist_identity_build_snapshot(array $prefs, array $categories, array $currencies) {
   $pref_snapshot = array();
 
-  foreach (tourist_identity_target_prefs() as $target_pref) {
-    $key = $target_pref[0] . '.' . $target_pref[1];
+  foreach (tourist_identity_snapshot_pref_keys() as $pref_key) {
+    $key = $pref_key[0] . '.' . $pref_key[1];
     $pref_snapshot[$key] = array_key_exists($key, $prefs) ? $prefs[$key] : null;
   }
 
@@ -152,4 +180,11 @@ function tourist_identity_disclaimer($locale) {
 function tourist_identity_configure_url($admin_base_url, $plugin_file, $plugins_path) {
   $plugin = str_replace(str_replace('\\', '/', $plugins_path), '', str_replace('\\', '/', $plugin_file));
   return $admin_base_url . '?' . http_build_query(array('page' => 'plugins', 'action' => 'admin', 'plugin' => $plugin));
+}
+
+// True when the showcase plugin must be relinked so its fields apply only to the kept category.
+function tourist_identity_showcase_link_needed(array $selected, $keep_category_id) {
+  $normalized = array_values(array_unique(array_map('intval', $selected)));
+
+  return $normalized !== array((int)$keep_category_id);
 }

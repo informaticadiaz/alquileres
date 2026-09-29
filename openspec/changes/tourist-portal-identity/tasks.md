@@ -35,21 +35,21 @@ Chain strategy: stacked-to-main
 
 ## Phase 2: Osclass-Bound Plugin Wiring — PR 2
 
-- [ ] 2.1 Create `plugins/tourist-identity/index.php`: header + hooks (`install_`, `_uninstall`, `_configure`, `gettext`, `footer`, `init`).
-- [ ] 2.2 `tourist_identity_install()`: snapshot into pref section `tourist_identity` before any write (spec: Snapshot on Install).
-- [ ] 2.3 `_apply()`: category DAO update + `osc_update_cat_stats()`, ARS insert/flags/default, core+sigma prefs, logo copy, showcase-47 link if `function_exists`, delete items 1/2 via `ItemActions`, return change count.
-- [ ] 2.4 `_uninstall()`: restore snapshot, keep ARS disabled, delete plugin logo + `tourist_identity` section (spec: Restore on Uninstall).
-- [ ] 2.5 `_configure()`: CSRF-checked "Re-apply" action calling `_apply()`.
-- [ ] 2.6 `_gettext($s)`: apply override map, guarded by `OC_ADMIN === false` (spec: Public-Only Gettext Overrides).
-- [ ] 2.7 `_footer()` disclaimer + `_init_currencies()` exporting enabled-only `currencies` View.
-- [ ] 2.8 Add `plugins/tourist-identity/assets/logo.svg`.
-- [ ] 2.9 Add `plugins/tourist-identity/README.md`: ops notes, source-string list, re-sync reminder.
-- [ ] 2.10 Lint `index.php`; re-run `php tests/test_tourist_showcase.php` (no regression).
+- [x] 2.1 Create `plugins/tourist-identity/index.php`: header + hooks (`install_`, `_uninstall`, `_configure`, `gettext`, `footer`, `init`).
+- [x] 2.2 `tourist_identity_install()`: snapshot into pref section `tourist_identity` before any write (spec: Snapshot on Install).
+- [x] 2.3 `_apply()`: category DAO update + `osc_update_cat_stats()`, ARS insert/flags/default, core+sigma prefs, logo copy, showcase-47 link if `function_exists`, delete items 1/2 via `ItemActions`, return change count.
+- [x] 2.4 `_uninstall()`: restore snapshot, keep ARS disabled, delete plugin logo + `tourist_identity` section (spec: Restore on Uninstall).
+- [x] 2.5 `_configure()`: CSRF-checked "Re-apply" action calling `_apply()`.
+- [x] 2.6 `_gettext($s)`: apply override map, guarded by `OC_ADMIN === false` (spec: Public-Only Gettext Overrides).
+- [x] 2.7 `_footer()` disclaimer + `_init_currencies()` exporting enabled-only `currencies` View.
+- [x] 2.8 Add `plugins/tourist-identity/assets/logo.svg`.
+- [x] 2.9 Add `plugins/tourist-identity/README.md`: ops notes, source-string list, re-sync reminder.
+- [x] 2.10 Lint `index.php`; re-run `php tests/test_tourist_showcase.php` (no regression).
 
 ## Phase 3: Local Verification
 
-- [ ] 3.1 Re-run `php tests/test_tourist_showcase.php`; all assertions pass.
-- [ ] 3.2 Trace `_apply()` idempotency by hand: second-call plan is empty against applied state.
+- [x] 3.1 Re-run `php tests/test_tourist_showcase.php`; all assertions pass.
+- [x] 3.2 Trace `_apply()` idempotency by hand: second-call plan is empty against applied state.
 
 ## Phase 4: Deployment (Gated — requires explicit user authorization; DB-changing, public site)
 
