@@ -1,0 +1,14 @@
+[Unit]
+Description=FewohBee SQLite demo: verified backup with retention
+Documentation=file:///home/ignacio/fewohbee/task.md
+ConditionPathExists=%h/.config/fewohbee/fewohbee.env
+ConditionPathExists=%h/.local/share/fewohbee/app/bin/console
+
+[Service]
+Type=oneshot
+WorkingDirectory=%h/.local/share/fewohbee/app
+EnvironmentFile=%h/.config/fewohbee/fewohbee.env
+ExecStart=/usr/bin/php -d variables_order=EGPCS bin/console app:sqlite:backup --dir=%h/.local/share/fewohbee/backups --keep=14 --no-interaction
+NoNewPrivileges=yes
+UMask=0077
+Nice=10

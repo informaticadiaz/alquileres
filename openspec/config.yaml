@@ -1,0 +1,47 @@
+# openspec/config.yaml
+schema: spec-driven
+
+context: |
+  Tech stack: PHP 8.5.4, Osclass 8.3.1 (vendor, git-ignored, app/osclass),
+  MySQL 8.4.11. Own code: plugins/tourist-showcase/ (Osclass plugin).
+  Tests: plain PHP assertion script (tests/test_tourist_showcase.php).
+  Docs: Spanish markdown at repo root. Public site behind systemd --user
+  osclass.service on 127.0.0.1:8783 (alquileres.diazignacio.ar).
+  Never install services, DNS, or Cloudflare config from here.
+
+projects:
+  - path: "."
+    stack: "PHP 8.5.4 (Osclass plugin ecosystem)"
+    test_command: "php tests/test_tourist_showcase.php"
+    lint_command: "php -l <file>"
+    framework: "plain PHP assertion script (no test framework)"
+
+strict_tdd: true
+
+rules:
+  proposal:
+    - Include rollback plan for risky changes
+    - Never propose installing, configuring, or exposing services (DNS, Cloudflare, systemd) without explicit authorization
+    - Never propose reading or printing data/osclass/credentials.env or app/osclass/config.php secrets
+  specs:
+    - Use Given/When/Then for scenarios
+    - Use RFC 2119 keywords (MUST, SHALL, SHOULD, MAY)
+  design:
+    - Document architecture decisions with rationale
+    - Respect Osclass plugin hook/API conventions; do not modify vendor code under app/osclass
+  tasks:
+    - Group by phase, use hierarchical numbering
+    - Keep tasks completable in one session
+  apply:
+    guidelines:
+      - Follow existing Osclass plugin patterns in plugins/tourist-showcase/
+      - After editing plugin source, remember the deployed copy under app/osclass/oc-content/plugins/ must be re-synced before activation/update (do not edit the deployed copy directly)
+      - Do not touch app/ runtime beyond reading
+    tdd: true
+    test_command: "php tests/test_tourist_showcase.php"
+  verify:
+    test_command: "php tests/test_tourist_showcase.php"
+    build_command: ""
+    coverage_threshold: 0
+  archive:
+    - Warn before merging destructive deltas

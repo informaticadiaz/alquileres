@@ -1,0 +1,22 @@
+[Unit]
+Description=FewohBee SQLite demo (alquileres.diazignacio.ar) on 127.0.0.1:8783
+Documentation=file:///home/ignacio/fewohbee/task.md
+After=network.target
+ConditionPathExists=%h/.config/fewohbee/fewohbee.env
+ConditionPathExists=%h/.local/share/fewohbee/app/public/index.php
+
+[Service]
+Type=simple
+WorkingDirectory=%h/.local/share/fewohbee/app
+EnvironmentFile=%h/.config/fewohbee/fewohbee.env
+# The PHP built-in server can fork request workers on Linux.
+Environment=PHP_CLI_SERVER_WORKERS=4
+# EGPCS exposes the service environment in $_ENV so the repository .env never overrides it.
+ExecStart=/usr/bin/php -d variables_order=EGPCS -d opcache.enable_cli=1 -S 127.0.0.1:8783 -t public
+Restart=on-failure
+RestartSec=5
+NoNewPrivileges=yes
+UMask=0077
+
+[Install]
+WantedBy=default.target
