@@ -129,7 +129,8 @@ function tourist_directory_fingerprint(array $entry) {
     isset($entry['web']) ? $entry['web'] : '',
   );
 
-  return sha1(implode('|', $parts));
+  // 'v2': entries imported before the type meta fix are planned as one-time updates.
+  return sha1('v2|' . implode('|', $parts));
 }
 
 // Generates the factual, non-copied description sentence for a directory entry, in the requested
@@ -240,7 +241,7 @@ function tourist_directory_item_params(array $entry, array $ctx) {
     $description[$locale] = tourist_directory_description($name, $type_key, $locality, $locale);
   }
 
-  return array(
+  $params = array(
     'catId' => $cat_id,
     'title' => $title,
     'description' => $description,
@@ -252,6 +253,15 @@ function tourist_directory_item_params(array $entry, array $ctx) {
     'dt_expiration' => '-1',
     'city' => $locality,
   );
+
+  // Osclass reads meta field values from the 'meta' param keyed by field id
+  // (ItemActions.php:169); the showcase type filter needs this value.
+  $type_field_id = isset($ctx['typeFieldId']) ? (int) $ctx['typeFieldId'] : 0;
+  if ($type_field_id > 0 && isset($entry['tipo']) && $entry['tipo'] !== '') {
+    $params['meta'] = array($type_field_id => $entry['tipo']);
+  }
+
+  return $params;
 }
 
 // Plans the transitions for one validated seed pass against the currently known directory markers.

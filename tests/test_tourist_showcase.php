@@ -1239,4 +1239,16 @@ expect_true(directory_removal_route_match('directorio/solicitar-baja/abc') === f
 expect_true(directory_removal_route_match('directorio/solicitar-baja/-5') === false, 'the removal route regexp rejects a negative-looking id');
 expect_true(directory_removal_route_match('otra-ruta/12/') === false, 'the removal route regexp rejects an unrelated path');
 
+// --- tourist-directory: accommodation type meta is written, and the fingerprint is versioned ---
+
+$type_entry = array('nombre' => 'Demo', 'localidad' => 'Villa Gesell', 'destino' => 'x', 'tipo' => 'Apart hotel', 'tipo_key' => 'apart_hotel', 'web' => 'https://demo.example');
+$type_params = tourist_directory_item_params($type_entry, array('catId' => 5, 'contactEmail' => 'd@directorio.invalid', 'locales' => array('es_ES'), 'typeFieldId' => 7));
+expect_true(isset($type_params['meta']) && $type_params['meta'] === array(7 => 'Apart hotel'), 'the accommodation type is passed to Osclass as the type meta field value');
+$no_type_params = tourist_directory_item_params($type_entry, array('catId' => 5, 'contactEmail' => 'd@directorio.invalid', 'locales' => array('es_ES')));
+expect_true(!isset($no_type_params['meta']), 'without a known type field id no meta is sent');
+expect_true(
+  tourist_directory_fingerprint($type_entry) === sha1('v2|Demo|Villa Gesell|x|Apart hotel|https://demo.example'),
+  'the fingerprint carries a format version so entries imported before the type fix are updated once'
+);
+
 echo "Tourist showcase checks passed.\n";

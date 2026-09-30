@@ -617,7 +617,14 @@ function tourist_directory_creation_context($catId) {
     'catId' => (int) $catId,
     'contactEmail' => tourist_directory_contact_email(),
     'locales' => tourist_directory_locales(tourist_directory_installed_locale_codes()),
+    'typeFieldId' => tourist_directory_type_field_id(),
   );
+}
+
+// Id of the showcase accommodation-type meta field, or 0 when the showcase plugin is absent.
+function tourist_directory_type_field_id() {
+  $field = Field::newInstance()->findBySlug('tourist_accommodation_type');
+  return (is_array($field) && isset($field['pk_i_id'])) ? (int) $field['pk_i_id'] : 0;
 }
 
 // Creates one new item for a validated entry (see tourist_directory_validate_row) in $catId, then
