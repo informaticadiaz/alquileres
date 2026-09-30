@@ -629,6 +629,18 @@ function tourist_directory_removal_decide(array $in) {
 // explicit confirmation the admin screen requires for this destructive-looking action). Any other
 // status/action combination -- including an unrecognized $action -- is rejected. Returns
 // array('ok'=>true,'status'=>NEW_STATUS) or array('ok'=>false,'error'=>CODE,'status'=>null).
+// ------------------------------------------------------------------------------------------------
+// Amendment (U7): public removal route/admin route wiring. The regexp is exposed here, not inlined
+// in index.php's osc_add_route() call, so it is directly testable without an Osclass runtime. No
+// $ anchor: Rewrite::init() matches it with preg_match('#^' . regexp . '#', $request_uri) (a prefix
+// match), so a trailing slash or an unrelated query tail after the digits never breaks the match --
+// see design.md's Amendment "Public page" architecture decision. The single capture group is the
+// numeric entry id, matching the url template's one {entry} placeholder.
+// ------------------------------------------------------------------------------------------------
+function tourist_directory_removal_route_regexp() {
+  return 'directorio/solicitar-baja/([0-9]+)';
+}
+
 function tourist_directory_admin_transition($status, $action, $confirm) {
   if ($action === 'mark_processed') {
     if ($status !== 'pending') {

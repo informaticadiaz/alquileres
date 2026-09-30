@@ -1222,4 +1222,21 @@ expect_true($plan_removal_result['removal_blocked'] === array('r1', 'r2', 'r3'),
 $plan_no_removal_result = tourist_directory_plan(array($plan_entry_create), array(), array());
 expect_true($plan_no_removal_result['removal_blocked'] === array(), 'removal_blocked defaults to empty when flags carries no removal_seed_ids');
 
+// --- tourist-directory: Phase 7.1 - removal route regexp (U7) ---
+
+function directory_removal_route_match($path) {
+  return preg_match('#^' . tourist_directory_removal_route_regexp() . '#', $path, $m) === 1 ? $m : false;
+}
+
+$m1 = directory_removal_route_match('directorio/solicitar-baja/12/');
+expect_true($m1 !== false && $m1[1] === '12', 'the removal route regexp matches a numeric entry id with a trailing slash and captures it');
+
+$m2 = directory_removal_route_match('directorio/solicitar-baja/12345');
+expect_true($m2 !== false && $m2[1] === '12345', 'the removal route regexp matches a numeric entry id with no trailing slash');
+
+expect_true(directory_removal_route_match('directorio/solicitar-baja/') === false, 'the removal route regexp rejects a path with no entry id at all');
+expect_true(directory_removal_route_match('directorio/solicitar-baja/abc') === false, 'the removal route regexp rejects a non-numeric entry id');
+expect_true(directory_removal_route_match('directorio/solicitar-baja/-5') === false, 'the removal route regexp rejects a negative-looking id');
+expect_true(directory_removal_route_match('otra-ruta/12/') === false, 'the removal route regexp rejects an unrelated path');
+
 echo "Tourist showcase checks passed.\n";

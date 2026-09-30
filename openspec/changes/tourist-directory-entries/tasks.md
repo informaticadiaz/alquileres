@@ -94,19 +94,19 @@ Chain strategy: stacked-to-main
 
 ## Phase 7: U7 — Amendment: Public Removal Route/Form, Admin Screen, Render Link, CSS, README
 
-- [ ] 7.1 RED: test for the removal-route regexp (exposed as a lib constant/pure helper) matching `directorio/solicitar-baja/12/` and rejecting malformed/non-numeric paths.
-- [ ] 7.2 GREEN: implement the regexp as a shared lib constant; register `osc_add_route('tourist-directory-removal', 'directorio/solicitar-baja/([0-9]+)', 'directorio/solicitar-baja/{entry}/', 'tourist-directory/views/removal-form.php')` and `osc_add_route('tourist-directory-admin', 'tourist-directory-admin/?', 'tourist-directory-admin/', 'tourist-directory/admin/requests.php')` at plugin load in `index.php`.
-- [ ] 7.3 GREEN: create `plugins/tourist-directory/views/removal-form.php` — `ABS_PATH` guard, entry id from the route param only (never a form field), relation radio (required), optional `reply_contact`/`reason`, Ley 25.326 privacy note, `osc_csrf_token_form()`, hidden honeypot (CSS off-screen, `autocomplete="off"`, `tabindex="-1"`), "temporarily unavailable" message when `_channel_ready()` is false.
-- [ ] 7.4 GREEN: implement the `init_custom` POST handler in `index.php` — acts only when route is ours and `REQUEST_METHOD==='POST'`; `osc_csrf_check()` first; builds `_removal_decide()` input including `_client_ip()`/`_ip_hash()`; on `accept`/`accept_retired`, inserts the request row THEN retires the entry (insert first); PRG via `osc_redirect_to()`.
-- [ ] 7.5 GREEN: update the render hooks — link to `osc_route_url('tourist-directory-removal', ['entry'=>$id])`, omitting the link when `osc_route_url()` returns `''`; remove the `init_contact` prefill (superseded, see 2.6).
-- [ ] 7.6 GREEN: add a `header` hook emitting `noindex` on the removal and admin routes.
-- [ ] 7.7 GREEN: create `plugins/tourist-directory/admin/requests.php` — lists requests (entry name, date, relation, status; reply contact visible only here); `mark_processed` and `reactivate` (requires `confirm=1`) actions.
-- [ ] 7.8 GREEN: wire the admin POST handling in `renderplugin_controller` with `osc_csrf_check()` + PRG; on `reactivate`, set every blocking request for that item to `rejected` and call `tourist_directory_reactivate($id, ['allow_reactivate'=>true])`.
-- [ ] 7.9 GREEN: wire `admin_menu_init` to add the "Tourist Directory Entries" admin menu entry via `osc_admin_menu_plugins`.
-- [ ] 7.10 GREEN: retention housekeeping on the admin page load — null `s_ip_hash` after 30 days; blank `reply_contact`/`reason` 180 days after `dt_processed`.
-- [ ] 7.11 GREEN: update `plugins/tourist-directory/assets/tourist-directory.css` for the removal form (honeypot off-screen styling) and admin screen.
-- [ ] 7.12 GREEN: update `plugins/tourist-directory/README.md` — routes, schema migration, throttle/retention defaults, admin usage.
-- [ ] 7.13 Verify U7: `php tests/test_tourist_showcase.php` green; `php -l` on all new/changed PHP; local commit.
+- [x] 7.1 RED: test for the removal-route regexp (exposed as a lib constant/pure helper) matching `directorio/solicitar-baja/12/` and rejecting malformed/non-numeric paths.
+- [x] 7.2 GREEN: implement the regexp as a shared lib constant; register `osc_add_route('tourist-directory-removal', 'directorio/solicitar-baja/([0-9]+)', 'directorio/solicitar-baja/{entry}/', 'tourist-directory/views/removal-form.php')` and `osc_add_route('tourist-directory-admin', 'tourist-directory-admin/?', 'tourist-directory-admin/', 'tourist-directory/admin/requests.php')` at plugin load in `index.php`.
+- [x] 7.3 GREEN: create `plugins/tourist-directory/views/removal-form.php` — `ABS_PATH` guard, entry id from the route param only (never a form field), relation radio (required), optional `reply_contact`/`reason`, Ley 25.326 privacy note, `osc_csrf_token_form()`, hidden honeypot (CSS off-screen, `autocomplete="off"`, `tabindex="-1"`), "temporarily unavailable" message when `_channel_ready()` is false.
+- [x] 7.4 GREEN: implement the `init_custom` POST handler in `index.php` — acts only when route is ours and `REQUEST_METHOD==='POST'`; `osc_csrf_check()` first; builds `_removal_decide()` input including `_client_ip()`/`_ip_hash()`; on `accept`/`accept_retired`, inserts the request row THEN retires the entry (insert first); PRG via `osc_redirect_to()`.
+- [x] 7.5 GREEN: update the render hooks — link to `osc_route_url('tourist-directory-removal', ['entry'=>$id])`, omitting the link when `osc_route_url()` returns `''`; remove the `init_contact` prefill (superseded, see 2.6).
+- [x] 7.6 GREEN: add a `header` hook emitting `noindex` on the removal and admin routes.
+- [x] 7.7 GREEN: create `plugins/tourist-directory/admin/requests.php` — lists requests (entry name, date, relation, status; reply contact visible only here); `mark_processed` and `reactivate` (requires `confirm=1`) actions.
+- [x] 7.8 GREEN: wire the admin POST handling in `renderplugin_controller` with `osc_csrf_check()` + PRG; on `reactivate`, set every blocking request for that item to `rejected` and call `tourist_directory_reactivate($id, ['allow_reactivate'=>true])`.
+- [x] 7.9 GREEN: wire `admin_menu_init` to add the "Tourist Directory Entries" admin menu entry via `osc_admin_menu_plugins`.
+- [x] 7.10 GREEN: retention housekeeping on the admin page load — null `s_ip_hash` after 30 days; blank `reply_contact`/`reason` 180 days after `dt_processed`.
+- [x] 7.11 GREEN: update `plugins/tourist-directory/assets/tourist-directory.css` for the removal form (honeypot off-screen styling) and admin screen.
+- [x] 7.12 GREEN: update `plugins/tourist-directory/README.md` — routes, schema migration, throttle/retention defaults, admin usage.
+- [x] 7.13 Verify U7: `php tests/test_tourist_showcase.php` green; `php -l` on all new/changed PHP; local commit is the orchestrator's step, not run by this apply batch.
 
 ## Phase 8: Amendment Deployment [USER][AUTH REQUIRED]
 

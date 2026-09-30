@@ -2,11 +2,11 @@
 
 ## Scope covered so far
 
-Phases 1-3 (U1-U3) and Phase 6 (U6: Amendment schema migration, removal-decision lib, importer
-precedence) are complete. Phase 4/5 (dry-run, deployment) and Phase 7/8 (U7 route/form/admin, and
-Amendment deployment) are NOT started -- out of scope for an apply batch (4/8.5 need the real
-Osclass/DB, 5/8 are [USER][AUTH REQUIRED], U7 is the next work unit). No commit made in any batch.
-No `app/` file was ever written, only read for citation. `data/prospeccion/*` was never read.
+Phases 1-3 (U1-U3), Phase 6 (U6: schema migration, removal-decision lib, importer precedence) and
+Phase 7 (U7: public removal route/form, admin screen, render link, CSS, README) are complete. Phase
+4/5 (dry-run, deployment) and Phase 8 (Amendment deployment) are NOT started -- out of scope for an
+apply batch (4/8.5 need the real Osclass/DB, 5/8 are [USER][AUTH REQUIRED]). No commit made in any
+batch. No `app/` file was ever written, only read for citation. `data/prospeccion/*` was never read.
 
 ## Completed Tasks
 
@@ -413,14 +413,146 @@ U1-U3. Rollback: revert the U6 diffs; `ensure_schema()` only ever runs `CREATE T
 EXISTS`, so a reverted migration leaves the removal table orphaned but harmless (never referenced
 publicly before U7).
 
+## Phase 7 (U7) — this batch (Amendment: public removal route/form, admin screen, render link, CSS, README)
+
+Scope: ONLY U7 (tasks 7.1-7.13). Phase 8 is out of scope, NOT started. `app/` was never written, only
+read for the vendor citations below (Rewrite/custom.php/plugins.php/AdminSecBaseModel/hSecurity/
+hAdminMenu/Item.php/DBCommandClass). `data/prospeccion/*` was never read.
+
+- [x] 7.1/7.2 `tourist_directory_removal_route_regexp()` (pure, `'directorio/solicitar-baja/([0-9]+)'`,
+  no `$` anchor so Rewrite's prefix match still works with a trailing slash or query tail) + two
+  `osc_add_route()` calls in `index.php` (removal + admin), registered unconditionally at plugin load
+  (only while enabled, since `Plugins::init()` only requires active plugins).
+- [x] 7.3 `views/removal-form.php` — `ABS_PATH` guard; entry id read ONLY from
+  `Params::getParam('entry')` (the route param); shows entry title (`Item::findByPrimaryKey`) and
+  fixed id; required relation radio; optional reply_contact/reason; Ley 25.326 note; CSRF token;
+  off-screen honeypot (`website` field, `aria-hidden`, `autocomplete="off"`, `tabindex="-1"`);
+  "temporarily unavailable" message when `tourist_directory_is_channel_ready()` is false.
+- [x] 7.4 `tourist_directory_init_custom_removal_post()` wired to `init_custom`. Route+POST gated;
+  `osc_csrf_check()` first (vendor exits on failure); resolves `_removal_decide()`'s inputs (marker
+  row, blocking-request check, PRIOR-only throttle counts via two new fail-closed count queries,
+  `_client_ip()`/`_ip_hash()` with the stored salt); insert-then-retire only on `accept`; PRG via
+  `osc_redirect_to()`. Response buckets (design decision, not pinned verbatim by design.md): a single
+  shared "confirmation" message for honeypot/already_requested/accept/accept_retired (never asserts a
+  specific state, so it's truthful for all four without distinguishing them); a distinct "check the
+  form" message for invalid; one shared "try again later" message for not_found AND throttled (so
+  neither discloses which actually happened).
+- [x] 7.5 Render link now `osc_route_url('tourist-directory-removal', ['entry'=>$id])`, omitted only
+  when that returns `''`; `tourist_directory_init_contact_prefill()` and its `init_contact` hook
+  removed entirely (the U2/U6-era page=contact link is gone).
+- [x] 7.6 `tourist_directory_noindex_header()` on `header` (front-end, covers the removal route) +
+  `tourist_directory_noindex_admin_header()` on `admin_header` (admin theme, covers the admin route)
+  — the two vendor themes fire different hooks in `<head>`, confirmed by reading both header.php
+  files, so one shared hook name could not cover both routes.
+- [x] 7.7 `admin/requests.php` — retention housekeeping call, channel-status line, requests table
+  (entry name/id, date, relation, status, reply contact, reason), per-row `mark_processed` (only while
+  `pending`) and `reactivate` (requires the confirm checkbox) inline forms.
+- [x] 7.8 `tourist_directory_admin_requests_handle_post()` wired to `renderplugin_controller`, route
+  + POST gated, `osc_csrf_check()` first, PRG. `reactivate` rejects EVERY blocking (`pending`/
+  `processed`) request for the item via `tourist_directory_reject_all_blocking_requests()` (not only
+  the clicked row), then calls `tourist_directory_reactivate($id, ['allow_reactivate'=>true])`.
+- [x] 7.9 `tourist_directory_admin_menu_init()` on `admin_menu_init` → `osc_admin_menu_plugins('Tourist
+  Directory Entries', osc_route_admin_url(...), ...)`.
+- [x] 7.10 `tourist_directory_removal_apply_retention()`: nulls `s_ip_hash` 30 days after
+  `dt_requested`; blanks `s_reply_contact`/`s_reason` 180 days after `dt_processed`. Called from the
+  top of `admin/requests.php` on every load; never from a public request.
+- [x] 7.11 CSS: honeypot off-screen block (`position:absolute; left:-9999px`, never `display:none`),
+  removal-form field/privacy-note styling, admin table + inline per-row action forms.
+- [x] 7.12 README: new "Removal request channel" section (schema migration, routes table, public form
+  + POST-handler precedence, admin screen, retention, importer precedence cross-reference); fixed the
+  now-stale "Production mail gate" paragraph left over from before U6 (it still described the old
+  contactEmail hard gate) to describe the channel-availability gate instead.
+- [x] 7.13 Verify U7: full suite green (`php tests/test_tourist_showcase.php` -> "Tourist showcase
+  checks passed.", exit 0, covers U1-U7); `php -l` clean on `index.php`, `tourist-directory-lib.php`,
+  `views/removal-form.php`, `admin/requests.php`, `bin/tourist-directory-import.php`, test file. No
+  commit made.
+
+### TDD Evidence (U7)
+
+RED (7.1): added the regexp-matching assertions against the pre-U7 lib; ran the suite; fatal `Call to
+undefined function tourist_directory_removal_route_regexp()` at the new test line. GREEN (7.2): added
+the pure function; reran; full suite green, all new assertions passing. This is the only new pure
+function in U7 — every other task (7.3-7.13) is Osclass-bound glue (routes, POST handlers, views,
+admin actions, CSS, docs) with no Osclass runtime available to this harness, same constraint every
+prior batch documented. It is verified by `php -l` on every changed/new file and by the vendor
+`file:line` citations below, matching the established pattern for glue in this plugin family.
+
+### Vendor citations read this batch (new, beyond apply-progress's existing table)
+
+| Symbol | Vendor location | Used for |
+|---|---|---|
+| `osc_add_route()` | `hUtils.php:391` → `Rewrite::addRoute()` | Route registration |
+| `Rewrite::init()` prefix match, no `$` anchor, `{arg}` → positional capture mapping | `classes/Rewrite.php:133-230` | Confirms the removal regexp's one capture group maps to `Params::getParam('entry')` |
+| `Plugins::init()` → `loadActive()`, called at `oc-load.php:326`; `Rewrite::newInstance()->init()` at `oc-load.php:366` | `classes/Plugins.php:771-773` | Routes register only while the plugin is enabled, always before matching |
+| `osc_route_url()`/`osc_route_admin_url()` | `hDefines.php:1623-1662` | Public/admin route URL builders; `''` only when the route id is unregistered |
+| `CWebCustom::__construct()` runs `init_custom` before `doModel()` | `controller/custom.php:27-30` | POST handler timing |
+| `CAdminPlugins::doModel()` `case 'renderplugin'` runs `renderplugin_controller` before `doView('plugins/view.php')` | `oc-admin/plugins.php:432-461` | Admin POST handler timing |
+| `AdminSecBaseModel` admin session + moderator-access allowlist check | `core/AdminSecBaseModel.php:20-45` | Admin route auth, enforced before our code runs |
+| `osc_csrf_token_form()`/`osc_csrf_check()` (redirects to referer/admin base and exits on failure) | `helpers/hSecurity.php:56-133` | CSRF on both forms |
+| `AdminMenu::init()` runs `admin_menu_init` | `classes/AdminMenu.php:207` | Admin menu wiring |
+| `osc_admin_menu_plugins()` | `helpers/hAdminMenu.php:351-353` | Admin menu entry |
+| `'header'` (front theme, `head.php:100`) vs `'admin_header'` (admin theme, `oc-admin/themes/omega/parts/header.php:41`) — distinct hooks, both inside `<head>` | theme files | Confirms noindex needs two separate hook registrations |
+| `Item::findByPrimaryKey()` → `extendDataSingle()` resolves `s_title` for the current locale, applies the `item_title` FILTER (already handled safely, see U2 Design Decision #1) | `model/Item.php:125-154,1512-1569` | Entry title shown on both views |
+| `DBCommandClass::insert()`/`set()`/`escape()` — `escape()` maps PHP `null`→SQL `NULL`; `query()` returns `true`/`false` for a write | `classes/database/DBCommandClass.php:695-757,820-854` | Removal-request insert, throttle count queries, retention updates |
+
+### Request-flow traces (U7, grounded in the code + vendor citations above; none executed against a live DB/site)
+
+1. **Valid request (fresh entry, first submission)**: POST to the removal route → `init_custom` →
+   route+method match → `osc_csrf_check()` passes → channel ready → marker exists, not retired, no
+   blocking request, both throttle counts 0 → `_removal_decide()` → `accept` → `_validate_removal()`
+   passes → `tourist_directory_insert_removal_request()` succeeds (pending row) →
+   `tourist_directory_retire($id, 'removal_request')` deactivates the item and stamps the marker →
+   confirmation flash → PRG redirect to the same form.
+2. **Duplicate on an already-removed entry**: same flow, but a blocking `pending`/`processed` row
+   already exists for this item → `already_requested` → the SAME confirmation flash as case 1, no
+   insert, no retire call → PRG. Indistinguishable from case 1 to the visitor.
+3. **Honeypot tripped**: `website` field non-empty → `honeypot` → SAME confirmation flash as case 1,
+   nothing is inserted, entry untouched → PRG.
+4. **Throttled (5th request in an hour from one IP)**: `ip_count_last_hour` returns 4 (this is the
+   5th) → `throttled` → shared "try again later" flash (same text `not_found` would show) → no
+   insert, no retire → PRG.
+5. **Missing table at request time**: `tourist_directory_is_channel_ready()` probes
+   `SELECT 1 FROM t_directory_removal_request LIMIT 1`; on a missing/broken table the probe returns
+   `false` → `_channel_ready()` returns `false` → handler short-circuits before resolving any other
+   input, shows the "temporarily unavailable" flash, writes nothing → PRG. The GET view shows the same
+   message instead of a form. No DDL ever runs from this request path (`tourist_directory_ensure_schema()`
+   is called only from `_install()`/`_enable()`).
+6. **Admin reactivate with confirm**: POST to the admin route with `action=reactivate&confirm=1` →
+   `renderplugin_controller` → route+method match → `osc_csrf_check()` passes → row found →
+   `_admin_transition('pending'|'processed', 'reactivate', 1)` → `ok, status='rejected'` →
+   `tourist_directory_reject_all_blocking_requests($itemId)` sets every blocking row for that item to
+   `rejected` → `tourist_directory_reactivate($itemId, ['allow_reactivate'=>true])` reactivates the
+   item → "Ficha reactivada" flash → PRG. Without `confirm=1`, `_admin_transition` returns
+   `confirm_required` and nothing is mutated.
+
+### Files Changed (U7) / Work Unit Evidence
+
+`index.php` +411/-25, `tourist-directory-lib.php` +12/-0, `views/removal-form.php` (new) 83,
+`admin/requests.php` (new) 97, `assets/tourist-directory.css` +83/-0, `README.md` +115/-16,
+`tests/test_tourist_showcase.php` +17/-0 — 859 changed lines for code+docs+tests (over the runtime
+ledger's 800-line cap for this unit). Every comment/doc line documents a real safety property (CSRF
+ordering, fail-closed throttle counts, insert-before-retire, non-leaking message buckets, the two
+distinct noindex hooks) or a vendor citation needed to trust the glue without a runtime harness; per
+`sdd-apply/SKILL.md` Step 2a, comments/docs/tests are never stripped just to hit a number. Recommend
+`size:exception` for this slice, consistent with U2's prior exception under the same already-resolved
+`auto-chain`/`stacked-to-main` decision (tasks.md: "Decision needed before apply: No" — each unit is
+its own deliverable PR slice). Test cmd/result: `php tests/test_tourist_showcase.php` → pass, exit 0.
+Runtime harness: N/A in this sandbox (Phase 8's manual HTTPS/CSRF/throttle/reactivate verification is
+`[USER][AUTH REQUIRED]`, tasks 8.4/8.6/8.7); every claim above is grounded in vendor `file:line`
+citations read this session instead. Rollback: disable the plugin (deactivates entries, per the
+unchanged U2 lifecycle); delete the two route registrations, the two new view files, and the U7
+additions in `index.php`/`tourist-directory-lib.php`/`README.md`/CSS/test file; the removal-request
+table is left in place so no precedence is lost (matches design.md's Amendment rollback note).
+
 ## Remaining Tasks (NOT started, out of this batch's scope)
-- [ ] Phase 4: manual dry-run against the real Osclass/DB — task 4.1 (explicitly out of scope for
-  this or any apply batch: requires the real server/DB and is gated on Phase 5's deployment)
+- [ ] Phase 4: manual dry-run against the real Osclass/DB — task 4.1 (requires the real server/DB,
+  gated on Phase 5's deployment)
 - [ ] Phase 5: deployment [USER][AUTH REQUIRED] — tasks 5.1-5.6
-- [ ] Phase 7 (U7): route/form/admin/render/CSS/README — tasks 7.1-7.13 (next work unit)
-- [ ] Phase 8: Amendment deployment [USER][AUTH REQUIRED] — tasks 8.1-8.7
+- [ ] Phase 8: Amendment deployment [USER][AUTH REQUIRED] — tasks 8.1-8.7 (next: the real schema
+  migration, real import, and manual HTTPS/CSRF/throttle/reactivate verification)
 
 ## Workload / PR Boundary
 - Mode: chained PR slice (auto-chain, stacked-to-main per tasks.md forecast)
-- Current work unit: U6 (see "Files Changed (U6) / Work Unit Evidence" above for the boundary,
-  rollback, and line-count evidence). U7 (tasks 7.1-7.13) and Phase 8 are the next work unit.
+- Current work unit: U7, complete (see "Files Changed (U7) / Work Unit Evidence" above for the
+  boundary, rollback, and line-count evidence — recommend `size:exception`). Phase 8 (deployment,
+  [USER][AUTH REQUIRED]) is next; no further apply work unit remains after it.

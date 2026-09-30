@@ -20,6 +20,28 @@ define('TOURIST_DIRECTORY_PLUGIN', osc_plugin_path(__FILE__));
 define('TOURIST_DIRECTORY_SECTION', 'tourist_directory');
 // Relative to osc_plugins_url(): the public URL of this plugin's front-end stylesheet.
 define('TOURIST_DIRECTORY_CSS_REL_PATH', 'tourist-directory/assets/tourist-directory.css');
+// Route ids, reused by every glue function that redirects or links to either route.
+define('TOURIST_DIRECTORY_REMOVAL_ROUTE', 'tourist-directory-removal');
+define('TOURIST_DIRECTORY_ADMIN_ROUTE', 'tourist-directory-admin');
+
+// Registered unconditionally at plugin load, i.e. only while the plugin is enabled --
+// Plugins::init() (oc-load.php:326) only requires active plugins' index.php, and routes must be
+// registered before Rewrite::newInstance()->init() (oc-load.php:366) matches the request URI. The
+// removal route's regexp is the pure, directly-testable tourist_directory_removal_route_regexp();
+// the admin route's regexp has no dynamic id segment, so it stays inline (design.md's Amendment
+// "Public page"/"Admin page" architecture decisions).
+osc_add_route(
+  TOURIST_DIRECTORY_REMOVAL_ROUTE,
+  tourist_directory_removal_route_regexp(),
+  'directorio/solicitar-baja/{entry}/',
+  'tourist-directory/views/removal-form.php'
+);
+osc_add_route(
+  TOURIST_DIRECTORY_ADMIN_ROUTE,
+  'tourist-directory-admin/?',
+  'tourist-directory-admin/',
+  'tourist-directory/admin/requests.php'
+);
 
 // ------------------------------------------------------------------------------------------------
 // Osclass-bound reads/writes. Every DECISION (should this block? what should this render? what is
@@ -360,27 +382,6 @@ osc_add_hook('pre_item_contact_post', 'tourist_directory_pre_post_guard');
 osc_add_hook('pre_item_send_friend_post', 'tourist_directory_pre_post_guard');
 osc_add_hook('pre_item_add_comment_post', 'tourist_directory_pre_post_guard');
 
-// Pre-fills the generic site contact form's subject when a visitor follows a "Solicitar baja" link
-// (which points at the SITE contact form, osc_contact_url(), never the guarded item contact form).
-// init_contact fires at oc-includes/osclass/controller/contact.php:27, before that controller's own
-// action switch.
-function tourist_directory_init_contact_prefill() {
-  $removalId = (int) Params::getParam('tourist_directory_removal');
-
-  if ($removalId <= 0) {
-    return;
-  }
-
-  if (!is_array(tourist_directory_entry_row($removalId))) {
-    return;
-  }
-
-  $subject = tourist_directory_text('Solicitud de baja - Ficha de directorio #', 'Removal request - Directory listing #', osc_current_user_locale()) . $removalId;
-  Session::newInstance()->_setForm('subject', $subject);
-}
-
-osc_add_hook('init_contact', 'tourist_directory_init_contact_prefill');
-
 // ------------------------------------------------------------------------------------------------
 // Rendering
 // ------------------------------------------------------------------------------------------------
@@ -415,6 +416,7 @@ function tourist_directory_render_notice_html($id, array $row) {
   $locale = osc_current_user_locale();
   $label = tourist_directory_text('Información pública, no gestionada por el complejo', 'Public listing, not managed by the property', $locale);
   $visitLabel = tourist_directory_text('Visitar sitio oficial', 'Visit official website', $locale);
+  $removalLabel = tourist_directory_text('Solicitar baja', 'Request removal', $locale);
 
   $website = (isset($row['s_official_website']) && $row['s_official_website'] !== '')
     ? tourist_directory_safe_url($row['s_official_website'])
@@ -427,10 +429,15 @@ function tourist_directory_render_notice_html($id, array $row) {
     $html .= '<a class="tourist-directory-official-link" href="' . osc_esc_html($website) . '" rel="nofollow noopener noreferrer" target="_blank">' . osc_esc_html($visitLabel) . '</a> ';
   }
 
-  // The "Solicitar baja" removal link is wired in U7, once the tourist-directory-removal route
-  // exists (osc_route_url('tourist-directory-removal', ['entry'=>$id]), omitted when that returns
-  // ''). tourist_directory_removal_url() (the old page=contact-based link) was removed in U6 along
-  // with the mail-dependent channel it pointed at -- see design.md's Amendment.
+  // Route-based, mail-independent removal link (Amendment U7). osc_route_url() returns '' only
+  // when the route was never registered at all (e.g. the plugin is disabled, in which case this
+  // hook would not even fire) -- so the link is omitted defensively rather than ever printing an
+  // empty href. tourist_directory_removal_url() (the old page=contact-based link) was removed in
+  // U6 along with the mail-dependent channel it pointed at -- see design.md's Amendment.
+  $removalUrl = osc_route_url(TOURIST_DIRECTORY_REMOVAL_ROUTE, array('entry' => $id));
+  if ($removalUrl !== '') {
+    $html .= '<a class="tourist-directory-removal-link" href="' . osc_esc_html($removalUrl) . '">' . osc_esc_html($removalLabel) . '</a>';
+  }
 
   $html .= '</div>';
 
@@ -563,6 +570,19 @@ function tourist_directory_enqueue_css() {
 }
 
 osc_add_hook('header', 'tourist_directory_enqueue_css');
+
+// Neither page needs to be indexed: the removal form is a single-use action page, and the admin
+// screen requires a login and carries operator-facing data. 'header' (head.php:100) only fires for
+// the front-end theme, so it covers the removal route; the admin backoffice never runs that hook
+// (its own theme calls 'admin_header' instead, parts/header.php:41), so it is covered separately by
+// tourist_directory_noindex_admin_header() below.
+function tourist_directory_noindex_header() {
+  if (Params::getParam('route') === TOURIST_DIRECTORY_REMOVAL_ROUTE) {
+    echo '<meta name="robots" content="noindex, nofollow, noarchive" />' . "\n";
+  }
+}
+
+osc_add_hook('header', 'tourist_directory_noindex_header');
 
 // ------------------------------------------------------------------------------------------------
 // Create / update / retire / reactivate (glue for the Phase 3 CLI importer; not wired to any
@@ -772,6 +792,372 @@ function tourist_directory_reactivate($itemId, array $ctx = array()) {
 
   return array('ok' => true, 'error' => null);
 }
+
+// ------------------------------------------------------------------------------------------------
+// Amendment (U7): public removal-request channel -- DB reads/writes backing the pure
+// tourist_directory_removal_decide()/_validate_removal() decisions. Every DECISION still lives in
+// the lib; this section only resolves the inputs those decisions need and applies their outcome.
+// ------------------------------------------------------------------------------------------------
+
+// One removal-request row by its own primary key, or false. Used by the admin screen's per-row
+// actions.
+function tourist_directory_removal_request_row($requestId) {
+  $requestId = (int) $requestId;
+
+  if ($requestId <= 0) {
+    return false;
+  }
+
+  $result = tourist_directory_dao()->query(
+    'SELECT pk_i_id, fk_i_item_id, s_seed_id, s_relation, s_reply_contact, s_reason, s_status, dt_requested, dt_processed FROM ' .
+    tourist_directory_removal_table() . ' WHERE pk_i_id = ' . $requestId
+  );
+
+  if ($result === false || $result->numRows() === 0) {
+    return false;
+  }
+
+  return $result->row();
+}
+
+// Every removal-request row, newest first. No pagination: this is an operator screen for a
+// low-volume table (one row per valid submission, deduplicated by tourist_directory_removal_decide()'s
+// already_requested outcome), not a public listing.
+function tourist_directory_removal_requests_all() {
+  $result = tourist_directory_dao()->query(
+    'SELECT pk_i_id, fk_i_item_id, s_seed_id, s_relation, s_reply_contact, s_reason, s_status, dt_requested, dt_processed FROM ' .
+    tourist_directory_removal_table() . ' ORDER BY dt_requested DESC'
+  );
+
+  if ($result === false) {
+    return array();
+  }
+
+  return $result->result();
+}
+
+// Prior (not counting the current attempt) submissions from the same hashed IP in the last hour.
+// Fails closed: an unreadable count is treated as the maximum, so a DB hiccup throttles rather than
+// silently allowing an unlimited rate.
+function tourist_directory_removal_count_ip_last_hour($ipHash) {
+  $result = tourist_directory_dao()->query(
+    'SELECT COUNT(*) AS c FROM ' . tourist_directory_removal_table() .
+    ' WHERE s_ip_hash = ' . tourist_directory_dao()->escape((string) $ipHash) .
+    ' AND dt_requested >= (NOW() - INTERVAL 1 HOUR)'
+  );
+
+  if ($result === false || $result->numRows() === 0) {
+    return PHP_INT_MAX;
+  }
+
+  $row = $result->row();
+  return isset($row['c']) ? (int) $row['c'] : PHP_INT_MAX;
+}
+
+// Prior (not counting the current attempt) submissions for the same item in the last 24 hours.
+// Same fail-closed contract as tourist_directory_removal_count_ip_last_hour().
+function tourist_directory_removal_count_entry_last_24h($itemId) {
+  $itemId = (int) $itemId;
+
+  $result = tourist_directory_dao()->query(
+    'SELECT COUNT(*) AS c FROM ' . tourist_directory_removal_table() .
+    ' WHERE fk_i_item_id = ' . $itemId .
+    ' AND dt_requested >= (NOW() - INTERVAL 24 HOUR)'
+  );
+
+  if ($result === false || $result->numRows() === 0) {
+    return PHP_INT_MAX;
+  }
+
+  $row = $result->row();
+  return isset($row['c']) ? (int) $row['c'] : PHP_INT_MAX;
+}
+
+// Inserts one pending removal-request row. $value is tourist_directory_validate_removal()'s
+// already-validated 'value' (relation/reply_contact/reason, all trimmed); empty optional strings are
+// stored as SQL NULL, not ''. Returns bool. Never throws: a failed insert must let the caller show a
+// generic error and skip the retire step (insert-first contract, design.md's Amendment "Decision").
+function tourist_directory_insert_removal_request($itemId, $seedId, array $value, $ipHash) {
+  try {
+    return tourist_directory_dao()->insert(tourist_directory_removal_table(), array(
+      'fk_i_item_id' => (int) $itemId,
+      's_seed_id' => (string) $seedId,
+      's_relation' => $value['relation'],
+      's_reply_contact' => ($value['reply_contact'] !== '') ? $value['reply_contact'] : null,
+      's_reason' => ($value['reason'] !== '') ? $value['reason'] : null,
+      's_ip_hash' => ($ipHash !== '') ? $ipHash : null,
+      's_status' => 'pending',
+      'dt_requested' => date('Y-m-d H:i:s'),
+    )) === true;
+  } catch (\Throwable $e) {
+    return false;
+  }
+}
+
+function tourist_directory_mark_request_processed($requestId) {
+  tourist_directory_dao()->update(tourist_directory_removal_table(), array(
+    's_status' => 'processed',
+    'dt_processed' => date('Y-m-d H:i:s'),
+  ), array('pk_i_id' => (int) $requestId));
+}
+
+// Rejects every currently-blocking (pending/processed) request for one item, not only the row the
+// admin clicked -- in the ordinary case there is exactly one, but this stays correct even if more
+// than one ever exists. Called only from the explicit admin 'reactivate' action (never automatic).
+function tourist_directory_reject_all_blocking_requests($itemId) {
+  $itemId = (int) $itemId;
+
+  tourist_directory_dao()->query(
+    'UPDATE ' . tourist_directory_removal_table() .
+    ' SET s_status = \'rejected\', dt_processed = ' . tourist_directory_dao()->escape(date('Y-m-d H:i:s')) .
+    ' WHERE fk_i_item_id = ' . $itemId . ' AND s_status IN (\'pending\', \'processed\')'
+  );
+}
+
+// Retention housekeeping (design.md's Amendment "Retention" row), run once per admin page load
+// (task 7.10) -- never from a public request. The status row itself is kept forever, for importer
+// precedence; only the IP hash and the optional free-text fields are pruned.
+function tourist_directory_removal_apply_retention() {
+  $dao = tourist_directory_dao();
+  $table = tourist_directory_removal_table();
+
+  $dao->query(
+    'UPDATE ' . $table . ' SET s_ip_hash = NULL' .
+    ' WHERE s_ip_hash IS NOT NULL AND dt_requested < (NOW() - INTERVAL 30 DAY)'
+  );
+
+  $dao->query(
+    'UPDATE ' . $table . ' SET s_reply_contact = NULL, s_reason = NULL' .
+    ' WHERE dt_processed IS NOT NULL AND dt_processed < (NOW() - INTERVAL 180 DAY)' .
+    ' AND (s_reply_contact IS NOT NULL OR s_reason IS NOT NULL)'
+  );
+}
+
+// One shared, non-leaking confirmation shown for honeypot (fake success -- nothing was written),
+// already_requested (must look identical to a fresh accept), accept, and accept_retired. It never
+// asserts a specific before/after state, so it is truthful for all four outcomes without
+// distinguishing them from one another.
+function tourist_directory_removal_confirmation_message($locale) {
+  return tourist_directory_text(
+    'Recibimos tu solicitud. Si corresponde, procesaremos la baja de la ficha.',
+    'We received your request. If applicable, we will process the listing removal.',
+    $locale
+  );
+}
+
+function tourist_directory_removal_invalid_message($locale) {
+  return tourist_directory_text(
+    'Revisá los datos del formulario (relación con el complejo obligatoria) e intentá nuevamente.',
+    'Please check the form (relation to the property is required) and try again.',
+    $locale
+  );
+}
+
+// Shared by 'not_found' and 'throttled' so neither response discloses which of the two actually
+// happened -- an invalid id and a rate-limited one look identical.
+function tourist_directory_removal_unavailable_message($locale) {
+  return tourist_directory_text(
+    'No pudimos procesar tu solicitud en este momento. Intentá nuevamente más tarde.',
+    'We could not process your request right now. Please try again later.',
+    $locale
+  );
+}
+
+function tourist_directory_removal_channel_unavailable_message($locale) {
+  return tourist_directory_text(
+    'El canal de solicitudes de baja está temporalmente no disponible. Intentá nuevamente más tarde.',
+    'The removal request channel is temporarily unavailable. Please try again later.',
+    $locale
+  );
+}
+
+// The init_custom POST handler (design.md's Amendment "POST handler" architecture decision). Acts
+// only for our own route and only on POST -- a GET to the same route just renders the view, doing
+// nothing here. osc_csrf_check() runs first and exits on failure (hSecurity.php:85-133), so every
+// path below it already carries a valid token. The entry id comes ONLY from Params::getParam('entry')
+// (the route param set by Rewrite::init()), never from a posted field -- the view never renders an
+// id input, so there is nothing for a client to override even if it tried.
+function tourist_directory_init_custom_removal_post() {
+  if (Params::getParam('route') !== TOURIST_DIRECTORY_REMOVAL_ROUTE) {
+    return;
+  }
+
+  if (($_SERVER['REQUEST_METHOD'] ?? '') !== 'POST') {
+    return;
+  }
+
+  osc_csrf_check();
+
+  $locale = osc_current_user_locale();
+  $entryId = (int) Params::getParam('entry');
+  $redirectUrl = osc_route_url(TOURIST_DIRECTORY_REMOVAL_ROUTE, array('entry' => $entryId));
+
+  if (!tourist_directory_is_channel_ready()) {
+    osc_add_flash_error_message(tourist_directory_removal_channel_unavailable_message($locale));
+    osc_redirect_to($redirectUrl);
+    return;
+  }
+
+  $marker = tourist_directory_marker_row($entryId);
+  $entryExists = is_array($marker);
+  $seedId = $entryExists ? $marker['s_seed_id'] : '';
+  $entryRetired = $entryExists && $marker['dt_retired'] !== null;
+  $blocking = $entryExists ? tourist_directory_has_blocking_removal_request($entryId, $seedId) : false;
+
+  $ip = tourist_directory_client_ip($_SERVER);
+  $ipHash = tourist_directory_ip_hash($ip, tourist_directory_ip_salt());
+  $ipCount = tourist_directory_removal_count_ip_last_hour($ipHash);
+  $entryCount = $entryExists ? tourist_directory_removal_count_entry_last_24h($entryId) : 0;
+
+  $decision = tourist_directory_removal_decide(array(
+    // The view's honeypot input is named 'website' -- a plausible-looking field for a bot to fill,
+    // never shown to a human (see views/removal-form.php and the CSS off-screen rule).
+    'honeypot' => Params::getParam('website'),
+    'relation' => Params::getParam('relation'),
+    'reply_contact' => Params::getParam('reply_contact'),
+    'reason' => Params::getParam('reason'),
+    'entry_exists' => $entryExists,
+    'blocking_request_exists' => $blocking,
+    'entry_retired' => $entryRetired,
+    'ip_count_last_hour' => $ipCount,
+    'entry_count_last_24h' => $entryCount,
+  ));
+
+  if ($decision === 'invalid') {
+    osc_add_flash_error_message(tourist_directory_removal_invalid_message($locale));
+    osc_redirect_to($redirectUrl);
+    return;
+  }
+
+  if ($decision === 'not_found' || $decision === 'throttled') {
+    osc_add_flash_error_message(tourist_directory_removal_unavailable_message($locale));
+    osc_redirect_to($redirectUrl);
+    return;
+  }
+
+  if ($decision === 'honeypot' || $decision === 'already_requested') {
+    // Fake success for the honeypot (nothing was written); the identical confirmation for
+    // already_requested (nothing is written either -- see design.md's Amendment "Decision" row).
+    osc_add_flash_ok_message(tourist_directory_removal_confirmation_message($locale));
+    osc_redirect_to($redirectUrl);
+    return;
+  }
+
+  // Only 'accept' and 'accept_retired' remain: both insert; only 'accept' also retires. Insert
+  // first -- if it fails, nothing changes and the entry is never retired unrecorded.
+  $validated = tourist_directory_validate_removal(array(
+    'relation' => Params::getParam('relation'),
+    'reply_contact' => Params::getParam('reply_contact'),
+    'reason' => Params::getParam('reason'),
+  ));
+
+  $inserted = $validated['ok']
+    ? tourist_directory_insert_removal_request($entryId, $seedId, $validated['value'], $ipHash)
+    : false;
+
+  if (!$inserted) {
+    osc_add_flash_error_message(tourist_directory_removal_unavailable_message($locale));
+    osc_redirect_to($redirectUrl);
+    return;
+  }
+
+  if ($decision === 'accept') {
+    // If retire fails here, the request row is already inserted and stays 'pending' -- visible to
+    // the admin, who can investigate; it is never silently lost (design.md's Amendment "Decision").
+    tourist_directory_retire($entryId, 'removal_request');
+  }
+
+  osc_add_flash_ok_message(tourist_directory_removal_confirmation_message($locale));
+  osc_redirect_to($redirectUrl);
+}
+
+osc_add_hook('init_custom', 'tourist_directory_init_custom_removal_post');
+
+// The admin screen's POST handler (design.md's Amendment "Admin page" architecture decision).
+// renderplugin_controller (oc-admin/plugins.php:456) fires for every renderplugin request
+// regardless of route, so this checks its own route first, exactly like the public handler above.
+// AdminSecBaseModel already enforced the admin session and the moderator-access allowlist before
+// this ever runs (oc-includes/osclass/core/AdminSecBaseModel.php:35-45).
+function tourist_directory_admin_requests_handle_post() {
+  if (Params::getParam('route') !== TOURIST_DIRECTORY_ADMIN_ROUTE) {
+    return;
+  }
+
+  if (($_SERVER['REQUEST_METHOD'] ?? '') !== 'POST') {
+    return;
+  }
+
+  osc_csrf_check();
+
+  $locale = osc_current_admin_locale();
+  $redirectUrl = osc_route_admin_url(TOURIST_DIRECTORY_ADMIN_ROUTE);
+  $requestId = (int) Params::getParam('id');
+  $action = (string) Params::getParam('action');
+  $confirm = (int) Params::getParam('confirm');
+
+  $row = tourist_directory_removal_request_row($requestId);
+
+  if (!is_array($row)) {
+    osc_add_flash_error_message(tourist_directory_text('Solicitud no encontrada.', 'Request not found.', $locale), 'admin');
+    osc_redirect_to($redirectUrl);
+    return;
+  }
+
+  $transition = tourist_directory_admin_transition($row['s_status'], $action, $confirm);
+
+  if (!$transition['ok']) {
+    $message = ($transition['error'] === 'confirm_required')
+      ? tourist_directory_text('Confirmá la reactivación marcando la casilla.', 'Confirm the reactivation by checking the box.', $locale)
+      : tourist_directory_text('Esa acción no es válida para el estado actual de la solicitud.', 'That action is not valid for the request\'s current status.', $locale);
+
+    osc_add_flash_error_message($message, 'admin');
+    osc_redirect_to($redirectUrl);
+    return;
+  }
+
+  if ($action === 'mark_processed') {
+    tourist_directory_mark_request_processed($requestId);
+    osc_add_flash_ok_message(tourist_directory_text('Solicitud marcada como procesada.', 'Request marked as processed.', $locale), 'admin');
+  } else {
+    // 'reactivate': reject every blocking request for the item (not only this row), then
+    // reactivate the item itself -- the only caller allowed to pass allow_reactivate=true outside
+    // the CLI's --allow-reactivate flag, since this is the explicit admin action design.md's
+    // "Removal Request Admin" requirement describes.
+    tourist_directory_reject_all_blocking_requests($row['fk_i_item_id']);
+    tourist_directory_reactivate($row['fk_i_item_id'], array('allow_reactivate' => true));
+    osc_add_flash_ok_message(tourist_directory_text('Ficha reactivada.', 'Listing reactivated.', $locale), 'admin');
+  }
+
+  osc_redirect_to($redirectUrl);
+}
+
+osc_add_hook('renderplugin_controller', 'tourist_directory_admin_requests_handle_post');
+
+// Admin menu entry (task 7.9). osc_route_admin_url() always builds a
+// ?page=plugins&action=renderplugin&route=... admin URL regardless of rewrite settings (hDefines.php
+// osc_route_admin_url()), so no pretty-URL dependency exists for the admin screen.
+function tourist_directory_admin_menu_init() {
+  osc_admin_menu_plugins(
+    'Tourist Directory Entries',
+    osc_route_admin_url(TOURIST_DIRECTORY_ADMIN_ROUTE),
+    'tourist_directory_requests'
+  );
+}
+
+osc_add_hook('admin_menu_init', 'tourist_directory_admin_menu_init');
+
+// Admin-side noindex counterpart to tourist_directory_noindex_header() above -- the admin theme
+// never fires 'header', it fires 'admin_header' instead, inside <head> (omega/parts/header.php:41).
+function tourist_directory_noindex_admin_header() {
+  if (Params::getParam('page') === 'plugins'
+    && Params::getParam('action') === 'renderplugin'
+    && Params::getParam('route') === TOURIST_DIRECTORY_ADMIN_ROUTE
+  ) {
+    echo '<meta name="robots" content="noindex, nofollow, noarchive" />' . "\n";
+  }
+}
+
+osc_add_hook('admin_header', 'tourist_directory_noindex_admin_header');
 
 osc_register_plugin(TOURIST_DIRECTORY_PLUGIN, 'tourist_directory_install');
 osc_add_hook(TOURIST_DIRECTORY_PLUGIN . '_enable', 'tourist_directory_enable');

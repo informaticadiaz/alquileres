@@ -73,3 +73,86 @@ body.tourist-directory-entry .price {
   font-size: 0.8em;
   font-weight: normal;
 }
+
+/* ------------------------------------------------------------------------------------------------
+ * Amendment (U7): the public removal request form (views/removal-form.php).
+ * ------------------------------------------------------------------------------------------------ */
+
+.tourist-directory-removal-form {
+  max-width: 40em;
+  margin: 1em auto;
+}
+
+.tourist-directory-removal-unavailable {
+  padding: 0.6em 0.8em;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background: #f7f7f7;
+}
+
+.tourist-directory-removal-entry {
+  font-weight: bold;
+}
+
+.tourist-directory-removal-privacy-note {
+  font-size: 0.85em;
+  color: #555;
+  padding: 0.6em 0.8em;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background: #fafafa;
+}
+
+.tourist-directory-removal-relation,
+.tourist-directory-removal-field {
+  margin: 0.8em 0;
+}
+
+.tourist-directory-removal-field input[type="text"],
+.tourist-directory-removal-field textarea {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* The honeypot field: hidden from a human visitor (off-screen, never display:none, since some bots
+   skip fields a screen reader / display check would flag as hidden) but still present and fillable
+   by a naive scripted bot -- tourist_directory_init_custom_removal_post() in index.php rejects any
+   submission where it carries a value. */
+.tourist-directory-hp-field {
+  position: absolute !important;
+  left: -9999px !important;
+  top: -9999px !important;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+/* ------------------------------------------------------------------------------------------------
+ * Amendment (U7): the admin removal-requests screen (admin/requests.php). Loaded inside oc-admin's
+ * own theme, which already provides base table/form styling -- these rules only adjust spacing and
+ * the inline per-row action forms, never enqueued on the front end.
+ * ------------------------------------------------------------------------------------------------ */
+
+.tourist-directory-admin-requests-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.tourist-directory-admin-requests-table th,
+.tourist-directory-admin-requests-table td {
+  padding: 0.5em 0.6em;
+  border-bottom: 1px solid #eee;
+  text-align: left;
+  vertical-align: top;
+}
+
+.tourist-directory-admin-inline-form {
+  display: inline-block;
+  margin: 0 0.6em 0.4em 0;
+}
+
+.tourist-directory-admin-confirm {
+  display: block;
+  margin: 0.3em 0;
+  font-size: 0.85em;
+}
