@@ -2,7 +2,7 @@
 
 ## Status
 
-Unit 1 (Phase 1: Tree Data, PR 1) — **complete**. Unit 2 (Phase 2: Pure Plans, PR 2) — **complete**. Unit 3 (Phase 3: Wiring + Docs, PR 3) — **complete**. Unit 4 (Phase 4: Deployment, [USER]/[AUTH REQUIRED]) — **not started** (out of scope for this batch by orchestrator instruction; requires live DB/site access this agent must not touch).
+Unit 1 (Phase 1: Tree Data, PR 1) — **complete**. Unit 2 (Phase 2: Pure Plans, PR 2) — **complete**. Unit 3 (Phase 3: Wiring + Docs, PR 3) — **complete**. Unit 4 (Phase 4: Deployment, [USER]/[AUTH REQUIRED]) — **complete** (2026-09-30): backup `data/osclass/backups/pre-tourist-destinations-20260929T224115.sql` taken by the orchestrator; sync, `diff -r` and Re-apply ×2 performed by the user (second Re-apply: 0 changes, `last_reapply_changes = 0`); read-only DB and HTTPS verification by the orchestrator (commit `7484701`).
 
 ## Completed Tasks
 
@@ -42,7 +42,7 @@ Unit 1 (Phase 1: Tree Data, PR 1) — **complete**. Unit 2 (Phase 2: Pure Plans,
 
 ## Remaining Tasks (out of scope for this batch, untouched)
 
-- [ ] Phase 4 (Deployment, [USER]/[AUTH REQUIRED]): 4.1–4.5
+- [x] Phase 4 (Deployment, [USER]/[AUTH REQUIRED]): 4.1–4.5 — done 2026-09-30
 
 ## Files Changed
 

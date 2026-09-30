@@ -695,4 +695,24 @@ expect_true(
   'excluding no ids returns every row unchanged'
 );
 
+// --- tourist-destination-categories: re-apply relinks every leaf after a showcase reinstall ---
+
+$full_tree_map = array();
+$next_leaf_id = 200;
+foreach (tourist_identity_tree() as $tree_region) {
+  foreach ($tree_region['leaves'] as $tree_leaf) {
+    $full_tree_map[$tree_leaf[0]] = $next_leaf_id++;
+  }
+}
+$reinstall_leaf_ids = tourist_identity_leaf_ids(tourist_identity_tree(), $full_tree_map);
+expect_true(count($reinstall_leaf_ids) === 51, 'all 51 destination leaves are resolved from the created-id map');
+expect_true(
+  tourist_identity_showcase_link_needed(array(), $reinstall_leaf_ids) === true,
+  'after a showcase reinstall empties category_ids, re-apply must relink the destinations'
+);
+expect_true(
+  tourist_identity_showcase_link_needed(array_reverse($reinstall_leaf_ids), $reinstall_leaf_ids) === false,
+  'once relinked, a further re-apply leaves the showcase linkage untouched'
+);
+
 echo "Tourist showcase checks passed.\n";
