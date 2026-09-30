@@ -110,10 +110,10 @@ Chain strategy: stacked-to-main
 
 ## Phase 8: Amendment Deployment [USER][AUTH REQUIRED]
 
-- [ ] 8.1 Agent: pre-deploy `mysqldump` backup into `data/osclass/backups/`, before the schema migration.
-- [ ] 8.2 [USER] Sync `plugins/tourist-directory/` into `app/osclass/oc-content/plugins/tourist-directory/` (read-only) via `diff -r`.
-- [ ] 8.3 [USER][AUTH REQUIRED] In oc-admin, Disable then Enable **Tourist Directory Entries** (explicitly NOT "Tourist Portal Identity") to run the schema migration.
-- [ ] 8.4 Agent: read-only checks — `tourist_directory.schema_version` pref is `2`, `t_directory_removal_request` table exists, and both routes are reachable over HTTPS, including the pretty-URL form.
-- [ ] 8.5 [USER][AUTH REQUIRED] Run the real import: `php bin/tourist-directory-import.php --file=data/prospeccion/seed/complejos.csv --apply` (now allowed since the removal channel exists; a placeholder `contactEmail` only warns).
-- [ ] 8.6 Agent: HTTPS verification of entries — label, no price, no contact UI, removal form renders and works; guards block CSRF-valid forged POSTs (forged POSTs only with explicit user authorization).
+- [x] 8.1 Agent: pre-deploy `mysqldump` backup into `data/osclass/backups/`, before the schema migration.
+- [x] 8.2 [USER] Sync `plugins/tourist-directory/` into `app/osclass/oc-content/plugins/tourist-directory/` (read-only) via `diff -r`.
+- [x] 8.3 [USER][AUTH REQUIRED] In oc-admin, Disable then Enable **Tourist Directory Entries** (explicitly NOT "Tourist Portal Identity") to run the schema migration.
+- [x] 8.4 Agent: read-only checks — `tourist_directory.schema_version` pref is `2`, `t_directory_removal_request` table exists, and both routes are reachable over HTTPS, including the pretty-URL form.
+- [x] 8.5 [USER][AUTH REQUIRED] Run the real import: `php bin/tourist-directory-import.php --file=data/prospeccion/seed/complejos.csv --apply` (now allowed since the removal channel exists; a placeholder `contactEmail` only warns).
+- [x] 8.6 Agent: HTTPS verification of entries — label, no price, no contact UI, removal form renders and works; guards block CSRF-valid forged POSTs (forged POSTs only with explicit user authorization).
 - [ ] 8.7 [USER][AUTH REQUIRED] Test removal request on one entry over HTTPS, confirm it deactivates and appears pending in the admin screen, then admin reactivates it with `confirm=1` to verify the explicit-reactivation path.
