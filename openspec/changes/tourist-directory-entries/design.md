@@ -76,3 +76,77 @@ Slicing (the 400-line target):
 
 - [ ] Only the `contactEmail` half of the mail gate can be automated. Actually delivering mail must be verified manually before `--apply`.
 - [ ] Reactivating a reversed `baja` row requires `--allow-reactivate`. This is deliberate: the spec says it "can" reactivate.
+
+---
+
+# Amendment: Removal Request Form (2026-09-30)
+
+Confirmed user decision: site mail is POSTPONED. The "Removal link" decision above (site contact form plus `init_contact` subject prefill) is SUPERSEDED. The production gate "Mail is verified" (Rollout step 5) and the placeholder-`contactEmail` refusal are REPLACED by "removal channel available". Placeholder mail becomes a warning only. U1–U3 stay deployed; zero entries exist.
+
+## Technical Approach
+
+A plugin-owned public route renders a removal form per entry. It works without email. A valid request inserts a `pending` row and then retires the entry immediately (reversibly) with reason `removal_request`. An admin route lists the requests. The importer treats a blocking request as higher precedence than any seed state or flag. Every decision (validation, throttle, idempotency, admin transitions, schema steps, plan precedence, client IP) lives in the lib under strict TDD. The glue only reads and writes.
+
+## Architecture Decisions
+
+| Topic | Choice | Rejected / why |
+|---|---|---|
+| Public page | `osc_add_route('tourist-directory-removal', 'directorio/solicitar-baja/([0-9]+)', 'directorio/solicitar-baja/{entry}/', 'tourist-directory/views/removal-form.php')` at plugin load. Routes are registered before `Rewrite::init` (`oc-load.php:326,366`; `Rewrite.php:114-121,152-299`). `osc_route_url` works with and without rewrite (`hDefines.php:1623-1644`). `CWebCustom` renders it inside the theme layout (`controller/custom.php:30,42-44,78`; `sigma/custom.php:20-23`), including flash (`sigma/header.php:143`). The regexp has no `$` anchor, so a query tail cannot break the match. The id comes ONLY from the route param `entry`, never from a form field. | `?page=custom&file=` is deprecated (`custom.php:47`). A theme page: vendor is read-only. |
+| POST handler | `init_custom` (`custom.php:30`, before `doModel`). It acts only when `route` is ours and `REQUEST_METHOD==='POST'`. `osc_csrf_check()` runs first; it redirects and exits on failure (`hSecurity.php:85-133`). The form prints `osc_csrf_token_form()` (`:56-63`). Post/Redirect/Get: `osc_redirect_to(route url)` exits (`utils.php:2641`). | Processing inside the view: output has already started. |
+| Admin page | `osc_add_route('tourist-directory-admin', 'tourist-directory-admin/?', 'tourist-directory-admin/', 'tourist-directory/admin/requests.php')`. Link: `osc_route_admin_url` (`hDefines.php:1654-1662`) → `renderplugin` renders inside `plugins/view.php` with the admin layout (`oc-admin/plugins.php:432-460`; `omega/plugins/view.php:35-42`). The admin session is enforced by `AdminSecBaseModel`. Moderators are excluded unless granted (`AdminSecBaseModel.php:35-45`). Menu: `admin_menu_init` (`AdminMenu.php:207`) → `osc_admin_menu_plugins` (`hAdminMenu.php:351`). POST actions run in `renderplugin_controller` (`plugins.php:456`, before `doView`) with `osc_csrf_check()` and PRG. A `_configure` hook redirects to the same page. The front controller refuses `/admin/` paths (`custom.php:53`). | `action=admin` + `_configure`: this renders with no layout, and flash messages are unreliable (`plugins.php:421-426`; the tourist-identity README). |
+| Table | `t_directory_removal_request`: `pk_i_id`, `fk_i_item_id` INT, `s_seed_id` VARCHAR(191), `s_relation` VARCHAR(16), `s_reply_contact` VARCHAR(190) NULL, `s_reason` VARCHAR(1000) NULL, `s_ip_hash` CHAR(64) NULL, `s_status` VARCHAR(16) (`pending`/`processed`/`rejected`), `dt_requested`, `dt_processed` NULL. Keys on (`fk_i_item_id`), (`s_seed_id`), (`s_ip_hash`,`dt_requested`). The seed id is copied into the row, so precedence survives a lost marker. Blocking statuses: `pending` and `processed`. | FK to the marker table: the same cascade risk as before. |
+| Migration | Pref `tourist_directory.schema_version`; target is `2`. `''` means `0`, because `Preference::get` returns `''` for a missing key (`Preference.php:153-158`). `tourist_directory_ensure_schema()` runs from install AND enable. It executes the pure `_schema_steps($stored)` using idempotent `CREATE TABLE IF NOT EXISTS` (step 1 = marker, step 2 = requests). It bumps the pref only after every step succeeds. The same routine generates the pref `ip_salt` (32 random bytes, hex) once. Request paths never run DDL. | DDL on demand in a public request. Relying on install: it will not rerun for the live plugin. |
+| Channel availability | `_channel_ready($storedVersion, $tableProbeOk)` requires version ≥ 2 AND `SELECT 1 FROM … LIMIT 1` !== false. If it is not ready, the form shows "temporarily unavailable" and changes nothing. The render hook omits the link when `osc_route_url` returns `''`. | — |
+| Decision | Pure `tourist_directory_removal_decide($in)`. Evaluated in order: honeypot `website` filled → `honeypot` (fake success, no write); validation errors → `invalid`; entry marker missing → `not_found` (generic message); blocking request already exists → `already_requested` (same confirmation as success, no insert); per-IP ≥ 5/hour or per-entry ≥ 3/24h → `throttled`; entry already retired → `accept_retired` (insert only); else `accept` (insert, then retire). Insert comes first: if the insert fails, nothing changes. If retire fails after the insert, the request stays pending and visible to the admin. | Retire-first: it produces an unrecorded deactivation. |
+| Validation | `relation` ∈ {propietario, administrador, otro} and is required. `reply_contact` ≤ 190 chars, `reason` ≤ 1000 chars, both optional. Values are trimmed, control characters are rejected, and multibyte-safe lengths are used. Input already passes the HTMLPurifier in `Params::getParam` (`Params.php:46-55`), and every value is escaped with `osc_esc_html` on output (public and admin). | — |
+| IP | Pure `_client_ip($server)`: use `HTTP_CF_CONNECTING_IP` only when `REMOTE_ADDR` is loopback (the Cloudflare tunnel → 127.0.0.1:8783), otherwise `REMOTE_ADDR`. Stored as `hash_hmac('sha256', ip, ip_salt)`. | `osc_get_ip()` trusts spoofable `Client-IP`/`X-Forwarded-For` headers and mutates `$_SERVER` (`utils.php:2482-2500`). |
+| Retention | On the admin page load: set `s_ip_hash` to NULL after 30 days. Blank `reply_contact`/`reason` 180 days after `dt_processed`. The status row is kept forever, for precedence. The privacy note (Ley 25.326) states the purpose, the optional fields, and the retention. | — |
+| Admin actions | Pure `_admin_transition($status, $action, $confirm)`: `mark_processed` goes pending→processed. `reactivate` goes pending/processed→rejected and requires `confirm=1`. On reactivate, the glue sets every blocking request of that item to `rejected` and calls `tourist_directory_reactivate($id, ['allow_reactivate'=>true])`. | — |
+| Importer precedence | `tourist_directory_plan(..., $flags['removal_seed_ids'])`: a `candidato` whose seed id has a blocking request → `skip`/`removal_requested`. This applies with or without a marker, retired or not, and even with `--allow-reactivate`, so the entry is never created, updated or reactivated. `baja` rows stay unchanged. The plan returns `removal_blocked` ids, and the report prints them. At apply time, each create/update/reactivate re-checks the requests freshly (race guard). `_enable` also excludes items with blocking requests (`NOT EXISTS`). | — |
+| Importer gate | `_cli_should_refuse($apply, $installed, $channelReady, $hasDirectoryEmail)`: `--apply` requires `$channelReady`. A dry run is allowed and warns. `_cli_warnings()` reports a placeholder `osc_contact_email()`. `--allow-placeholder-contact` is still parsed as a deprecated no-op. | — |
+
+## Rendering Changes
+
+The `init_contact` prefill is removed. `render_notice_html` links to `osc_route_url('tourist-directory-removal', ['entry'=>$id])`. A `header` hook emits `noindex` on our route. The form shows the entry title, the fixed id, the relation radio, the optional fields, the privacy note, and the hidden honeypot (CSS off-screen, `autocomplete="off"`, `tabindex="-1"`). Both views start with an `ABS_PATH` guard.
+
+## File Changes
+
+| File | Action |
+|---|---|
+| `plugins/tourist-directory/tourist-directory-lib.php` | Modify: version 0.2.0; schema/channel/validate/decide/limits/client_ip/ip_hash/admin_transition/removal_route; plan precedence; CLI gate and warnings; drop `_removal_url` |
+| `plugins/tourist-directory/index.php` | Modify: ensure_schema, salt, routes, `init_custom`/`renderplugin_controller`/`admin_menu_init`/`_configure`, enable exclusion, render link |
+| `plugins/tourist-directory/views/removal-form.php`, `admin/requests.php` | Create |
+| `plugins/tourist-directory/assets/tourist-directory.css`, `README.md` | Modify |
+| `bin/tourist-directory-import.php`, `tests/test_tourist_showcase.php` | Modify |
+
+## Testing Strategy
+
+RED first, in the lib: `_schema_steps` (`''`/1/2), `_channel_ready`, `_validate_removal` (relation enum, lengths, control characters, multibyte), `_removal_decide` (every outcome and its precedence order), the throttle boundaries (4/5, 2/3), `_client_ip` (spoof headers ignored, CF honoured only from loopback), `_ip_hash` (determinism, salt-dependence), `_admin_transition`, plan `removal_requested` with and without a marker and with `allow_reactivate`, `_cli_should_refuse`/`_cli_warnings`, and the route regexp matching `directorio/solicitar-baja/12/` only. Lint: `php -l`. Manual: see Verification.
+
+## Threat Matrix
+
+Routing: Applicable. The new public POST route is protected by CSRF (vendor), the honeypot, the throttle, a route-only id and escaped output. The admin route requires an admin session plus CSRF, and `/admin/` is refused on the front end. Each has RED tests on its pure decision. Shell/subprocess, VCS/PR, executable classification: N/A (none).
+
+## Slicing
+
+- **U6 (~600 lines)**: lib functions and tests, `ensure_schema`/salt/enable exclusion in `index.php`, plan precedence and the CLI gate/warnings, and the importer wiring for gate, report and apply re-check.
+- **U7 (~700 lines)**: routes, form view and handler, admin view and handler with its menu, render link, CSS, README.
+
+## Deploy and Verification
+
+1. The agent takes a DB backup.
+2. The user syncs `plugins/tourist-directory/` only.
+3. In oc-admin, the user runs Disable and then Enable on **Tourist Directory Entries**, NOT on Tourist Portal Identity. This runs the migration.
+4. Confirm the menu entry exists and the admin page reports schema 2.
+5. Dry-run the importer: it shows no "channel unavailable" warning.
+6. Import one test entry with `--apply`.
+7. Over HTTPS, the form renders. A missing token is rejected. A valid POST deactivates the entry, and the admin page lists the request as pending. A second POST shows the same confirmation with no new row. The honeypot writes nothing. The 6th POST in an hour is throttled.
+8. Admin reactivates the entry with confirm: the request becomes `rejected` and the item is active.
+9. A new request, then `--apply --allow-reactivate`: the importer reports `removal_requested` and the entry stays retired.
+
+Rollback: Disable the plugin, which deactivates entries. The requests table is kept, so it never loses precedence.
+
+## Open Questions
+
+- [ ] Are the throttle limits (5/h per IP, 3/24h per entry) and the retention periods (30d/180d) acceptable? Both are lib constants.
+- [ ] A legal review of the privacy note text is still pending, like the lawyer review before volume.
