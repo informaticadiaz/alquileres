@@ -407,9 +407,13 @@ function tourist_directory_cli_parse_args(array $args) {
 // writes, so the mail gate does not apply to it. An --apply run is refused while the current contact
 // email is a placeholder, unless --allow-placeholder-contact was explicitly passed. Returns false
 // (proceed) or a string reason code ('not_installed', 'placeholder_contact_email').
-function tourist_directory_cli_should_refuse($apply, $installed, $contactEmailIsPlaceholder, $allowPlaceholderContact) {
+function tourist_directory_cli_should_refuse($apply, $installed, $contactEmailIsPlaceholder, $allowPlaceholderContact, $hasDirectoryContactEmail = true) {
   if (!$installed) {
     return 'not_installed';
+  }
+
+  if (!$hasDirectoryContactEmail) {
+    return 'directory_contact_email_missing';
   }
 
   if ($apply && $contactEmailIsPlaceholder && !$allowPlaceholderContact) {
@@ -431,4 +435,14 @@ function tourist_directory_should_block($isEntry, $contactEmail, $placeholder) {
   }
 
   return (string)$contactEmail === (string)$placeholder;
+}
+
+// True when the stored per-install directory contact email is missing (Osclass returns '' for an
+// absent preference) or is not an undeliverable .invalid address, so it must be (re)generated.
+function tourist_directory_needs_contact_email($value) {
+  if (!is_string($value) || $value === '' || !filter_var($value, FILTER_VALIDATE_EMAIL)) {
+    return true;
+  }
+
+  return substr(strtolower($value), -strlen('.invalid')) !== '.invalid';
 }

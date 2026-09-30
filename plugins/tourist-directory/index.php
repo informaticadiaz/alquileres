@@ -40,10 +40,18 @@ function tourist_directory_dao() {
   return Item::newInstance()->dao;
 }
 
-// The per-install placeholder contact address. Empty/false only before install ever ran.
+// The per-install placeholder contact address; '' when it was never generated.
 function tourist_directory_contact_email() {
   $value = osc_get_preference('contact_email', TOURIST_DIRECTORY_SECTION);
-  return ($value === false) ? '' : $value;
+  return tourist_directory_needs_contact_email($value) ? '' : $value;
+}
+
+// Generates the placeholder once. Osclass returns '' (not false) for a missing preference
+// (Preference.php:155-159), so the check must treat '' as missing. Never rotates a valid address.
+function tourist_directory_ensure_contact_email() {
+  if (tourist_directory_needs_contact_email(osc_get_preference('contact_email', TOURIST_DIRECTORY_SECTION))) {
+    osc_set_preference('contact_email', tourist_directory_generate_placeholder_email(), TOURIST_DIRECTORY_SECTION);
+  }
 }
 
 // Every locale code actually installed on this site (mirrors tourist_identity_installed_tree_locales()).
@@ -77,9 +85,7 @@ function tourist_directory_install() {
 
   // Generated exactly once per install: a re-install (uninstall keeps this pref) never rotates the
   // address, so existing entries keep matching it.
-  if (osc_get_preference('contact_email', TOURIST_DIRECTORY_SECTION) === false) {
-    osc_set_preference('contact_email', tourist_directory_generate_placeholder_email(), TOURIST_DIRECTORY_SECTION);
-  }
+  tourist_directory_ensure_contact_email();
 
   // A directory-only install/reinstall must also pick up the current showcase dropdown vocabulary,
   // exactly like tourist-showcase's own install does for itself (tourist-showcase.php:41).
@@ -129,6 +135,7 @@ function tourist_directory_marker_item_ids($whereSql) {
 }
 
 function tourist_directory_enable() {
+  tourist_directory_ensure_contact_email();
   tourist_directory_reactivate_non_retired_items();
 }
 

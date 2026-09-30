@@ -156,12 +156,14 @@ $refusal = tourist_directory_cli_should_refuse(
   $flags['apply'],
   $installed,
   tourist_directory_is_placeholder_email($contactEmail),
-  $flags['allow_placeholder_contact']
+  $flags['allow_placeholder_contact'],
+  $installed && tourist_directory_contact_email() !== ''
 );
 
 if ($refusal !== false) {
   $messages = array(
     'not_installed' => 'The tourist-directory plugin is not installed/active on this Osclass site. Nothing was read or written.',
+    'directory_contact_email_missing' => 'The directory placeholder contact email is missing. Disable and enable Tourist Directory Entries in oc-admin to generate it. Nothing was read or written.',
     'placeholder_contact_email' => 'Refusing --apply: osclass.contactEmail is still a placeholder value. Verify mail works, set a real contactEmail, then re-run (or pass --allow-placeholder-contact on a non-production install).',
   );
   fwrite(STDERR, (isset($messages[$refusal]) ? $messages[$refusal] : $refusal) . "\n");

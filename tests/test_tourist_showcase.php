@@ -1118,4 +1118,19 @@ expect_true(
   'the not-installed refusal applies to a dry run too, before any plan can be built'
 );
 
+// --- tourist-directory: the per-install placeholder email must exist and be undeliverable ---
+
+expect_true(tourist_directory_needs_contact_email('') === true, 'a missing preference (Osclass returns an empty string) requires generating the placeholder email');
+expect_true(tourist_directory_needs_contact_email(false) === true, 'a false preference requires generating the placeholder email');
+expect_true(tourist_directory_needs_contact_email('owner@complejo.com.ar') === true, 'a deliverable address is never accepted as the directory placeholder');
+expect_true(tourist_directory_needs_contact_email('directorio-abc123@directorio.invalid') === false, 'an existing .invalid placeholder is kept');
+expect_true(
+  tourist_directory_cli_should_refuse(false, true, false, false, false) === 'directory_contact_email_missing',
+  'the importer refuses even a dry run when the directory placeholder email is missing'
+);
+expect_true(
+  tourist_directory_cli_should_refuse(true, true, false, false, true) === false,
+  'the importer proceeds when installed, the site email is real and the placeholder exists'
+);
+
 echo "Tourist showcase checks passed.\n";
