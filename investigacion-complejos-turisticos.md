@@ -93,11 +93,20 @@ datos de personas físicas.
 Cuando el complejo acepta sumarse, la ficha se reemplaza por su anuncio
 completo, cargado o autorizado por el propietario.
 
+### Inclusión sin costo (2026-09-30)
+
+- Incluir un complejo en el directorio, como ficha o como anuncio, **no tiene
+  costo**. El índice de complejos es información esencial para el proyecto.
+- Los mensajes de invitación no mencionan costos; si un complejo pregunta, se
+  responde que la inclusión no tiene costo.
+- La monetización se definirá por otra vía, sin cobrar la inclusión.
+
 ## Decisiones pendientes
 
 - Cómo implementar las fichas de directorio en Osclass sin formulario de
   consulta ni precio (hoy todo anuncio muestra el contacto nativo).
-- Canal de contacto (correo, formulario web, WhatsApp comercial) y texto del
-  mensaje de invitación.
+- Canal de contacto (correo, formulario web, WhatsApp comercial). Hay un
+  borrador del mensaje en `data/prospeccion/borrador-invitacion.md`.
+- Modelo de monetización (no basado en cobrar la inclusión).
 - Correo propio del sitio para prospección (hoy el correo de Osclass no está
   configurado).
