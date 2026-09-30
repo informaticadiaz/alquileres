@@ -64,8 +64,8 @@ Files: `plugins/tourist-identity/index.php` unless noted.
 
 ## Phase 4: Deployment [USER] [AUTH REQUIRED]
 
-- [ ] 4.1 [USER] Backup: `mysqldump --single-transaction --no-tablespaces <db> > data/osclass/backups/pre-destination-categories-<date>.sql` (read-only).
-- [ ] 4.2 [USER] Sync: `cp -a plugins/tourist-identity/. app/osclass/oc-content/plugins/tourist-identity/` (read-only), then `diff -r plugins/tourist-identity/ app/osclass/oc-content/plugins/tourist-identity/` (read-only) confirms match.
-- [ ] 4.3 [USER][AUTH REQUIRED] Configure → "Re-apply" once; inline count > 0.
-- [ ] 4.4 [USER][AUTH REQUIRED] Configure → "Re-apply" again; inline result reads "0 change(s)".
-- [ ] 4.5 Agent, read-only HTTPS `curl`: home lists 6 regions in order; a region page lists leaves, catch-all last; publish form offers only leaves; showcase fields on a leaf; en_US checked.
+- [x] 4.1 [USER] Backup: `mysqldump --single-transaction --no-tablespaces <db> > data/osclass/backups/pre-destination-categories-<date>.sql` (read-only).
+- [x] 4.2 [USER] Sync: `cp -a plugins/tourist-identity/. app/osclass/oc-content/plugins/tourist-identity/` (read-only), then `diff -r plugins/tourist-identity/ app/osclass/oc-content/plugins/tourist-identity/` (read-only) confirms match.
+- [x] 4.3 [USER][AUTH REQUIRED] Configure → "Re-apply" once; inline count > 0.
+- [x] 4.4 [USER][AUTH REQUIRED] Configure → "Re-apply" again; inline result reads "0 change(s)".
+- [x] 4.5 Agent, read-only HTTPS `curl`: home lists 6 regions in order; a region page lists leaves, catch-all last; publish form offers only leaves; showcase fields on a leaf; en_US checked.
