@@ -367,4 +367,294 @@ foreach ($destination_tree as $region) {
 expect_true(count($all_keys) === count(array_unique($all_keys)), 'every region and leaf key is unique across the whole tree');
 expect_true(count($all_keys) === 57, 'the tree carries 6 region keys plus 51 leaf keys');
 
+// --- tourist-identity: Phase 2.1 - tree_plan (regions+leaves insert/update/describe, idempotent, map-drift reinsert) ---
+
+$full_tree = tourist_identity_tree();
+$locales = array('es_ES', 'en_US');
+
+// Case A: empty map + a stale anchor row -> anchor gets describe/update only, every other region
+// and leaf is planned for insertion (regions first, then leaves).
+$anchor_row_stale = array('pk_i_id' => 47, 'b_enabled' => 1, 'fk_i_parent_id' => 4, 'i_position' => 3);
+$stale_rows = array(47 => $anchor_row_stale);
+$stale_descs = array(
+  47 => array(
+    'es_ES' => array('s_name' => 'Alquiler Vacacional', 's_description' => 'Descripción vieja', 's_slug' => 'alquiler-vacacional'),
+    'en_US' => array('s_name' => 'Vacation Rental', 's_description' => 'Old description', 's_slug' => 'vacation-rental'),
+  ),
+);
+
+$plan_empty_map = tourist_identity_tree_plan($full_tree, $stale_rows, $stale_descs, array(), $locales, $anchor_row_stale);
+
+expect_true(count($plan_empty_map['insert']) === 56, 'an empty map plans 5 region inserts + 51 leaf inserts (Buenos Aires stays anchored)');
+$insert_keys = array_map(function ($entry) { return $entry['key']; }, $plan_empty_map['insert']);
+expect_true(!in_array('buenos-aires', $insert_keys, true), 'the anchored Buenos Aires region is never planned for insertion');
+expect_true(
+  array_slice($insert_keys, 0, 5) === array('cordoba', 'cuyo', 'litoral', 'norte', 'patagonia'),
+  'the five non-anchor regions are planned for insertion before any leaf'
+);
+expect_true($insert_keys[5] === 'caba', 'leaves are planned for insertion only after every region, starting with the first Buenos Aires leaf');
+expect_true(
+  $plan_empty_map['insert'][0]['parent_key'] === null && $plan_empty_map['insert'][0]['position'] === 1,
+  'a region insert carries no parent_key and its region index as position'
+);
+expect_true(
+  $plan_empty_map['insert'][5]['parent_key'] === 'buenos-aires' && $plan_empty_map['insert'][5]['position'] === 0,
+  'a leaf insert carries its region key as parent_key and its leaf index as position'
+);
+expect_true(
+  isset($plan_empty_map['update'][47]) && $plan_empty_map['update'][47]['fk_i_parent_id'] === null,
+  'the anchor row is planned to move to the root of the tree'
+);
+expect_true(
+  isset($plan_empty_map['describe'][47]['es_ES']) && $plan_empty_map['describe'][47]['es_ES']['s_name'] === 'Buenos Aires' && $plan_empty_map['describe'][47]['es_ES']['s_slug'] === 'buenos-aires',
+  'the anchor description is planned to become "Buenos Aires" with slug "buenos-aires"'
+);
+
+// Case B: a fully-applied tree (idempotent second pass) -> empty plan.
+$applied_rows = array(47 => array('pk_i_id' => 47, 'b_enabled' => 1, 'fk_i_parent_id' => null, 'i_position' => 0));
+$applied_descs = array(
+  47 => array(
+    'es_ES' => array('s_name' => 'Buenos Aires', 's_description' => '', 's_slug' => 'buenos-aires'),
+    'en_US' => array('s_name' => 'Buenos Aires', 's_description' => '', 's_slug' => 'buenos-aires'),
+  ),
+);
+$applied_map = array();
+$next_id = 100;
+foreach ($full_tree as $region_index => $region) {
+  if (!isset($region['anchor'])) {
+    $region_id = $next_id++;
+    $applied_map[$region['key']] = $region_id;
+    $applied_rows[$region_id] = array('pk_i_id' => $region_id, 'b_enabled' => 1, 'fk_i_parent_id' => null, 'i_position' => $region_index);
+    $applied_descs[$region_id] = array(
+      'es_ES' => array('s_name' => $region['names']['es_ES'], 's_description' => '', 's_slug' => $region['key']),
+      'en_US' => array('s_name' => $region['names']['en_US'], 's_description' => '', 's_slug' => $region['key']),
+    );
+    $region_parent_id = $region_id;
+  } else {
+    $region_parent_id = 47;
+  }
+
+  foreach ($region['leaves'] as $leaf_index => $leaf) {
+    list($leaf_key, $es_name, $en_name) = $leaf;
+    $leaf_id = $next_id++;
+    $applied_map[$leaf_key] = $leaf_id;
+    $applied_rows[$leaf_id] = array('pk_i_id' => $leaf_id, 'b_enabled' => 1, 'fk_i_parent_id' => $region_parent_id, 'i_position' => $leaf_index);
+    $applied_descs[$leaf_id] = array(
+      'es_ES' => array('s_name' => $es_name, 's_description' => '', 's_slug' => $leaf_key),
+      'en_US' => array('s_name' => $en_name, 's_description' => '', 's_slug' => $leaf_key),
+    );
+  }
+}
+
+$plan_applied = tourist_identity_tree_plan($full_tree, $applied_rows, $applied_descs, $applied_map, $locales, $applied_rows[47]);
+expect_true(
+  $plan_applied === array('insert' => array(), 'update' => array(), 'describe' => array()),
+  'a second pass against a fully-applied tree plans no inserts, updates, or descriptions'
+);
+
+// Case C: a map entry whose row was deleted out from under the plugin is re-inserted, not silently skipped.
+$drifted_map = array('cordoba' => 999);
+$drifted_rows = array(47 => $applied_rows[47]);
+$drifted_descs = array(47 => $applied_descs[47]);
+$plan_drifted = tourist_identity_tree_plan($full_tree, $drifted_rows, $drifted_descs, $drifted_map, $locales, $drifted_rows[47]);
+$drifted_insert_keys = array_map(function ($entry) { return $entry['key']; }, $plan_drifted['insert']);
+expect_true(
+  in_array('cordoba', $drifted_insert_keys, true),
+  'a map id missing from the current rows is re-inserted instead of being treated as already applied'
+);
+
+// --- tourist-identity: Phase 2.2 - leaf ids resolved from a full map, in tree order ---
+
+$full_map_for_leaf_ids = array();
+$expected_leaf_ids = array();
+$leaf_id_counter = 200;
+foreach ($full_tree as $region) {
+  foreach ($region['leaves'] as $leaf) {
+    $full_map_for_leaf_ids[$leaf[0]] = $leaf_id_counter;
+    $expected_leaf_ids[] = $leaf_id_counter;
+    $leaf_id_counter++;
+  }
+}
+// Region keys also live in the same production map; leaf_ids must ignore them.
+$full_map_for_leaf_ids['cordoba'] = 9999;
+
+expect_true(
+  tourist_identity_leaf_ids($full_tree, $full_map_for_leaf_ids) === $expected_leaf_ids,
+  'leaf ids resolve to the 51 mapped leaf ids in tree order, ignoring region keys in the same map'
+);
+
+$partial_map_for_leaf_ids = array($full_tree[0]['leaves'][0][0] => 500);
+expect_true(
+  tourist_identity_leaf_ids($full_tree, $partial_map_for_leaf_ids) === array(500),
+  'leaf ids skips any leaf key not yet present in the map instead of inserting a placeholder'
+);
+
+// --- tourist-identity: Phase 2.3 - showcase link needed, array-target set comparison (scalar kept) ---
+
+expect_true(
+  tourist_identity_showcase_link_needed(array(1, 2, 3), array(3, 2, 1)) === false,
+  'an array target matches selected ids regardless of order'
+);
+expect_true(
+  tourist_identity_showcase_link_needed(array(1, 2), array(1, 2, 3)) === true,
+  'a selected set missing an id from the array target still needs relinking'
+);
+expect_true(
+  tourist_identity_showcase_link_needed(array(47), 47) === false,
+  'the previously-supported scalar target behavior is preserved'
+);
+
+// --- tourist-identity: Phase 2.4 - slug resolver (free base, -2/-3 collision, self-exclusion) ---
+
+$owners_free = array('tandil' => null);
+expect_true(
+  tourist_identity_resolve_slug('tandil', function ($slug) use ($owners_free) {
+    return isset($owners_free[$slug]) ? $owners_free[$slug] : null;
+  }, 0) === 'tandil',
+  'a free base slug is returned unchanged'
+);
+
+$owners_collision = array('tandil' => 99, 'tandil-2' => null);
+expect_true(
+  tourist_identity_resolve_slug('tandil', function ($slug) use ($owners_collision) {
+    return isset($owners_collision[$slug]) ? $owners_collision[$slug] : null;
+  }, 0) === 'tandil-2',
+  'a base slug owned by another category resolves to the first free numbered suffix'
+);
+
+$owners_double_collision = array('tandil' => 99, 'tandil-2' => 98, 'tandil-3' => null);
+expect_true(
+  tourist_identity_resolve_slug('tandil', function ($slug) use ($owners_double_collision) {
+    return isset($owners_double_collision[$slug]) ? $owners_double_collision[$slug] : null;
+  }, 0) === 'tandil-3',
+  'two consecutive collisions resolve to the second numbered suffix'
+);
+
+$owners_self = array('tandil' => 42);
+expect_true(
+  tourist_identity_resolve_slug('tandil', function ($slug) use ($owners_self) {
+    return isset($owners_self[$slug]) ? $owners_self[$slug] : null;
+  }, 42) === 'tandil',
+  'a slug already owned by the category being described is not treated as a collision'
+);
+
+// --- tourist-identity: Phase 2.5 - supplementary tree snapshot build + restore round-trip ---
+
+$anchor_row_for_snapshot = array('pk_i_id' => 47, 'i_position' => 3, 'b_enabled' => 1, 'fk_i_parent_id' => 4);
+$anchor_descs_for_snapshot = array(
+  'es_ES' => array('s_name' => 'Alquiler Vacacional', 's_description' => 'Descripción original', 's_slug' => 'alquiler-vacacional'),
+  'en_US' => array('s_name' => 'Vacation Rental', 's_description' => 'Original description', 's_slug' => 'vacation-rental'),
+);
+
+$tree_snapshot_json = tourist_identity_build_tree_snapshot($anchor_row_for_snapshot, $anchor_descs_for_snapshot);
+expect_true(is_string($tree_snapshot_json) && $tree_snapshot_json !== '', 'the supplementary tree snapshot serializes as a non-empty JSON string');
+
+$decoded_tree_snapshot = json_decode($tree_snapshot_json, true);
+expect_true($decoded_tree_snapshot['anchor']['id'] === 47, 'the tree snapshot records the anchor category id');
+expect_true($decoded_tree_snapshot['anchor']['i_position'] === 3, 'the tree snapshot records the anchor position before it moves to the root');
+
+$tree_restore_plan = tourist_identity_tree_restore_plan($tree_snapshot_json);
+expect_true($tree_restore_plan['id'] === 47, 'the tree restore plan round-trips the anchor id');
+expect_true($tree_restore_plan['i_position'] === 3, 'the tree restore plan round-trips the anchor position');
+expect_true(
+  $tree_restore_plan['descriptions'] === $anchor_descs_for_snapshot,
+  'the tree restore plan round-trips the anchor descriptions verbatim'
+);
+
+expect_throws(function () {
+  tourist_identity_tree_restore_plan('{not valid json');
+}, 'restoring an invalid tree snapshot JSON throws instead of silently returning garbage');
+
+// --- tourist-identity: Phase 2.6 - uninstall plan (delete empty, disable in-use, leaves before regions, null=disable) ---
+
+$uninstall_map_simple = array('leaf-empty' => 10);
+$uninstall_rows_simple = array(10 => array('fk_i_parent_id' => 1));
+expect_true(
+  tourist_identity_uninstall_plan($uninstall_map_simple, $uninstall_rows_simple, array(10 => 0))
+    === array('delete' => array(10), 'disable' => array(), 'map' => array()),
+  'a plugin-created row with zero linked items is deleted and dropped from the map'
+);
+
+$uninstall_map_in_use = array('leaf-in-use' => 11);
+$uninstall_rows_in_use = array(11 => array('fk_i_parent_id' => 1));
+expect_true(
+  tourist_identity_uninstall_plan($uninstall_map_in_use, $uninstall_rows_in_use, array(11 => 3))
+    === array('delete' => array(), 'disable' => array(11), 'map' => array('leaf-in-use' => 11)),
+  'a plugin-created row holding items is disabled and kept in the map, never deleted'
+);
+
+$uninstall_map_null_count = array('leaf-unknown' => 12);
+$uninstall_rows_null_count = array(12 => array('fk_i_parent_id' => 1));
+expect_true(
+  tourist_identity_uninstall_plan($uninstall_map_null_count, $uninstall_rows_null_count, array())
+    === array('delete' => array(), 'disable' => array(12), 'map' => array('leaf-unknown' => 12)),
+  'an unknown (null) item count disables rather than deletes, since deletion cannot be proven safe'
+);
+
+$uninstall_map_region_deletable = array('region' => 1, 'leaf' => 10);
+$uninstall_rows_region_deletable = array(
+  1 => array('fk_i_parent_id' => null),
+  10 => array('fk_i_parent_id' => 1),
+);
+$plan_region_deletable = tourist_identity_uninstall_plan($uninstall_map_region_deletable, $uninstall_rows_region_deletable, array(1 => 0, 10 => 0));
+expect_true(
+  $plan_region_deletable['delete'] === array(10, 1),
+  'an empty leaf is deleted before its now-empty parent region, never the reverse'
+);
+expect_true($plan_region_deletable['map'] === array(), 'both deleted ids are dropped from the kept map');
+
+$uninstall_map_region_kept = array('region' => 2, 'leaf' => 20);
+$uninstall_rows_region_kept = array(
+  2 => array('fk_i_parent_id' => null),
+  20 => array('fk_i_parent_id' => 2),
+);
+$plan_region_kept = tourist_identity_uninstall_plan($uninstall_map_region_kept, $uninstall_rows_region_kept, array(2 => 0, 20 => 5));
+expect_true(
+  $plan_region_kept['delete'] === array() && $plan_region_kept['disable'] === array(20, 2),
+  'a region whose leaf survives (holds items) is disabled instead of deleted, even though the region itself has zero direct items'
+);
+expect_true(
+  $plan_region_kept['map'] === array('region' => 2, 'leaf' => 20),
+  'both the surviving leaf and its blocked-from-deletion region stay in the kept map'
+);
+
+// --- tourist-identity: Phase 2.7 - prune ids (remove given ids, keep order/uniqueness) ---
+
+expect_true(
+  tourist_identity_prune_ids(array(47, 12, 8), array(12)) === array(47, 8),
+  'removed ids are dropped while the remaining order is preserved'
+);
+expect_true(
+  tourist_identity_prune_ids(array(47, 12, 8, 12), array()) === array(47, 12, 8),
+  'duplicate selected ids are deduplicated even when nothing is removed'
+);
+expect_true(
+  tourist_identity_prune_ids(array(1, 2, 3), array(1, 2, 3)) === array(),
+  'removing every selected id leaves an empty list'
+);
+
+// --- tourist-identity: Phase 2.8 - re-apply message formatter and version bump ---
+
+expect_true(
+  tourist_identity_reapply_message(0) === 'Re-apply complete: 0 change(s).',
+  'a zero-change re-apply reports "0 change(s)"'
+);
+expect_true(
+  tourist_identity_reapply_message(7) === 'Re-apply complete: 7 change(s).',
+  'a re-apply with changes reports the exact count'
+);
+expect_true(tourist_identity_version() === '1.1.0', 'the identity plugin version is bumped for the destination-tree feature');
+
+// --- tourist-destination-categories: uninstall never deletes or disables protected pre-existing categories ---
+
+$protected_plan = tourist_identity_uninstall_plan(
+  array('buenos-aires' => 47, 'tandil' => 200),
+  array(47 => array('fk_i_parent_id' => null), 200 => array('fk_i_parent_id' => 47)),
+  array(47 => 0, 200 => 0),
+  array(47)
+);
+expect_true(!in_array(47, $protected_plan['delete'], true), 'a protected anchor category is never deleted even if it leaks into the created-id map');
+expect_true(!in_array(47, $protected_plan['disable'], true), 'a protected anchor category is never disabled by the uninstall plan; its snapshot restores it');
+expect_true(in_array(200, $protected_plan['delete'], true), 'an empty created leaf under the protected anchor is still deleted');
+
 echo "Tourist showcase checks passed.\n";

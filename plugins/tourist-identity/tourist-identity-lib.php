@@ -9,7 +9,13 @@
 // so the guard itself is testable in isolation.
 
 function tourist_identity_version() {
-  return '1.0.0';
+  return '1.1.0';
+}
+
+// Formats the inline "Re-apply" outcome shown on the configure screen, independent of the
+// transient flash message.
+function tourist_identity_reapply_message($changeCount) {
+  return 'Re-apply complete: ' . (int)$changeCount . ' change(s).';
 }
 
 function tourist_identity_target_prefs() {
@@ -182,9 +188,279 @@ function tourist_identity_configure_url($admin_base_url, $plugin_file, $plugins_
   return $admin_base_url . '?' . http_build_query(array('page' => 'plugins', 'action' => 'admin', 'plugin' => $plugin));
 }
 
-// True when the showcase plugin must be relinked so its fields apply only to the kept category.
-function tourist_identity_showcase_link_needed(array $selected, $keep_category_id) {
-  $normalized = array_values(array_unique(array_map('intval', $selected)));
+// True when the showcase plugin must be relinked so its fields apply to exactly the target
+// category id(s). $target may be a single id (prior scalar contract) or an array of ids
+// (destination-tree leaves), compared as a set regardless of order.
+function tourist_identity_showcase_link_needed(array $selected, $target) {
+  $normalized_selected = array_values(array_unique(array_map('intval', $selected)));
+  sort($normalized_selected);
 
-  return $normalized !== array((int)$keep_category_id);
+  $target_ids = is_array($target) ? $target : array($target);
+  $normalized_target = array_values(array_unique(array_map('intval', $target_ids)));
+  sort($normalized_target);
+
+  return $normalized_selected !== $normalized_target;
+}
+
+// Removes $removed ids from $selected, de-duplicating along the way, while preserving the
+// relative order of the remaining ids.
+function tourist_identity_prune_ids(array $selected, array $removed) {
+  $removed_ids = array_map('intval', $removed);
+  $pruned = array();
+
+  foreach ($selected as $id) {
+    $id = (int)$id;
+    if (!in_array($id, $removed_ids, true) && !in_array($id, $pruned, true)) {
+      $pruned[] = $id;
+    }
+  }
+
+  return $pruned;
+}
+
+// Plans which plugin-created category rows to delete vs. disable on uninstall. $map is
+// key=>id for every plugin-created row; $rows is id=>['fk_i_parent_id'=>id|null] for those same
+// ids (parent linkage, to process leaves before regions); $counts is id=>int|null (linked item
+// count, null when unknown/unsafe to trust). A row deletes only when its own count is exactly 0
+// AND none of its children survive (were not also deleted); everything else is disabled and
+// kept in the map, including any row with an unknown (null) count.
+// $protected_ids lists pre-existing categories (the anchor) that the plan must never delete
+// or disable, even if they leak into the created-id map; their snapshot restores them.
+function tourist_identity_uninstall_plan(array $map, array $rows, array $counts, array $protected_ids = array()) {
+  $protected = array_flip(array_map('intval', $protected_ids));
+  $children_of = array();
+  foreach ($rows as $id => $row) {
+    $parent = isset($row['fk_i_parent_id']) ? $row['fk_i_parent_id'] : null;
+    if ($parent !== null) {
+      $parent = (int)$parent;
+      if (!isset($children_of[$parent])) {
+        $children_of[$parent] = array();
+      }
+      $children_of[$parent][] = (int)$id;
+    }
+  }
+
+  $leaf_ids = array();
+  $region_ids = array();
+  foreach (array_map('intval', array_values($map)) as $id) {
+    if (isset($protected[$id])) {
+      continue;
+    }
+    if (empty($children_of[$id])) {
+      $leaf_ids[] = $id;
+    } else {
+      $region_ids[] = $id;
+    }
+  }
+
+  $delete = array();
+  $disable = array();
+  $deleted = array();
+
+  foreach ($leaf_ids as $id) {
+    $count = array_key_exists($id, $counts) ? $counts[$id] : null;
+    if ($count === 0) {
+      $delete[] = $id;
+      $deleted[$id] = true;
+    } else {
+      $disable[] = $id;
+    }
+  }
+
+  foreach ($region_ids as $id) {
+    $count = array_key_exists($id, $counts) ? $counts[$id] : null;
+    $children = isset($children_of[$id]) ? $children_of[$id] : array();
+    $all_children_deleted = true;
+    foreach ($children as $child_id) {
+      if (empty($deleted[$child_id])) {
+        $all_children_deleted = false;
+        break;
+      }
+    }
+
+    if ($count === 0 && $all_children_deleted) {
+      $delete[] = $id;
+      $deleted[$id] = true;
+    } else {
+      $disable[] = $id;
+    }
+  }
+
+  $kept_map = array();
+  foreach ($map as $key => $id) {
+    if (empty($deleted[(int)$id])) {
+      $kept_map[$key] = $id;
+    }
+  }
+
+  return array('delete' => $delete, 'disable' => $disable, 'map' => $kept_map);
+}
+
+// Builds the supplementary snapshot of the anchor category (47) captured only once, before the
+// first destination-tree apply repurposes it. The main tourist_identity.snapshot already covers
+// 47's b_enabled/parent state; this snapshot covers what that one lacks: position and per-locale
+// description (name/description/slug), so uninstall can restore 47 to its pre-tree identity.
+function tourist_identity_build_tree_snapshot(array $anchorRow, array $anchorDescs) {
+  return json_encode(array(
+    'version' => tourist_identity_version(),
+    'anchor' => array(
+      'id' => isset($anchorRow['pk_i_id']) ? (int)$anchorRow['pk_i_id'] : null,
+      'i_position' => isset($anchorRow['i_position']) ? (int)$anchorRow['i_position'] : null,
+      'descriptions' => $anchorDescs,
+    ),
+  ));
+}
+
+function tourist_identity_tree_restore_plan($json) {
+  $decoded = json_decode($json, true);
+
+  if ($decoded === null || json_last_error() !== JSON_ERROR_NONE) {
+    throw new \InvalidArgumentException('tourist_identity_tree_restore_plan: invalid snapshot JSON');
+  }
+
+  $anchor = isset($decoded['anchor']) ? $decoded['anchor'] : array();
+
+  return array(
+    'id' => isset($anchor['id']) ? $anchor['id'] : null,
+    'i_position' => isset($anchor['i_position']) ? $anchor['i_position'] : null,
+    'descriptions' => isset($anchor['descriptions']) ? $anchor['descriptions'] : array(),
+  );
+}
+
+// Resolves a stable base slug to a slug free for the given owner ($selfId): the base slug is
+// used unchanged unless another category already owns it, in which case "-2", "-3", ... is
+// appended until $ownerOf reports either no owner or $selfId itself.
+function tourist_identity_resolve_slug($slug, callable $ownerOf, $selfId) {
+  $candidate = $slug;
+  $suffix = 1;
+
+  while (true) {
+    $owner = $ownerOf($candidate);
+    if ($owner === null || (int)$owner === (int)$selfId) {
+      return $candidate;
+    }
+    $suffix++;
+    $candidate = $slug . '-' . $suffix;
+  }
+}
+
+// Resolves every leaf's mapped category id, in tree order, skipping any leaf key not yet
+// present in the map. Region keys that may also live in $map are ignored.
+function tourist_identity_leaf_ids(array $tree, array $map) {
+  $ids = array();
+
+  foreach ($tree as $region) {
+    foreach ($region['leaves'] as $leaf) {
+      $key = $leaf[0];
+      if (array_key_exists($key, $map)) {
+        $ids[] = (int)$map[$key];
+      }
+    }
+  }
+
+  return $ids;
+}
+
+// Fills $update/$describe (by reference) for one already-existing tree row (region or leaf)
+// against its target enabled/parent/position/description state. Used only by
+// tourist_identity_tree_plan().
+function tourist_identity_tree_plan_row($id, array $names, $slug, $parent_id, $position, array $rows, array $descs, array $locales, array &$update, array &$describe) {
+  $row = $rows[$id];
+  $changes = array();
+
+  if ((int)$row['b_enabled'] !== 1) {
+    $changes['b_enabled'] = 1;
+  }
+
+  $current_parent = (isset($row['fk_i_parent_id']) && $row['fk_i_parent_id'] !== null) ? (int)$row['fk_i_parent_id'] : null;
+  $target_parent = ($parent_id !== null) ? (int)$parent_id : null;
+  if ($current_parent !== $target_parent) {
+    $changes['fk_i_parent_id'] = $target_parent;
+  }
+
+  $current_position = isset($row['i_position']) ? (int)$row['i_position'] : null;
+  if ($current_position !== $position) {
+    $changes['i_position'] = $position;
+  }
+
+  if (!empty($changes)) {
+    $update[$id] = $changes;
+  }
+
+  foreach ($locales as $locale) {
+    $target = array('s_name' => $names[$locale], 's_description' => '', 's_slug' => $slug);
+    $current = isset($descs[$id][$locale]) ? $descs[$id][$locale] : null;
+
+    if ($current !== $target) {
+      if (!isset($describe[$id])) {
+        $describe[$id] = array();
+      }
+      $describe[$id][$locale] = $target;
+    }
+  }
+}
+
+// Plans the destination tree against current DB state, without touching the database.
+// Buenos Aires reuses the pre-existing anchor row ($anchorRow); every other region/leaf is
+// resolved through the persisted id map, and re-inserted if its mapped id no longer has a row.
+function tourist_identity_tree_plan(array $tree, array $rows, array $descs, array $map, array $locales, array $anchorRow) {
+  $insert = array();
+  $update = array();
+  $describe = array();
+  $region_ids = array();
+  $region_index = 0;
+
+  foreach ($tree as $region) {
+    $key = $region['key'];
+    $is_anchor = array_key_exists('anchor', $region);
+
+    if ($is_anchor) {
+      $id = (int)$anchorRow['pk_i_id'];
+      $region_ids[$key] = $id;
+      tourist_identity_tree_plan_row($id, $region['names'], $key, null, $region_index, $rows, $descs, $locales, $update, $describe);
+    } elseif (isset($map[$key]) && isset($rows[(int)$map[$key]])) {
+      $id = (int)$map[$key];
+      $region_ids[$key] = $id;
+      tourist_identity_tree_plan_row($id, $region['names'], $key, null, $region_index, $rows, $descs, $locales, $update, $describe);
+    } else {
+      $insert[] = array(
+        'key' => $key,
+        'parent_key' => null,
+        'position' => $region_index,
+        'fields' => array('b_enabled' => 1, 'fk_i_parent_id' => null),
+        'names' => $region['names'],
+      );
+      $region_ids[$key] = null;
+    }
+
+    $region_index++;
+  }
+
+  foreach ($tree as $region) {
+    $region_key = $region['key'];
+    $parent_id = $region_ids[$region_key];
+    $leaf_index = 0;
+
+    foreach ($region['leaves'] as $leaf) {
+      list($leaf_key, $es_name, $en_name) = $leaf;
+      $names = array('es_ES' => $es_name, 'en_US' => $en_name);
+
+      if (isset($map[$leaf_key]) && isset($rows[(int)$map[$leaf_key]])) {
+        $id = (int)$map[$leaf_key];
+        tourist_identity_tree_plan_row($id, $names, $leaf_key, $parent_id, $leaf_index, $rows, $descs, $locales, $update, $describe);
+      } else {
+        $insert[] = array(
+          'key' => $leaf_key,
+          'parent_key' => $region_key,
+          'position' => $leaf_index,
+          'fields' => array('b_enabled' => 1, 'fk_i_parent_id' => null),
+          'names' => $names,
+        );
+      }
+
+      $leaf_index++;
+    }
+  }
+
+  return array('insert' => $insert, 'update' => $update, 'describe' => $describe);
 }

@@ -36,17 +36,17 @@ Chain strategy: stacked-to-main
 
 Files: `plugins/tourist-identity/tourist-identity-lib.php` unless noted.
 
-- [ ] 2.1 RED: `tourist_identity_tree_plan()` — empty map inserts regions then leaves; anchor 47 gets describe/update only; full-map rerun is empty (idempotent); map id missing from rows is re-inserted.
-- [ ] 2.2 RED: `tourist_identity_leaf_ids()` returns the 51 ids in tree order from a full map.
-- [ ] 2.3 RED: `tourist_identity_showcase_link_needed()` set-compares an array target (51 ids, any order); prior scalar behavior kept.
-- [ ] 2.4 RED: `tourist_identity_resolve_slug()` — base slug when free, `-2`/`-3` on collision, self-exclusion via injected `ownerOf`/`selfId`.
-- [ ] 2.5 RED: `tourist_identity_build_tree_snapshot()`/`tourist_identity_tree_restore_plan()` round-trip; invalid JSON throws.
-- [ ] 2.6 RED: `tourist_identity_uninstall_plan()` — zero-item row deletes, item-holding row disables (kept in map), leaves before region, `null` count disables.
-- [ ] 2.7 RED: `tourist_identity_prune_ids()` removes given ids, keeps order/uniqueness.
-- [ ] 2.8 RED: `tourist_identity_reapply_message(0)` === `'Re-apply complete: 0 change(s).'`; `tourist_identity_version()` === `'1.1.0'`.
-- [ ] 2.9 GREEN: implement `tourist_identity_tree_plan()` (delegates others to `tourist_identity_category_plan`), `tourist_identity_leaf_ids()`, `tourist_identity_resolve_slug()`, `tourist_identity_build_tree_snapshot()`, `tourist_identity_tree_restore_plan()`.
-- [ ] 2.10 GREEN: implement `tourist_identity_uninstall_plan()`, `tourist_identity_prune_ids()`, `tourist_identity_reapply_message()`; update `tourist_identity_showcase_link_needed()` for array targets; bump `tourist_identity_version()` to `1.1.0`.
-- [ ] 2.11 VERIFY: test green (prior assertions kept), `php -l`; commit Unit 2.
+- [x] 2.1 RED: `tourist_identity_tree_plan()` — empty map inserts regions then leaves; anchor 47 gets describe/update only; full-map rerun is empty (idempotent); map id missing from rows is re-inserted.
+- [x] 2.2 RED: `tourist_identity_leaf_ids()` returns the 51 ids in tree order from a full map.
+- [x] 2.3 RED: `tourist_identity_showcase_link_needed()` set-compares an array target (51 ids, any order); prior scalar behavior kept.
+- [x] 2.4 RED: `tourist_identity_resolve_slug()` — base slug when free, `-2`/`-3` on collision, self-exclusion via injected `ownerOf`/`selfId`.
+- [x] 2.5 RED: `tourist_identity_build_tree_snapshot()`/`tourist_identity_tree_restore_plan()` round-trip; invalid JSON throws.
+- [x] 2.6 RED: `tourist_identity_uninstall_plan()` — zero-item row deletes, item-holding row disables (kept in map), leaves before region, `null` count disables.
+- [x] 2.7 RED: `tourist_identity_prune_ids()` removes given ids, keeps order/uniqueness.
+- [x] 2.8 RED: `tourist_identity_reapply_message(0)` === `'Re-apply complete: 0 change(s).'`; `tourist_identity_version()` === `'1.1.0'`.
+- [x] 2.9 GREEN: implement `tourist_identity_tree_plan()` (delegates others to `tourist_identity_category_plan`), `tourist_identity_leaf_ids()`, `tourist_identity_resolve_slug()`, `tourist_identity_build_tree_snapshot()`, `tourist_identity_tree_restore_plan()`.
+- [x] 2.10 GREEN: implement `tourist_identity_uninstall_plan()`, `tourist_identity_prune_ids()`, `tourist_identity_reapply_message()`; update `tourist_identity_showcase_link_needed()` for array targets; bump `tourist_identity_version()` to `1.1.0`.
+- [x] 2.11 VERIFY: test green (prior assertions kept), `php -l`. Commit intentionally **deferred** — this apply batch's scope explicitly excludes commit/push.
 
 ## Phase 3: Wiring + Docs (Unit 3, PR 3)
 
