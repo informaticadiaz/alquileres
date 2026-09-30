@@ -197,3 +197,7 @@ Scanned all `tourist_identity_*` assertions added or modified by this change (`t
 - "Linkage restored after showcase reinstall" now has dedicated unit coverage in `tests/test_tourist_showcase.php`: an emptied `category_ids` requires relinking all 51 leaf ids, and a relinked set (any order) needs no further change. Suite exit 0.
 - `apply-progress.md` status reconciled: Phase 4 complete (backup, user sync + Re-apply ×2 with 0 changes on the second run, read-only DB/HTTPS verification, commit `7484701`).
 - Remaining gap: the "Restore on Uninstall" scenario family is not runtime-provable in production without undoing the deployment; it is covered by unit tests (`uninstall_plan` incl. protected ids, `prune_ids`, tree snapshot round-trip) and code review of `restore_tree()`.
+
+## Accepted exception (user decision, 2026-09-30)
+
+The user explicitly accepted, as a permanent exception, that the "Restore on Uninstall" scenario family is not proven in production. Evidence: unit-tested `uninstall_plan` (including protected anchor ids), `prune_ids`, tree snapshot round-trip; code review of `restore_tree()` (parent structure read from raw `t_category`, failure disables instead of deleting, deletes only created categories with exactly 0 items and no remaining children, leaves before regions); pre-deploy backup `data/osclass/backups/pre-tourist-destinations-20260929T224115.sql`. No CRITICAL findings. Approved for archive with this exception.
