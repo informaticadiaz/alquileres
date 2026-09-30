@@ -9,7 +9,7 @@
 // index.php and bin/tourist-directory-import.php (Phase 2/3), never here.
 
 function tourist_directory_version() {
-  return '0.1.0';
+  return '0.2.0';
 }
 
 // The seed CSV header whitelist: the control key (id), the routing state
@@ -214,13 +214,6 @@ function tourist_directory_safe_url($url) {
   return $url;
 }
 
-// Appends the removal-request marker to a contact URL, choosing '?' or '&' depending on whether
-// $contactUrl already carries a query string.
-function tourist_directory_removal_url($contactUrl, $id) {
-  $separator = (strpos((string)$contactUrl, '?') !== false) ? '&' : '?';
-  return $contactUrl . $separator . 'tourist_directory_removal=' . (int)$id;
-}
-
 // Builds the full admin Params map for one validated entry (see tourist_directory_validate_row),
 // ready to be fed one key at a time into Params::setParam() ahead of ItemActions(true)->prepareData()
 // ->add()/->edit(). $ctx carries request-independent context the lib cannot resolve itself:
@@ -267,24 +260,45 @@ function tourist_directory_item_params(array $entry, array $ctx) {
 // one row per already-imported marker: 'item_id' (int), 'fingerprint' (string), 'retired' (bool),
 // and 'item_missing' (bool -- true when the underlying t_item row for this marker no longer exists;
 // resolved by the caller before calling this function, since checking the database is not a pure
-// operation). $flags carries 'allow_reactivate' (bool, default false).
+// operation). $flags carries 'allow_reactivate' (bool, default false) and 'removal_seed_ids'
+// (array of seed ids that have a blocking removal request -- pending or processed -- default
+// empty).
 //
-// Returns array('actions'=>[...], 'not_in_seed'=>[ids]): 'actions' has one row per valid entry --
-// array('id','action','entry','item_id','reason') -- with action one of 'create', 'update', 'noop',
-// 'retire', 'reactivate', or 'skip' (reason one of 'reactivate_not_allowed', 'missing_item',
-// 'no_entry', 'not_importable'). 'not_in_seed' lists existing marker ids absent from this seed pass
-// entirely, reported only -- absence from the file alone never retires an entry; only an explicit
-// baja/anuncio_propio row does.
+// Returns array('actions'=>[...], 'not_in_seed'=>[ids], 'removal_blocked'=>[ids]): 'actions' has
+// one row per valid entry -- array('id','action','entry','item_id','reason') -- with action one of
+// 'create', 'update', 'noop', 'retire', 'reactivate', or 'skip' (reason one of
+// 'reactivate_not_allowed', 'missing_item', 'no_entry', 'not_importable', 'removal_requested').
+// 'not_in_seed' lists existing marker ids absent from this seed pass entirely, reported only --
+// absence from the file alone never retires an entry; only an explicit baja/anuncio_propio row
+// does. A 'candidato' row whose seed id carries a blocking removal request is skipped before any
+// other check (with or without a marker, retired or not, even with allow_reactivate set) and its id
+// is also collected in 'removal_blocked'. A 'baja'/'anuncio_propio' row is unaffected.
 function tourist_directory_plan(array $valid, array $existing, array $flags = array()) {
   $allow_reactivate = !empty($flags['allow_reactivate']);
+  $removal_ids = isset($flags['removal_seed_ids']) && is_array($flags['removal_seed_ids'])
+    ? array_flip($flags['removal_seed_ids'])
+    : array();
   $actions = array();
   $seen_ids = array();
+  $removal_blocked = array();
 
   foreach ($valid as $entry) {
     $id = isset($entry['id']) ? $entry['id'] : '';
     $estado = isset($entry['estado_catalogo']) ? $entry['estado_catalogo'] : '';
     $seen_ids[$id] = true;
     $current = isset($existing[$id]) ? $existing[$id] : null;
+
+    if ($estado === 'candidato' && isset($removal_ids[$id])) {
+      $actions[] = array(
+        'id' => $id,
+        'action' => 'skip',
+        'entry' => $entry,
+        'item_id' => $current !== null ? $current['item_id'] : null,
+        'reason' => 'removal_requested',
+      );
+      $removal_blocked[] = $id;
+      continue;
+    }
 
     if ($current !== null && !empty($current['item_missing'])) {
       $actions[] = tourist_directory_plan_missing_item($id, $entry, $current);
@@ -313,7 +327,7 @@ function tourist_directory_plan(array $valid, array $existing, array $flags = ar
     }
   }
 
-  return array('actions' => $actions, 'not_in_seed' => $not_in_seed);
+  return array('actions' => $actions, 'not_in_seed' => $not_in_seed, 'removal_blocked' => $removal_blocked);
 }
 
 // A marker whose underlying item is gone is planned for retirement (reason missing_item) exactly
@@ -401,26 +415,43 @@ function tourist_directory_cli_parse_args(array $args) {
   return $flags;
 }
 
-// Decides whether the importer must refuse to run, before touching anything. Refuses unconditionally
-// when the plugin is not installed ($installed === false; there is no placeholder contact context to
-// even compare against). Otherwise: a dry run ($apply === false) is always allowed -- it never
-// writes, so the mail gate does not apply to it. An --apply run is refused while the current contact
-// email is a placeholder, unless --allow-placeholder-contact was explicitly passed. Returns false
-// (proceed) or a string reason code ('not_installed', 'placeholder_contact_email').
-function tourist_directory_cli_should_refuse($apply, $installed, $contactEmailIsPlaceholder, $allowPlaceholderContact, $hasDirectoryContactEmail = true) {
+// Decides whether the importer must refuse to run, before touching anything. Refuses
+// unconditionally when the plugin is not installed, or when the per-install directory placeholder
+// contact email is missing (needed for every write's contactEmail Params value). A dry run
+// ($apply === false) is otherwise always allowed, regardless of $channelReady -- it never writes,
+// so the removal-channel gate does not apply to it. An --apply run is refused unless the removal
+// channel is ready (schema_version >= 2 and the request table probes OK -- see
+// tourist_directory_channel_ready()). The old osclass.contactEmail placeholder hard gate is REPLACED
+// by this channel-availability gate; a placeholder site contact email is reported only as a warning
+// (see tourist_directory_cli_warnings()), never blocks. Returns false (proceed) or a string reason
+// code ('not_installed', 'directory_contact_email_missing', 'channel_not_ready').
+function tourist_directory_cli_should_refuse($apply, $installed, $channelReady, $hasDirectoryEmail) {
   if (!$installed) {
     return 'not_installed';
   }
 
-  if (!$hasDirectoryContactEmail) {
+  if (!$hasDirectoryEmail) {
     return 'directory_contact_email_missing';
   }
 
-  if ($apply && $contactEmailIsPlaceholder && !$allowPlaceholderContact) {
-    return 'placeholder_contact_email';
+  if ($apply && !$channelReady) {
+    return 'channel_not_ready';
   }
 
   return false;
+}
+
+// Non-blocking warnings printed alongside the plan report. Currently reports only a placeholder
+// site osclass.contactEmail -- the old hard gate on that value is gone (see
+// tourist_directory_cli_should_refuse()), so this is the only remaining signal for it.
+function tourist_directory_cli_warnings($siteContactEmailIsPlaceholder) {
+  $warnings = array();
+
+  if ($siteContactEmailIsPlaceholder) {
+    $warnings[] = 'site_contact_email_placeholder';
+  }
+
+  return $warnings;
 }
 
 // Fail-closed contact-guard decision. $isEntry is the tri-state marker lookup result: true (a
@@ -445,4 +476,179 @@ function tourist_directory_needs_contact_email($value) {
   }
 
   return substr(strtolower($value), -strlen('.invalid')) !== '.invalid';
+}
+
+// ------------------------------------------------------------------------------------------------
+// Amendment: removal-request pure decisions (schema migration, channel availability, validation,
+// throttle, client IP, admin transitions). Every DB-touching step lives in index.php; these
+// functions only decide.
+// ------------------------------------------------------------------------------------------------
+
+// The target schema version. Bumping this and adding a step here is the only change needed to add
+// a future migration step.
+function tourist_directory_schema_target_version() {
+  return 2;
+}
+
+// Decides which migration steps are still needed for a stored schema_version preference value.
+// Osclass returns '' for a missing preference (Preference.php:155-159), which this function treats
+// as version 0, same as an explicit 0/false/null. Step 1 is the marker table (t_directory_entry,
+// already created by every install since U2); step 2 is the removal-request table
+// (t_directory_removal_request, new in this Amendment). Returns the ordered list of step numbers
+// still needed: version 0 -> [1, 2], version 1 -> [2], version 2 (or higher) -> [].
+function tourist_directory_schema_steps($stored) {
+  $version = ($stored === '' || $stored === false || $stored === null) ? 0 : (int) $stored;
+  $steps = array();
+
+  if ($version < 1) {
+    $steps[] = 1;
+  }
+  if ($version < 2) {
+    $steps[] = 2;
+  }
+
+  return $steps;
+}
+
+// The removal request/public-form channel is ready only once the schema migration reached its
+// target version AND a live probe of the request table succeeded ($tableProbeOk is resolved by the
+// caller -- checking the database is not a pure operation). A stored version below target, or a
+// failed/false probe, means "temporarily unavailable": the public form must show that message and
+// --apply must refuse (see tourist_directory_cli_should_refuse()).
+function tourist_directory_channel_ready($storedVersion, $tableProbeOk) {
+  $version = ($storedVersion === '' || $storedVersion === false || $storedVersion === null) ? 0 : (int) $storedVersion;
+  return $version >= tourist_directory_schema_target_version() && $tableProbeOk === true;
+}
+
+// True when $value contains a raw control character (other than tab/LF/CR, which a free-text reason
+// field may legitimately carry). Used to reject e.g. embedded NUL bytes or escape sequences in
+// removal-form input. Byte-range check: ASCII control bytes are always single-byte in UTF-8 (every
+// multibyte lead/continuation byte is >= 0x80), so no multibyte-aware regex flag is needed here.
+function tourist_directory_has_control_chars($value) {
+  return preg_match('/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/', (string) $value) === 1;
+}
+
+// Validates one removal-form submission. 'relation' is required and must be one of propietario,
+// administrador, otro. 'reply_contact' (<=190 chars) and 'reason' (<=1000 chars) are optional, but
+// when present must contain no raw control characters and stay within their length cap, measured
+// multibyte-safely (mb_strlen). Returns array('ok'=>true,'value'=>['relation','reply_contact',
+// 'reason']) (all three trimmed) on success, or array('ok'=>false,'error'=>CODE) on rejection.
+// Never touches the database.
+function tourist_directory_validate_removal(array $in) {
+  $relation = isset($in['relation']) ? trim((string) $in['relation']) : '';
+  $reply_contact = isset($in['reply_contact']) ? trim((string) $in['reply_contact']) : '';
+  $reason = isset($in['reason']) ? trim((string) $in['reason']) : '';
+
+  $valid_relations = array('propietario', 'administrador', 'otro');
+  if ($relation === '' || !in_array($relation, $valid_relations, true)) {
+    return array('ok' => false, 'error' => 'invalid_relation');
+  }
+
+  if (tourist_directory_has_control_chars($reply_contact) || mb_strlen($reply_contact) > 190) {
+    return array('ok' => false, 'error' => 'invalid_reply_contact');
+  }
+
+  if (tourist_directory_has_control_chars($reason) || mb_strlen($reason) > 1000) {
+    return array('ok' => false, 'error' => 'invalid_reason');
+  }
+
+  return array('ok' => true, 'error' => null, 'value' => array(
+    'relation' => $relation,
+    'reply_contact' => $reply_contact,
+    'reason' => $reason,
+  ));
+}
+
+// Resolves the requester's IP from a $_SERVER-shaped array without ever trusting a spoofable header
+// by default. HTTP_CLIENT_IP and HTTP_X_FORWARDED_FOR are never read (osc_get_ip() trusts them,
+// utils.php:2482-2500 -- deliberately not reused here). HTTP_CF_CONNECTING_IP is honored only when
+// REMOTE_ADDR itself is loopback (127.0.0.1 or ::1) -- i.e. only when the request really did arrive
+// through the local Cloudflare tunnel -- otherwise REMOTE_ADDR is returned as-is.
+function tourist_directory_client_ip(array $server) {
+  $remote = isset($server['REMOTE_ADDR']) ? (string) $server['REMOTE_ADDR'] : '';
+  $is_loopback = in_array($remote, array('127.0.0.1', '::1'), true);
+
+  if ($is_loopback && !empty($server['HTTP_CF_CONNECTING_IP'])) {
+    return (string) $server['HTTP_CF_CONNECTING_IP'];
+  }
+
+  return $remote;
+}
+
+// Salted, deterministic IP hash for throttle lookups and retention. Never store a raw IP address.
+function tourist_directory_ip_hash($ip, $salt) {
+  return hash_hmac('sha256', (string) $ip, (string) $salt);
+}
+
+// The full removal-request decision, evaluated in this exact precedence order (see design.md's
+// Amendment "Decision" row): a filled honeypot -> 'honeypot' (fake success, no write); a validation
+// error -> 'invalid'; no entry marker -> 'not_found' (generic message, never reveals whether the id
+// ever existed); an already-recorded blocking request (pending/processed) -> 'already_requested'
+// (same confirmation as success, no insert); the per-IP or per-entry throttle exceeded ->
+// 'throttled'; an already-retired entry -> 'accept_retired' (insert only, no re-retire); otherwise
+// -> 'accept' (insert, then retire). $in carries the raw form fields ('honeypot', 'relation',
+// 'reply_contact', 'reason') plus context the caller resolved: 'entry_exists' (bool),
+// 'blocking_request_exists' (bool), 'entry_retired' (bool), 'ip_count_last_hour' and
+// 'entry_count_last_24h' (int, PRIOR requests only, not counting this attempt). The per-IP limit is
+// 5 requests/hour (4 allowed, the 5th throttled: prior count >= 4); the per-entry limit is
+// 3 requests/24h (2 allowed, the 3rd throttled: prior count >= 2).
+function tourist_directory_removal_decide(array $in) {
+  $honeypot = isset($in['honeypot']) ? trim((string) $in['honeypot']) : '';
+  if ($honeypot !== '') {
+    return 'honeypot';
+  }
+
+  $validation = tourist_directory_validate_removal($in);
+  if (!$validation['ok']) {
+    return 'invalid';
+  }
+
+  if (empty($in['entry_exists'])) {
+    return 'not_found';
+  }
+
+  if (!empty($in['blocking_request_exists'])) {
+    return 'already_requested';
+  }
+
+  $ip_count = isset($in['ip_count_last_hour']) ? (int) $in['ip_count_last_hour'] : 0;
+  $entry_count = isset($in['entry_count_last_24h']) ? (int) $in['entry_count_last_24h'] : 0;
+  if ($ip_count >= 4 || $entry_count >= 2) {
+    return 'throttled';
+  }
+
+  if (!empty($in['entry_retired'])) {
+    return 'accept_retired';
+  }
+
+  return 'accept';
+}
+
+// Pure admin transition for one removal request. 'mark_processed' moves 'pending' -> 'processed'.
+// 'reactivate' moves 'pending' or 'processed' -> 'rejected', but only when $confirm === 1 (the
+// explicit confirmation the admin screen requires for this destructive-looking action). Any other
+// status/action combination -- including an unrecognized $action -- is rejected. Returns
+// array('ok'=>true,'status'=>NEW_STATUS) or array('ok'=>false,'error'=>CODE,'status'=>null).
+function tourist_directory_admin_transition($status, $action, $confirm) {
+  if ($action === 'mark_processed') {
+    if ($status !== 'pending') {
+      return array('ok' => false, 'error' => 'invalid_status', 'status' => null);
+    }
+
+    return array('ok' => true, 'error' => null, 'status' => 'processed');
+  }
+
+  if ($action === 'reactivate') {
+    if ($status !== 'pending' && $status !== 'processed') {
+      return array('ok' => false, 'error' => 'invalid_status', 'status' => null);
+    }
+
+    if ((int) $confirm !== 1) {
+      return array('ok' => false, 'error' => 'confirm_required', 'status' => null);
+    }
+
+    return array('ok' => true, 'error' => null, 'status' => 'rejected');
+  }
+
+  return array('ok' => false, 'error' => 'invalid_action', 'status' => null);
 }

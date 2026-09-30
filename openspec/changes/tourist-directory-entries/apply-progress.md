@@ -2,13 +2,11 @@
 
 ## Scope covered so far
 
-Phase 1 (U1), Phase 2 (U2), and Phase 3 (U3: import planner + CLI + README) are complete. Phase 4
-(manual dry-run) and Phase 5 (deployment, [USER][AUTH REQUIRED]) are NOT started -- both are
-explicitly out of scope for an apply batch (Phase 4 requires the real Osclass/DB, Phase 5 is
-[USER][AUTH REQUIRED]). No commit made in any batch (commit is the orchestrator's step, not run by
-this apply batch). No `app/` file was ever written, only read for citation verification.
-`data/prospeccion/*` was never read in any batch; the U3 sample dry-run used a synthetic in-memory
-fixture through the pure planner only.
+Phases 1-3 (U1-U3) and Phase 6 (U6: Amendment schema migration, removal-decision lib, importer
+precedence) are complete. Phase 4/5 (dry-run, deployment) and Phase 7/8 (U7 route/form/admin, and
+Amendment deployment) are NOT started -- out of scope for an apply batch (4/8.5 need the real
+Osclass/DB, 5/8 are [USER][AUTH REQUIRED], U7 is the next work unit). No commit made in any batch.
+No `app/` file was ever written, only read for citation. `data/prospeccion/*` was never read.
 
 ## Completed Tasks
 
@@ -356,22 +354,73 @@ see Work Unit Evidence above).
 | `osc_esc_html`, `osc_esc_js` existence | helper | `oc-includes/osclass/helpers/hSanitize.php:180,215` (existence confirmed; only `osc_esc_html` used — no inline JS was needed) | Output escaping |
 | `random_bytes()` (PHP 8.5 core) | language | n/a | Per-install placeholder email generation |
 
+## Phase 6 (U6) — this batch (Amendment: removal-request pure lib, schema migration, importer gate)
+
+Scope: ONLY U6 (tasks 6.1-6.19). U7 and Phase 8 are out of scope, NOT started. `app/` was never
+written, only read for the `escape()`/`quote()` DAO-method citation below.
+
+- [x] 6.1/6.2 `_schema_steps($stored)` (pure) + `tourist_directory_ensure_schema()` (glue): idempotent
+  `CREATE TABLE IF NOT EXISTS` for the marker table (step 1, DDL moved out of `_install()`) and the
+  new `t_directory_removal_request` table (step 2); bumps `schema_version` to `'2'` only after every
+  step succeeds; generates `ip_salt` (32 random bytes, hex) once. Called from `_install()` AND `_enable()`.
+- [x] 6.3/6.4 `_channel_ready($storedVersion, $tableProbeOk)` (pure) + `tourist_directory_is_channel_ready()`
+  (live `SELECT 1 ... LIMIT 1` probe). `_removal_url()` and its one call site (the "Solicitar baja"
+  link in `render_notice_html`) were removed; the link is omitted until U7 wires `osc_route_url()`.
+  `init_contact` prefill deliberately left alone — its removal is task 7.5, not 6.4.
+- [x] 6.5/6.6 `_validate_removal($in)` — relation enum required; `reply_contact`<=190/`reason`<=1000
+  chars via `mb_strlen`. Design decision (not pinned by design.md): tab/LF/CR are NOT treated as
+  control characters (reason is free text); only other C0/DEL bytes are rejected.
+- [x] 6.7/6.8 `_client_ip($server)` (never reads `HTTP_CLIENT_IP`/`X-Forwarded-For`; honors
+  `HTTP_CF_CONNECTING_IP` only when `REMOTE_ADDR` is loopback) + `_ip_hash()` (`hash_hmac('sha256', ...)`).
+- [x] 6.9/6.10 `_removal_decide($in)` — string outcome, exact precedence order. Design decision:
+  throttle inputs are PRIOR-request counts (excluding this attempt); thresholds `>=4` (per-IP) /
+  `>=2` (per-entry) land "4 ok/5th throttled" and "2 ok/3rd throttled" exactly on the tasks.md
+  boundary. Calls `_validate_removal()` internally for the `invalid` branch only.
+- [x] 6.11/6.12 `_admin_transition($status, $action, $confirm)` — as specified.
+- [x] 6.13/6.14 `plan()` gained `$flags['removal_seed_ids']` + `removal_blocked` return key, checked
+  first for `candidato` rows only (`baja`/`anuncio_propio` untouched). Backward compatible.
+- [x] 6.15/6.16 `_cli_should_refuse()` signature changed from 5 args (contactEmailIsPlaceholder/
+  allowPlaceholderContact) to `($apply,$installed,$channelReady,$hasDirectoryEmail)` — breaking
+  change, every caller/test updated. Precedence: `not_installed` > `directory_contact_email_missing`
+  > `channel_not_ready`. Added `_cli_warnings()`. `--allow-placeholder-contact` stays a parsed no-op.
+- [x] 6.17 CLI queries `tourist_directory_blocking_removal_seed_ids()` before planning; re-checks
+  `tourist_directory_has_blocking_removal_request($itemId,$seedId)` (uses `DAO::escape()` — no
+  `quote()` method exists on `DBCommandClass`, confirmed by reading it) immediately before each
+  create/update/reactivate write; blocked rows skipped and reported alongside plan's `removal_blocked`.
+- [x] 6.18 `_reactivate_non_retired_items()` (called from `_enable()`) excludes items with a
+  `pending`/`processed` removal request via a correlated `NOT EXISTS` subquery.
+- [x] 6.19 Verify U6: full suite green (`php tests/test_tourist_showcase.php` -> "Tourist showcase
+  checks passed.", exit 0, covers U1-U6); `php -l` clean on all 4 changed PHP files. No commit made.
+
+### TDD Evidence (U6)
+
+RED: `Call to undefined function` fatal against the PRE-U6 lib (`git show HEAD:...lib.php`) for
+all 8 new pure functions individually, plus a behavioral RED via `git stash`-ing only the lib file
+and running the updated suite (failed on `_cli_should_refuse`: old 5-arg signature returned the
+wrong code under the new 4-arg semantics). GREEN: `git stash pop` + full-suite rerun, all green.
+One macro RED->GREEN cycle for this interdependent set, not 8 toggles, given the unit's size. Glue
+(`ensure_schema`, `is_channel_ready`, `blocking_removal_seed_ids`, `has_blocking_removal_request`,
+the enable NOT EXISTS query, CLI wiring) is Osclass-bound with no runtime harness here (same as
+every prior batch) — verified by `php -l` + the vendor citation above.
+
+### Files Changed (U6) / Work Unit Evidence
+
+`tourist-directory-lib.php` +258/-27, `index.php` +196/-14, `bin/tourist-directory-import.php`
++55/-9, `tests/test_tourist_showcase.php` +165/-46 — 674 changed lines for code+tests
+(table-driven test compaction kept it under budget without losing scenario coverage). Test
+cmd/result: `php tests/test_tourist_showcase.php` -> pass, exit 0. Runtime harness: N/A, same as
+U1-U3. Rollback: revert the U6 diffs; `ensure_schema()` only ever runs `CREATE TABLE IF NOT
+EXISTS`, so a reverted migration leaves the removal table orphaned but harmless (never referenced
+publicly before U7).
+
 ## Remaining Tasks (NOT started, out of this batch's scope)
 - [ ] Phase 4: manual dry-run against the real Osclass/DB — task 4.1 (explicitly out of scope for
   this or any apply batch: requires the real server/DB and is gated on Phase 5's deployment)
 - [ ] Phase 5: deployment [USER][AUTH REQUIRED] — tasks 5.1-5.6
+- [ ] Phase 7 (U7): route/form/admin/render/CSS/README — tasks 7.1-7.13 (next work unit)
+- [ ] Phase 8: Amendment deployment [USER][AUTH REQUIRED] — tasks 8.1-8.7
 
 ## Workload / PR Boundary
 - Mode: chained PR slice (auto-chain, stacked-to-main per tasks.md forecast)
-- Current work unit: U3 — Import planner + CLI + README
-- Boundary: starts from U2's clean, all-green baseline and ends with U3's full importer surface
-  (`tourist_directory_plan()` + 3 private helpers, `tourist_directory_cli_parse_args()`,
-  `tourist_directory_cli_should_refuse()`, `bin/tourist-directory-import.php`, and the README's
-  "Importer CLI" section), all green and linted, tasks 3.1-3.6 checked off. U1+U2+U3 together
-  complete every apply-phase task in tasks.md (Phases 1-3); only Phase 4 (manual dry-run,
-  requires the real server) and Phase 5 (deployment, `[USER][AUTH REQUIRED]`) remain, and both are
-  explicitly out of scope for an apply batch.
-- Rollback boundary: see Work Unit Evidence above.
-- Estimated review budget impact: ~699 authored changed lines for this slice, within the runtime
-  ledger's 800-line cap for this work unit (no `size:exception` needed for U3, unlike U2), consistent
-  with the already-resolved auto-chain/stacked-to-main decision.
+- Current work unit: U6 (see "Files Changed (U6) / Work Unit Evidence" above for the boundary,
+  rollback, and line-count evidence). U7 (tasks 7.1-7.13) and Phase 8 are the next work unit.

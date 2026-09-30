@@ -885,14 +885,9 @@ expect_true(tourist_directory_safe_url('javascript:alert(1)') === false, 'a non-
 expect_true(tourist_directory_safe_url('ftp://example.com/file') === false, 'an ftp URL is rejected');
 expect_true(tourist_directory_safe_url('') === false, 'an empty URL is rejected');
 
-expect_true(
-  tourist_directory_removal_url('https://alquileres.diazignacio.ar/contact', 42) === 'https://alquileres.diazignacio.ar/contact?tourist_directory_removal=42',
-  'a contact URL with no existing query string gets a leading ? separator'
-);
-expect_true(
-  tourist_directory_removal_url('https://alquileres.diazignacio.ar/contact?ref=home', 42) === 'https://alquileres.diazignacio.ar/contact?ref=home&tourist_directory_removal=42',
-  'a contact URL that already carries a query string gets an & separator instead'
-);
+// tourist_directory_removal_url() was removed in the Amendment (U6): the page=contact removal
+// link it built is superseded by a plugin-owned route-based removal form (see design.md
+// Amendment, tasks.md 6.4/7.1-7.5).
 
 expect_true(tourist_directory_should_block(null, 'anything@example.com', 'directorio-abc@directorio.invalid') === true, 'a failed marker lookup (null) fails closed and blocks');
 expect_true(tourist_directory_should_block(true, 'anything@example.com', 'directorio-abc@directorio.invalid') === true, 'a confirmed directory entry always blocks');
@@ -1093,30 +1088,23 @@ expect_true(
   'an unrecognized argument is collected for reporting instead of being silently ignored'
 );
 
-expect_true(
-  tourist_directory_cli_should_refuse(false, true, true, false) === false,
-  'a dry run (no --apply) is never refused for mail configuration, since it never writes'
-);
-expect_true(
-  tourist_directory_cli_should_refuse(true, true, true, false) === 'placeholder_contact_email',
-  '--apply is refused while osclass.contactEmail is still a placeholder and no override was passed'
-);
-expect_true(
-  tourist_directory_cli_should_refuse(true, true, true, true) === false,
-  '--allow-placeholder-contact explicitly overrides the production mail gate'
-);
-expect_true(
-  tourist_directory_cli_should_refuse(true, true, false, false) === false,
-  '--apply proceeds once osclass.contactEmail is a real, non-placeholder address'
-);
-expect_true(
-  tourist_directory_cli_should_refuse(true, false, false, false) === 'not_installed',
-  'the importer refuses entirely when the tourist-directory plugin is not installed'
-);
-expect_true(
-  tourist_directory_cli_should_refuse(false, false, false, false) === 'not_installed',
-  'the not-installed refusal applies to a dry run too, before any plan can be built'
-);
+// --- tourist-directory: Phase 6.15/6.16 - _cli_should_refuse(apply, installed, channelReady,
+// hasDirectoryEmail) replaces the old placeholder-contactEmail hard gate with the removal-channel
+// gate; _cli_warnings() (U6) ---
+
+foreach (array(
+  array(false, true, false, true, false),   // dry run never gated by channel readiness
+  array(true, true, false, true, 'channel_not_ready'),
+  array(true, true, true, true, false),     // apply proceeds once channel ready
+  array(true, false, true, true, 'not_installed'),
+  array(false, false, true, true, 'not_installed'), // not-installed gates dry run too
+  array(false, true, true, false, 'directory_contact_email_missing'),
+  array(true, true, true, false, 'directory_contact_email_missing'), // precedes channel check
+) as $c) {
+  expect_true(tourist_directory_cli_should_refuse($c[0], $c[1], $c[2], $c[3]) === $c[4], 'cli_should_refuse(' . implode(',', array_slice($c, 0, 4)) . ') => ' . var_export($c[4], true));
+}
+expect_true(tourist_directory_cli_warnings(true) === array('site_contact_email_placeholder'), 'a placeholder site contactEmail warns, never refuses');
+expect_true(tourist_directory_cli_warnings(false) === array(), 'a real site contactEmail produces no warnings');
 
 // --- tourist-directory: the per-install placeholder email must exist and be undeliverable ---
 
@@ -1124,13 +1112,114 @@ expect_true(tourist_directory_needs_contact_email('') === true, 'a missing prefe
 expect_true(tourist_directory_needs_contact_email(false) === true, 'a false preference requires generating the placeholder email');
 expect_true(tourist_directory_needs_contact_email('owner@complejo.com.ar') === true, 'a deliverable address is never accepted as the directory placeholder');
 expect_true(tourist_directory_needs_contact_email('directorio-abc123@directorio.invalid') === false, 'an existing .invalid placeholder is kept');
+
+// --- tourist-directory: Phase 6.1/6.2 - _schema_steps($stored); Phase 6.3/6.4 - _channel_ready
+// ($storedVersion, $tableProbeOk) (U6) ---
+
+foreach (array(array('', array(1, 2)), array(0, array(1, 2)), array('0', array(1, 2)), array(1, array(2)), array('1', array(2)), array(2, array()), array('2', array())) as $c) {
+  expect_true(tourist_directory_schema_steps($c[0]) === $c[1], 'schema_steps(' . var_export($c[0], true) . ') => ' . var_export($c[1], true));
+}
+foreach (array(array(2, true, true), array(1, true, false), array(2, false, false), array('', true, false), array(3, true, true)) as $c) {
+  expect_true(tourist_directory_channel_ready($c[0], $c[1]) === $c[2], 'channel_ready(' . var_export($c[0], true) . ',' . var_export($c[1], true) . ') => ' . var_export($c[2], true));
+}
+
+// --- tourist-directory: Phase 6.5/6.6 - _validate_removal($in) (U6) ---
+
+expect_true(tourist_directory_validate_removal(array('relation' => 'propietario'))['ok'] === true, 'a bare valid relation with no optional fields validates');
+expect_true(tourist_directory_validate_removal(array('relation' => ''))['error'] === 'invalid_relation', 'a missing relation is rejected');
+expect_true(tourist_directory_validate_removal(array('relation' => 'inquilino'))['error'] === 'invalid_relation', 'a relation outside the enum is rejected');
+expect_true(tourist_directory_validate_removal(array('relation' => 'administrador', 'reply_contact' => str_repeat('a', 190)))['ok'] === true, 'reply_contact at exactly 190 chars is accepted');
+expect_true(tourist_directory_validate_removal(array('relation' => 'administrador', 'reply_contact' => str_repeat('a', 191)))['error'] === 'invalid_reply_contact', 'reply_contact over 190 chars is rejected');
+expect_true(tourist_directory_validate_removal(array('relation' => 'otro', 'reason' => str_repeat('a', 1000)))['ok'] === true, 'reason at exactly 1000 chars is accepted');
+expect_true(tourist_directory_validate_removal(array('relation' => 'otro', 'reason' => str_repeat('a', 1001)))['error'] === 'invalid_reason', 'reason over 1000 chars is rejected');
+expect_true(tourist_directory_validate_removal(array('relation' => 'otro', 'reply_contact' => "abc\x00def"))['error'] === 'invalid_reply_contact', 'an embedded NUL byte is rejected as a control character');
+expect_true(tourist_directory_validate_removal(array('relation' => 'otro', 'reason' => 'Ya no operamos: ñoño 🙂'))['ok'] === true, 'a multibyte reason is length-checked with mb_strlen, not byte length');
 expect_true(
-  tourist_directory_cli_should_refuse(false, true, false, false, false) === 'directory_contact_email_missing',
-  'the importer refuses even a dry run when the directory placeholder email is missing'
+  mb_strlen(tourist_directory_validate_removal(array('relation' => 'otro', 'reply_contact' => '  contacto@x.com  '))['value']['reply_contact']) === mb_strlen('contacto@x.com'),
+  'reply_contact is trimmed before length validation'
 );
-expect_true(
-  tourist_directory_cli_should_refuse(true, true, false, false, true) === false,
-  'the importer proceeds when installed, the site email is real and the placeholder exists'
+
+// --- tourist-directory: Phase 6.7/6.8 - _client_ip($server) / _ip_hash($ip, $salt) (U6) ---
+
+expect_true(tourist_directory_client_ip(array('REMOTE_ADDR' => '203.0.113.9')) === '203.0.113.9', 'REMOTE_ADDR is used as-is when it is not loopback');
+expect_true(tourist_directory_client_ip(array('REMOTE_ADDR' => '203.0.113.9', 'HTTP_CF_CONNECTING_IP' => '198.51.100.1')) === '203.0.113.9', 'HTTP_CF_CONNECTING_IP is ignored when REMOTE_ADDR is not loopback');
+expect_true(tourist_directory_client_ip(array('REMOTE_ADDR' => '127.0.0.1', 'HTTP_CF_CONNECTING_IP' => '198.51.100.1')) === '198.51.100.1', 'HTTP_CF_CONNECTING_IP is honored only when REMOTE_ADDR is loopback');
+expect_true(tourist_directory_client_ip(array('REMOTE_ADDR' => '::1', 'HTTP_CF_CONNECTING_IP' => '198.51.100.1')) === '198.51.100.1', 'IPv6 loopback (::1) also honors HTTP_CF_CONNECTING_IP');
+expect_true(tourist_directory_client_ip(array('REMOTE_ADDR' => '127.0.0.1', 'HTTP_CLIENT_IP' => '198.51.100.1')) === '127.0.0.1', 'HTTP_CLIENT_IP is never read at all, spoofed or not');
+expect_true(tourist_directory_client_ip(array('REMOTE_ADDR' => '127.0.0.1', 'HTTP_X_FORWARDED_FOR' => '198.51.100.1')) === '127.0.0.1', 'HTTP_X_FORWARDED_FOR is never read at all, spoofed or not');
+expect_true(tourist_directory_ip_hash('203.0.113.9', 'salt-a') === tourist_directory_ip_hash('203.0.113.9', 'salt-a'), 'ip_hash is deterministic for the same ip and salt');
+expect_true(tourist_directory_ip_hash('203.0.113.9', 'salt-a') !== tourist_directory_ip_hash('203.0.113.9', 'salt-b'), 'ip_hash changes when the salt changes');
+expect_true(strlen(tourist_directory_ip_hash('203.0.113.9', 'salt-a')) === 64, 'ip_hash is a 64-char sha256 hex digest, matching s_ip_hash CHAR(64)');
+
+// --- tourist-directory: Phase 6.9/6.10 - _removal_decide($in) precedence order (U6) ---
+
+function directory_removal_in($overrides = array()) {
+  return array_merge(array(
+    'honeypot' => '', 'relation' => 'propietario', 'reply_contact' => '', 'reason' => '',
+    'entry_exists' => true, 'blocking_request_exists' => false, 'entry_retired' => false,
+    'ip_count_last_hour' => 0, 'entry_count_last_24h' => 0,
+  ), $overrides);
+}
+
+foreach (array(
+  array(array('honeypot' => 'http://spam.example'), 'honeypot'),
+  array(array('relation' => ''), 'invalid'),
+  array(array('entry_exists' => false), 'not_found'),
+  array(array('blocking_request_exists' => true), 'already_requested'),
+  array(array('ip_count_last_hour' => 3), 'accept'),   // 4th ok (limit 5/hour)
+  array(array('ip_count_last_hour' => 4), 'throttled'), // 5th throttled
+  array(array('entry_count_last_24h' => 1), 'accept'),   // 2nd ok (limit 3/24h)
+  array(array('entry_count_last_24h' => 2), 'throttled'), // 3rd throttled
+  array(array('entry_retired' => true), 'accept_retired'),
+  array(array(), 'accept'),
+) as $c) {
+  expect_true(tourist_directory_removal_decide(directory_removal_in($c[0])) === $c[1], 'removal_decide precedence: expected ' . $c[1]);
+}
+
+// --- tourist-directory: Phase 6.11/6.12 - _admin_transition($status, $action, $confirm) (U6) ---
+
+foreach (array(
+  array('pending', 'mark_processed', 0, 'processed'),
+  array('processed', 'mark_processed', 0, 'invalid_status'),
+  array('pending', 'reactivate', 1, 'rejected'),
+  array('processed', 'reactivate', 1, 'rejected'),
+  array('pending', 'reactivate', 0, 'confirm_required'),
+  array('rejected', 'reactivate', 1, 'invalid_status'),
+  array('pending', 'bogus_action', 1, 'invalid_action'),
+) as $c) {
+  $r = tourist_directory_admin_transition($c[0], $c[1], $c[2]);
+  expect_true(($r['ok'] ? $r['status'] : $r['error']) === $c[3], "admin_transition({$c[0]},{$c[1]},{$c[2]}) => {$c[3]}");
+}
+
+// --- tourist-directory: Phase 6.13/6.14 - plan() removal-request precedence (U6) ---
+
+$plan_removal_existing = array(
+  'r1' => array('item_id' => 401, 'fingerprint' => 'irrelevant', 'retired' => false, 'item_missing' => false),
+  'r2' => array('item_id' => 402, 'fingerprint' => 'irrelevant', 'retired' => true, 'item_missing' => false),
+  'r4' => array('item_id' => 404, 'fingerprint' => 'irrelevant', 'retired' => false, 'item_missing' => false),
 );
+
+$plan_removal_result = tourist_directory_plan(
+  array(directory_plan_entry('r1', 'candidato'), directory_plan_entry('r2', 'candidato'), directory_plan_entry('r3', 'candidato'), directory_plan_entry('r4', 'baja')),
+  $plan_removal_existing,
+  array('allow_reactivate' => true, 'removal_seed_ids' => array('r1', 'r2', 'r3'))
+);
+
+$plan_removal_actions = array();
+foreach ($plan_removal_result['actions'] as $row) {
+  $plan_removal_actions[$row['id']] = $row;
+}
+
+// r1: active marker + blocking request; r2: retired marker + blocking request, even with
+// allow_reactivate; r3: no marker at all + blocking request -- all three skip/removal_requested,
+// never created/updated/reactivated. r4 (baja) is unaffected by removal_seed_ids.
+foreach (array('r1', 'r2', 'r3') as $id) {
+  expect_true($plan_removal_actions[$id]['action'] === 'skip' && $plan_removal_actions[$id]['reason'] === 'removal_requested', "plan(): $id with a blocking removal request is skipped, never created/updated/reactivated");
+}
+expect_true($plan_removal_actions['r4']['action'] === 'retire' && $plan_removal_actions['r4']['reason'] === 'baja', 'a baja row is unaffected by removal_seed_ids');
+expect_true($plan_removal_result['removal_blocked'] === array('r1', 'r2', 'r3'), 'every removal-blocked seed id is collected in removal_blocked, for the CLI report');
+
+$plan_no_removal_result = tourist_directory_plan(array($plan_entry_create), array(), array());
+expect_true($plan_no_removal_result['removal_blocked'] === array(), 'removal_blocked defaults to empty when flags carries no removal_seed_ids');
 
 echo "Tourist showcase checks passed.\n";

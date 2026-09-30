@@ -72,25 +72,25 @@ Chain strategy: stacked-to-main
 
 ## Phase 6: U6 — Amendment: Schema Migration, Removal-Decision Lib, Importer Precedence (Pure, TDD)
 
-- [ ] 6.1 RED: tests for `_schema_steps($stored)` transitions (`''`/`0` -> steps 1+2; `1` -> step 2 only; `2` -> no-op).
-- [ ] 6.2 GREEN: implement `_schema_steps()` and `tourist_directory_ensure_schema()` in `tourist-directory-lib.php`/`index.php` — idempotent `CREATE TABLE IF NOT EXISTS` for `t_directory_removal_request` (step 2), bump `tourist_directory.schema_version` pref only after all steps succeed, generate `tourist_directory.ip_salt` pref once (32 random bytes, hex); call from install AND enable.
-- [ ] 6.3 RED: tests for `_channel_ready($storedVersion, $tableProbeOk)`.
-- [ ] 6.4 GREEN: implement `_channel_ready()`; remove `_removal_url()` (superseded, see 1.5/1.6) and its call sites.
-- [ ] 6.5 RED: tests for `_validate_removal($in)` — relation enum (propietario/administrador/otro, required), `reply_contact` <=190 chars, `reason` <=1000 chars, control-character rejection, multibyte-safe length.
-- [ ] 6.6 GREEN: implement `_validate_removal()`.
-- [ ] 6.7 RED: tests for `_client_ip($server)` (spoofed `Client-IP`/`X-Forwarded-For` ignored; `HTTP_CF_CONNECTING_IP` honored only when `REMOTE_ADDR` is loopback) and `_ip_hash($ip, $salt)` (determinism, salt-dependence).
-- [ ] 6.8 GREEN: implement `_client_ip()` and `_ip_hash()` (`hash_hmac('sha256', ip, ip_salt)`).
-- [ ] 6.9 RED: tests for `_removal_decide($in)` covering every outcome in precedence order: honeypot filled -> `honeypot`; validation error -> `invalid`; missing marker -> `not_found`; existing blocking request -> `already_requested`; throttle boundaries per-IP (4 ok / 5th throttled within an hour) and per-entry (2 ok / 3rd throttled within 24h) -> `throttled`; already retired -> `accept_retired`; else -> `accept`.
-- [ ] 6.10 GREEN: implement `_removal_decide()` with the exact precedence order above.
-- [ ] 6.11 RED: tests for `_admin_transition($status, $action, $confirm)` — `mark_processed` pending->processed; `reactivate` pending/processed->rejected requires `confirm=1`; invalid status/action combinations rejected.
-- [ ] 6.12 GREEN: implement `_admin_transition()`.
-- [ ] 6.13 RED: tests for `tourist_directory_plan()` with `$flags['removal_seed_ids']` — `candidato` rows with a blocking seed id -> skip `removal_requested`, with and without a marker, retired or not, and even with `allow_reactivate` set; `baja` rows unaffected.
-- [ ] 6.14 GREEN: update `tourist_directory_plan()` to check `removal_seed_ids` before any other state, returning `removal_blocked` ids for the report.
-- [ ] 6.15 RED: tests for `_cli_should_refuse($apply, $installed, $channelReady, $hasDirectoryEmail)` (apply requires `channelReady`; dry-run never gated) and `_cli_warnings()` (placeholder `osc_contact_email()` warning).
-- [ ] 6.16 GREEN: replace the contactEmail hard gate in `_cli_should_refuse()` with the channel-availability gate (superseded, see 3.4); add `_cli_warnings()`; keep `--allow-placeholder-contact` parsed as a deprecated no-op.
-- [ ] 6.17 GREEN: wire `bin/tourist-directory-import.php` to re-check blocking requests fresh at apply time for each create/update/reactivate row (race guard) and print `removal_blocked` ids in the report.
-- [ ] 6.18 GREEN: wire `tourist_directory_enable()` to exclude items with a blocking removal request (`NOT EXISTS`) from auto-reactivation.
-- [ ] 6.19 Verify U6: `php tests/test_tourist_showcase.php` green; `php -l` on `tourist-directory-lib.php`, `index.php`, `bin/tourist-directory-import.php`, test file; local commit.
+- [x] 6.1 RED: tests for `_schema_steps($stored)` transitions (`''`/`0` -> steps 1+2; `1` -> step 2 only; `2` -> no-op).
+- [x] 6.2 GREEN: implement `_schema_steps()` and `tourist_directory_ensure_schema()` in `tourist-directory-lib.php`/`index.php` — idempotent `CREATE TABLE IF NOT EXISTS` for `t_directory_removal_request` (step 2), bump `tourist_directory.schema_version` pref only after all steps succeed, generate `tourist_directory.ip_salt` pref once (32 random bytes, hex); call from install AND enable.
+- [x] 6.3 RED: tests for `_channel_ready($storedVersion, $tableProbeOk)`.
+- [x] 6.4 GREEN: implement `_channel_ready()`; remove `_removal_url()` (superseded, see 1.5/1.6) and its call sites.
+- [x] 6.5 RED: tests for `_validate_removal($in)` — relation enum (propietario/administrador/otro, required), `reply_contact` <=190 chars, `reason` <=1000 chars, control-character rejection, multibyte-safe length.
+- [x] 6.6 GREEN: implement `_validate_removal()`.
+- [x] 6.7 RED: tests for `_client_ip($server)` (spoofed `Client-IP`/`X-Forwarded-For` ignored; `HTTP_CF_CONNECTING_IP` honored only when `REMOTE_ADDR` is loopback) and `_ip_hash($ip, $salt)` (determinism, salt-dependence).
+- [x] 6.8 GREEN: implement `_client_ip()` and `_ip_hash()` (`hash_hmac('sha256', ip, ip_salt)`).
+- [x] 6.9 RED: tests for `_removal_decide($in)` covering every outcome in precedence order: honeypot filled -> `honeypot`; validation error -> `invalid`; missing marker -> `not_found`; existing blocking request -> `already_requested`; throttle boundaries per-IP (4 ok / 5th throttled within an hour) and per-entry (2 ok / 3rd throttled within 24h) -> `throttled`; already retired -> `accept_retired`; else -> `accept`.
+- [x] 6.10 GREEN: implement `_removal_decide()` with the exact precedence order above.
+- [x] 6.11 RED: tests for `_admin_transition($status, $action, $confirm)` — `mark_processed` pending->processed; `reactivate` pending/processed->rejected requires `confirm=1`; invalid status/action combinations rejected.
+- [x] 6.12 GREEN: implement `_admin_transition()`.
+- [x] 6.13 RED: tests for `tourist_directory_plan()` with `$flags['removal_seed_ids']` — `candidato` rows with a blocking seed id -> skip `removal_requested`, with and without a marker, retired or not, and even with `allow_reactivate` set; `baja` rows unaffected.
+- [x] 6.14 GREEN: update `tourist_directory_plan()` to check `removal_seed_ids` before any other state, returning `removal_blocked` ids for the report.
+- [x] 6.15 RED: tests for `_cli_should_refuse($apply, $installed, $channelReady, $hasDirectoryEmail)` (apply requires `channelReady`; dry-run never gated) and `_cli_warnings()` (placeholder `osc_contact_email()` warning).
+- [x] 6.16 GREEN: replace the contactEmail hard gate in `_cli_should_refuse()` with the channel-availability gate (superseded, see 3.4); add `_cli_warnings()`; keep `--allow-placeholder-contact` parsed as a deprecated no-op.
+- [x] 6.17 GREEN: wire `bin/tourist-directory-import.php` to re-check blocking requests fresh at apply time for each create/update/reactivate row (race guard) and print `removal_blocked` ids in the report.
+- [x] 6.18 GREEN: wire `tourist_directory_enable()` to exclude items with a blocking removal request (`NOT EXISTS`) from auto-reactivation.
+- [x] 6.19 Verify U6: `php tests/test_tourist_showcase.php` green; `php -l` on `tourist-directory-lib.php`, `index.php`, `bin/tourist-directory-import.php`, test file; local commit.
 
 ## Phase 7: U7 — Amendment: Public Removal Route/Form, Admin Screen, Render Link, CSS, README
 

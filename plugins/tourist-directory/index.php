@@ -40,6 +40,116 @@ function tourist_directory_dao() {
   return Item::newInstance()->dao;
 }
 
+// The removal-request table name (Amendment, schema step 2).
+function tourist_directory_removal_table() {
+  return DB_TABLE_PREFIX . 't_directory_removal_request';
+}
+
+// Stored schema_version preference as an int; Osclass returns '' for a missing preference
+// (Preference.php:155-159), which is treated as version 0, same as tourist_directory_schema_steps().
+function tourist_directory_stored_schema_version() {
+  $value = osc_get_preference('schema_version', TOURIST_DIRECTORY_SECTION);
+  return ($value === '' || $value === false) ? 0 : (int) $value;
+}
+
+// The per-install IP-hashing salt; '' when it was never generated.
+function tourist_directory_ip_salt() {
+  $value = osc_get_preference('ip_salt', TOURIST_DIRECTORY_SECTION);
+  return ($value === false) ? '' : $value;
+}
+
+// Generated once (32 random bytes, hex). Never rotated: rotating it would make every existing
+// s_ip_hash unrecognizable for throttle lookups.
+function tourist_directory_ensure_ip_salt() {
+  if (tourist_directory_ip_salt() === '') {
+    osc_set_preference('ip_salt', bin2hex(random_bytes(32)), TOURIST_DIRECTORY_SECTION);
+  }
+}
+
+// Live probe backing tourist_directory_channel_ready()'s $tableProbeOk argument: a cheap SELECT
+// against the removal-request table. False on any failure (table missing, DB error, exception) --
+// never trust a probe that did not affirmatively succeed.
+function tourist_directory_removal_table_probe_ok() {
+  try {
+    $result = tourist_directory_dao()->query('SELECT 1 FROM ' . tourist_directory_removal_table() . ' LIMIT 1');
+    return $result !== false;
+  } catch (\Throwable $e) {
+    return false;
+  }
+}
+
+// Combines the stored schema version with a live table probe via the pure
+// tourist_directory_channel_ready() decision. Used by the (U7) public form and by the CLI importer.
+function tourist_directory_is_channel_ready() {
+  return tourist_directory_channel_ready(tourist_directory_stored_schema_version(), tourist_directory_removal_table_probe_ok());
+}
+
+// Idempotent schema migration -- the SOLE DDL entry point for this plugin. MUST run only from
+// install/enable, NEVER from a public request. tourist_directory_schema_steps() (pure) decides
+// which steps are still needed from the stored preference; each step is its own idempotent
+// CREATE TABLE IF NOT EXISTS, so re-running after a partial failure is always safe. The version
+// preference is bumped only after every needed step has run without throwing.
+function tourist_directory_ensure_schema() {
+  $steps = tourist_directory_schema_steps(osc_get_preference('schema_version', TOURIST_DIRECTORY_SECTION));
+
+  foreach ($steps as $step) {
+    if ($step === 1) {
+      tourist_directory_create_marker_table();
+    } elseif ($step === 2) {
+      tourist_directory_create_removal_request_table();
+    }
+  }
+
+  if (!empty($steps)) {
+    osc_set_preference('schema_version', (string) tourist_directory_schema_target_version(), TOURIST_DIRECTORY_SECTION);
+  }
+
+  tourist_directory_ensure_ip_salt();
+}
+
+function tourist_directory_create_marker_table() {
+  tourist_directory_dao()->query(
+    'CREATE TABLE IF NOT EXISTS ' . tourist_directory_table() . ' (' .
+    'pk_i_id INT(10) UNSIGNED NOT NULL AUTO_INCREMENT, ' .
+    'fk_i_item_id INT(10) UNSIGNED NOT NULL, ' .
+    's_seed_id VARCHAR(191) NOT NULL, ' .
+    's_official_website VARCHAR(255) NOT NULL DEFAULT \'\', ' .
+    's_fingerprint CHAR(40) NOT NULL, ' .
+    'dt_imported DATETIME NOT NULL, ' .
+    'dt_updated DATETIME NOT NULL, ' .
+    'dt_retired DATETIME NULL, ' .
+    's_retired_reason VARCHAR(32) NULL, ' .
+    'PRIMARY KEY (pk_i_id), ' .
+    'UNIQUE KEY idx_directory_item (fk_i_item_id), ' .
+    'UNIQUE KEY idx_directory_seed (s_seed_id)' .
+    ') ENGINE=InnoDB DEFAULT CHARACTER SET \'utf8mb4\' COLLATE \'utf8mb4_unicode_ci\''
+  );
+}
+
+// t_directory_removal_request: see design.md's Amendment "Table" architecture decision. No FK to
+// the marker table (same cascade-risk rationale as the marker table itself); s_seed_id is copied in
+// so precedence survives a lost marker.
+function tourist_directory_create_removal_request_table() {
+  tourist_directory_dao()->query(
+    'CREATE TABLE IF NOT EXISTS ' . tourist_directory_removal_table() . ' (' .
+    'pk_i_id INT(10) UNSIGNED NOT NULL AUTO_INCREMENT, ' .
+    'fk_i_item_id INT(10) UNSIGNED NOT NULL, ' .
+    's_seed_id VARCHAR(191) NOT NULL, ' .
+    's_relation VARCHAR(16) NOT NULL, ' .
+    's_reply_contact VARCHAR(190) NULL, ' .
+    's_reason VARCHAR(1000) NULL, ' .
+    's_ip_hash CHAR(64) NULL, ' .
+    's_status VARCHAR(16) NOT NULL DEFAULT \'pending\', ' .
+    'dt_requested DATETIME NOT NULL, ' .
+    'dt_processed DATETIME NULL, ' .
+    'PRIMARY KEY (pk_i_id), ' .
+    'KEY idx_directory_removal_item (fk_i_item_id), ' .
+    'KEY idx_directory_removal_seed (s_seed_id), ' .
+    'KEY idx_directory_removal_ip (s_ip_hash, dt_requested)' .
+    ') ENGINE=InnoDB DEFAULT CHARACTER SET \'utf8mb4\' COLLATE \'utf8mb4_unicode_ci\''
+  );
+}
+
 // The per-install placeholder contact address; '' when it was never generated.
 function tourist_directory_contact_email() {
   $value = osc_get_preference('contact_email', TOURIST_DIRECTORY_SECTION);
@@ -66,22 +176,7 @@ function tourist_directory_installed_locale_codes() {
 // MUST echo nothing: Plugins::install() treats any output buffer content as an install failure
 // (oc-includes/osclass/classes/Plugins.php:422).
 function tourist_directory_install() {
-  tourist_directory_dao()->query(
-    'CREATE TABLE IF NOT EXISTS ' . tourist_directory_table() . ' (' .
-    'pk_i_id INT(10) UNSIGNED NOT NULL AUTO_INCREMENT, ' .
-    'fk_i_item_id INT(10) UNSIGNED NOT NULL, ' .
-    's_seed_id VARCHAR(191) NOT NULL, ' .
-    's_official_website VARCHAR(255) NOT NULL DEFAULT \'\', ' .
-    's_fingerprint CHAR(40) NOT NULL, ' .
-    'dt_imported DATETIME NOT NULL, ' .
-    'dt_updated DATETIME NOT NULL, ' .
-    'dt_retired DATETIME NULL, ' .
-    's_retired_reason VARCHAR(32) NULL, ' .
-    'PRIMARY KEY (pk_i_id), ' .
-    'UNIQUE KEY idx_directory_item (fk_i_item_id), ' .
-    'UNIQUE KEY idx_directory_seed (s_seed_id)' .
-    ') ENGINE=InnoDB DEFAULT CHARACTER SET \'utf8mb4\' COLLATE \'utf8mb4_unicode_ci\''
-  );
+  tourist_directory_ensure_schema();
 
   // Generated exactly once per install: a re-install (uninstall keeps this pref) never rotates the
   // address, so existing entries keep matching it.
@@ -107,17 +202,22 @@ function tourist_directory_deactivate_every_managed_item() {
   }
 }
 
-// Reactivates only entries whose marker was never retired (dt_retired IS NULL). A retired entry
-// stays deactivated across enable/disable/reinstall cycles until an explicit --allow-reactivate
-// import run reverses it (Phase 3 CLI).
+// Reactivates only entries whose marker was never retired (dt_retired IS NULL) AND that carry no
+// blocking removal request (pending or processed) -- a NOT EXISTS guard, since an item can be
+// deactivated by an accepted removal request without its marker ever being touched
+// (tourist_directory_retire() is never called by the removal-form handler; see design.md's
+// Amendment "Decision" row). A retired entry, or one with a blocking request, stays deactivated
+// across enable/disable/reinstall cycles until an explicit admin/CLI action reverses it.
 function tourist_directory_reactivate_non_retired_items() {
   $actions = new ItemActions(true);
-  foreach (tourist_directory_marker_item_ids('dt_retired IS NULL') as $itemId) {
+  $where = 'dt_retired IS NULL AND NOT EXISTS (SELECT 1 FROM ' . tourist_directory_removal_table() .
+    ' r WHERE r.fk_i_item_id = ' . tourist_directory_table() . '.fk_i_item_id AND r.s_status IN (\'pending\', \'processed\'))';
+  foreach (tourist_directory_marker_item_ids($where) as $itemId) {
     $actions->activate($itemId);
   }
 }
 
-// $whereSql is always one of the two fixed literals above -- never user input -- so string
+// $whereSql is always one of the fixed literals above -- never user input -- so string
 // concatenation here carries no injection risk.
 function tourist_directory_marker_item_ids($whereSql) {
   $result = tourist_directory_dao()->query('SELECT fk_i_item_id FROM ' . tourist_directory_table() . ' WHERE ' . $whereSql);
@@ -135,6 +235,7 @@ function tourist_directory_marker_item_ids($whereSql) {
 }
 
 function tourist_directory_enable() {
+  tourist_directory_ensure_schema();
   tourist_directory_ensure_contact_email();
   tourist_directory_reactivate_non_retired_items();
 }
@@ -314,8 +415,6 @@ function tourist_directory_render_notice_html($id, array $row) {
   $locale = osc_current_user_locale();
   $label = tourist_directory_text('Información pública, no gestionada por el complejo', 'Public listing, not managed by the property', $locale);
   $visitLabel = tourist_directory_text('Visitar sitio oficial', 'Visit official website', $locale);
-  $removalLabel = tourist_directory_text('Solicitar baja', 'Request removal', $locale);
-  $removalUrl = tourist_directory_removal_url(osc_contact_url(), $id);
 
   $website = (isset($row['s_official_website']) && $row['s_official_website'] !== '')
     ? tourist_directory_safe_url($row['s_official_website'])
@@ -328,7 +427,11 @@ function tourist_directory_render_notice_html($id, array $row) {
     $html .= '<a class="tourist-directory-official-link" href="' . osc_esc_html($website) . '" rel="nofollow noopener noreferrer" target="_blank">' . osc_esc_html($visitLabel) . '</a> ';
   }
 
-  $html .= '<a class="tourist-directory-removal-link" href="' . osc_esc_html($removalUrl) . '">' . osc_esc_html($removalLabel) . '</a>';
+  // The "Solicitar baja" removal link is wired in U7, once the tourist-directory-removal route
+  // exists (osc_route_url('tourist-directory-removal', ['entry'=>$id]), omitted when that returns
+  // ''). tourist_directory_removal_url() (the old page=contact-based link) was removed in U6 along
+  // with the mail-dependent channel it pointed at -- see design.md's Amendment.
+
   $html .= '</div>';
 
   return $html;
@@ -563,6 +666,53 @@ function tourist_directory_touch_marker($itemId, array $entry) {
     's_fingerprint' => tourist_directory_fingerprint($entry),
     'dt_updated' => date('Y-m-d H:i:s'),
   ), array('fk_i_item_id' => (int) $itemId));
+}
+
+// Every seed id (across the whole removal-request table, not scoped to one seed pass) that
+// currently carries a blocking request (pending or processed). Used to build
+// tourist_directory_plan()'s 'removal_seed_ids' flag from the importer.
+function tourist_directory_blocking_removal_seed_ids() {
+  $result = tourist_directory_dao()->query(
+    'SELECT DISTINCT s_seed_id FROM ' . tourist_directory_removal_table() . ' WHERE s_status IN (\'pending\', \'processed\')'
+  );
+
+  // Fail closed: null tells the importer the removal state is unknown, so it must not write.
+  if ($result === false) {
+    return null;
+  }
+
+  $ids = array();
+  foreach ($result->result() as $row) {
+    $ids[] = $row['s_seed_id'];
+  }
+
+  return $ids;
+}
+
+// Race guard for the importer's apply loop: re-checks, fresh, immediately before a create/update/
+// reactivate write, whether the target now carries a blocking removal request that was not yet on
+// file when the plan was built (e.g. a visitor submitted one between planning and applying).
+// Matches by item id (existing entries) OR seed id (a brand-new create has no item id yet).
+function tourist_directory_has_blocking_removal_request($itemId, $seedId) {
+  $conditions = array();
+  if ((int) $itemId > 0) {
+    $conditions[] = 'fk_i_item_id = ' . (int) $itemId;
+  }
+  if ($seedId !== '' && $seedId !== null) {
+    $conditions[] = 's_seed_id = ' . tourist_directory_dao()->escape((string) $seedId);
+  }
+
+  if (empty($conditions)) {
+    return false;
+  }
+
+  $result = tourist_directory_dao()->query(
+    'SELECT 1 FROM ' . tourist_directory_removal_table() .
+    ' WHERE s_status IN (\'pending\', \'processed\') AND (' . implode(' OR ', $conditions) . ') LIMIT 1'
+  );
+
+  // Fail closed: an unreadable removal state counts as blocking, so no write proceeds.
+  return $result === false || $result->numRows() > 0;
 }
 
 function tourist_directory_marker_row($itemId) {

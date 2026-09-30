@@ -29,10 +29,12 @@
 // estado_prospecto, fecha_ultimo_contacto, ...) is dropped by tourist_directory_parse_rows() before
 // this script ever sees it, and none of them are ever printed, logged, or written anywhere.
 //
-// Production mail gate: with --apply, the importer refuses to run while osclass.contactEmail is
-// still a placeholder value (.invalid/.test/.example/.localhost, bare localhost, or example.*),
-// unless --allow-placeholder-contact is passed. A dry run (no --apply) is never gated: it never
-// writes, regardless of mail configuration.
+// Production import gate (Amendment/U6): with --apply, the importer refuses to run unless the
+// removal-request channel is ready (the plugin's schema migration reached version 2 and the
+// request table probes OK). A dry run (no --apply) is never gated on channel readiness: it never
+// writes. osclass.contactEmail being a placeholder no longer hard-gates anything; it only produces
+// a printed warning. --allow-placeholder-contact is kept as a parsed, deprecated no-op flag for
+// backward compatibility with existing invocations.
 //
 // Before any --apply write, the importer also refuses if a registered Osclass user already owns
 // this install's per-plugin placeholder contact address: ItemActions::prepareData() auto-links an
@@ -112,6 +114,13 @@ function tourist_directory_cli_print_report(array $plan, array $errorRows, $appl
       fwrite(STDOUT, "  [{$id}]\n");
     }
   }
+
+  if (!empty($plan['removal_blocked'])) {
+    fwrite(STDOUT, "\n-- BLOCKED BY A RECORDED REMOVAL REQUEST (never created/updated/reactivated; set the seed row to baja/no_contactar) --\n");
+    foreach ($plan['removal_blocked'] as $id) {
+      fwrite(STDOUT, "  [{$id}]\n");
+    }
+  }
 }
 
 $flags = tourist_directory_cli_parse_args(array_slice($argv, 1));
@@ -168,11 +177,11 @@ require_once ABS_PATH . 'oc-load.php';
 // i.e. only when the plugin is actually installed and active there.
 $installed = function_exists('tourist_directory_contact_email');
 $contactEmail = $installed ? osc_contact_email() : '';
+$channelReady = $installed && function_exists('tourist_directory_is_channel_ready') && tourist_directory_is_channel_ready();
 $refusal = tourist_directory_cli_should_refuse(
   $flags['apply'],
   $installed,
-  tourist_directory_is_placeholder_email($contactEmail),
-  $flags['allow_placeholder_contact'],
+  $channelReady,
   $installed && tourist_directory_contact_email() !== ''
 );
 
@@ -180,10 +189,14 @@ if ($refusal !== false) {
   $messages = array(
     'not_installed' => 'The tourist-directory plugin is not installed/active on this Osclass site. Nothing was read or written.',
     'directory_contact_email_missing' => 'The directory placeholder contact email is missing. Disable and enable Tourist Directory Entries in oc-admin to generate it. Nothing was read or written.',
-    'placeholder_contact_email' => 'Refusing --apply: osclass.contactEmail is still a placeholder value. Verify mail works, set a real contactEmail, then re-run (or pass --allow-placeholder-contact on a non-production install).',
+    'channel_not_ready' => 'Refusing --apply: the removal-request channel is not ready yet. In oc-admin, Disable then Enable Tourist Directory Entries to run the schema migration, then re-run.',
   );
   fwrite(STDERR, (isset($messages[$refusal]) ? $messages[$refusal] : $refusal) . "\n");
   exit(1);
+}
+
+foreach (tourist_directory_cli_warnings(tourist_directory_is_placeholder_email($contactEmail)) as $warning) {
+  fwrite(STDERR, "Warning: osclass.contactEmail is still a placeholder value. It no longer blocks --apply, but real mail delivery depends on it being fixed.\n");
 }
 
 // --- Read & parse the CSV. tourist_directory_parse_rows() reads columns by header name and keeps
@@ -284,7 +297,23 @@ foreach ($markerRows as $row) {
   );
 }
 
-$plan = tourist_directory_plan($validEntries, $existing, array('allow_reactivate' => $flags['allow_reactivate']));
+// --- Seed ids with a blocking removal request (pending or processed): tourist_directory_plan()
+// checks this before any other state, so a candidato row is never created/updated/reactivated for
+// an entry someone already asked to have removed, marker or no marker, retired or not
+// (tasks.md 6.13/6.14). ---
+$removalSeedIds = array();
+if ($installed && function_exists('tourist_directory_blocking_removal_seed_ids')) {
+  $removalSeedIds = tourist_directory_blocking_removal_seed_ids();
+}
+if ($removalSeedIds === null) {
+  fwrite(STDERR, "Cannot read removal requests; refusing to plan so no removed entry can come back. Nothing was written.\n");
+  exit(1);
+}
+
+$plan = tourist_directory_plan($validEntries, $existing, array(
+  'allow_reactivate' => $flags['allow_reactivate'],
+  'removal_seed_ids' => $removalSeedIds,
+));
 
 tourist_directory_cli_print_report($plan, $errorRows, $flags['apply']);
 
@@ -303,8 +332,18 @@ if (is_array($placeholderOwner) && isset($placeholderOwner['pk_i_id']) && $place
 }
 
 $applied = array('create' => 0, 'update' => 0, 'retire' => 0, 'reactivate' => 0, 'failed' => 0);
+$raceBlocked = array();
 
 foreach ($plan['actions'] as $action) {
+  // Race guard: a create/update/reactivate action was planned against the removal-request state
+  // read at the top of this run; re-check fresh immediately before writing, in case a visitor
+  // filed a removal request in the meantime (tasks.md 6.17).
+  if (in_array($action['action'], array('create', 'update', 'reactivate'), true)
+    && tourist_directory_has_blocking_removal_request($action['item_id'], $action['id'])) {
+    $raceBlocked[] = $action['id'];
+    continue;
+  }
+
   switch ($action['action']) {
     case 'create':
       $catId = isset($catMap[$action['entry']['destino']]) ? (int) $catMap[$action['entry']['destino']] : 0;
@@ -328,6 +367,10 @@ foreach ($plan['actions'] as $action) {
       $applied[$result['ok'] ? 'reactivate' : 'failed']++;
       break;
   }
+}
+
+if (!empty($raceBlocked)) {
+  fwrite(STDOUT, "\nBlocked at apply time by a removal request filed after planning: " . implode(', ', $raceBlocked) . "\n");
 }
 
 osc_update_cat_stats();
