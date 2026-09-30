@@ -26,11 +26,11 @@ Chain strategy: stacked-to-main
 
 ## Phase 1: Tree Data (Unit 1, PR 1)
 
-- [ ] 1.1 RED: test `tourist_identity_tree()` = 6 regions in order (Buenos Aires, Córdoba, Cuyo, Litoral, Norte, Patagonia).
-- [ ] 1.2 RED: test 51 leaves, `research.md` order per region, catch-all last, unique `^[a-z0-9-]+$` keys, both locale names present.
-- [ ] 1.3 GREEN: create `plugins/tourist-identity/tourist-identity-tree.php` with `tourist_identity_tree()`; anchor 47 = Buenos Aires.
-- [ ] 1.4 Require the new file from `tests/test_tourist_showcase.php`.
-- [ ] 1.5 VERIFY: test green, `php -l` on the new file; commit Unit 1.
+- [x] 1.1 RED: test `tourist_identity_tree()` = 6 regions in order (Buenos Aires, Córdoba, Cuyo, Litoral, Norte, Patagonia).
+- [x] 1.2 RED: test 51 leaves, `research.md` order per region, catch-all last, unique `^[a-z0-9-]+$` keys, both locale names present.
+- [x] 1.3 GREEN: create `plugins/tourist-identity/tourist-identity-tree.php` with `tourist_identity_tree()`; anchor 47 = Buenos Aires.
+- [x] 1.4 Require the new file from `tests/test_tourist_showcase.php`.
+- [x] 1.5 VERIFY: test green, `php -l` on the new file; commit Unit 1. (test + lint green; commit intentionally deferred — orchestrator scope for this apply batch excludes commit/push)
 
 ## Phase 2: Pure Plans (Unit 2, PR 2)
 

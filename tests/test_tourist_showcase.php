@@ -2,6 +2,7 @@
 
 require __DIR__ . '/../plugins/tourist-showcase/tourist-showcase-lib.php';
 require __DIR__ . '/../plugins/tourist-identity/tourist-identity-lib.php';
+require __DIR__ . '/../plugins/tourist-identity/tourist-identity-tree.php';
 
 function expect_true($condition, $message) {
   if (!$condition) {
@@ -264,5 +265,106 @@ expect_true(tourist_identity_showcase_link_needed(array(47), 47) === false, 'a l
 expect_true(tourist_identity_showcase_link_needed(array('47'), 47) === false, 'string category ids from preferences are compared as integers');
 expect_true(tourist_identity_showcase_link_needed(array(47, 44), 47) === true, 'extra linked categories are replaced by the kept category only');
 expect_true(tourist_identity_showcase_link_needed(array(44), 47) === true, 'a linkage to another category is replaced');
+
+// --- tourist-identity: Phase 1 - destination tree shape (6 regions, 51 leaves) ---
+
+$destination_tree = tourist_identity_tree();
+
+expect_true(count($destination_tree) === 6, 'the destination tree defines exactly six regions');
+
+$expected_region_keys = array('buenos-aires', 'cordoba', 'cuyo', 'litoral', 'norte', 'patagonia');
+$actual_region_keys = array_map(function ($region) { return $region['key']; }, $destination_tree);
+expect_true(
+  $actual_region_keys === $expected_region_keys,
+  'the six regions appear in the confirmed order: Buenos Aires, Córdoba, Cuyo, Litoral, Norte, Patagonia'
+);
+
+$expected_region_names = array(
+  'buenos-aires' => 'Buenos Aires',
+  'cordoba' => 'Córdoba',
+  'cuyo' => 'Cuyo',
+  'litoral' => 'Litoral',
+  'norte' => 'Norte',
+  'patagonia' => 'Patagonia',
+);
+foreach ($destination_tree as $region) {
+  expect_true(
+    $region['names']['es_ES'] === $expected_region_names[$region['key']] && $region['names']['en_US'] === $expected_region_names[$region['key']],
+    'region "' . $region['key'] . '" carries its es_ES and en_US name'
+  );
+}
+
+$buenos_aires_region = $destination_tree[0];
+expect_true(
+  $buenos_aires_region['key'] === 'buenos-aires' && $buenos_aires_region['anchor'] === 47,
+  'the Buenos Aires region is anchored to the pre-existing category 47'
+);
+foreach ($destination_tree as $region) {
+  if ($region['key'] !== 'buenos-aires') {
+    expect_true(!array_key_exists('anchor', $region), 'only the Buenos Aires region carries an anchor id');
+  }
+}
+
+$leaf_counts = array();
+foreach ($destination_tree as $region) {
+  $leaf_counts[$region['key']] = count($region['leaves']);
+}
+expect_true(
+  $leaf_counts === array(
+    'buenos-aires' => 10,
+    'cordoba' => 8,
+    'cuyo' => 7,
+    'litoral' => 8,
+    'norte' => 9,
+    'patagonia' => 9,
+  ),
+  'each region declares the confirmed leaf count from research.md (45 destinations + 6 catch-alls)'
+);
+
+$total_leaves = array_sum($leaf_counts);
+expect_true($total_leaves === 51, 'the tree defines exactly 51 leaf destinations across all regions');
+
+$expected_first_leaf = array(
+  'buenos-aires' => array('caba', 'Ciudad Autónoma de Buenos Aires (CABA)', 'Buenos Aires City'),
+  'cordoba' => array('villa-carlos-paz', 'Villa Carlos Paz', 'Villa Carlos Paz'),
+  'cuyo' => array('ciudad-de-mendoza', 'Ciudad de Mendoza', 'Mendoza City'),
+  'litoral' => array('puerto-iguazu', 'Puerto Iguazú (Cataratas)', 'Puerto Iguazú (Iguazú Falls)'),
+  'norte' => array('salta', 'Salta (ciudad y Valles Calchaquíes)', 'Salta (city & Calchaquí Valleys)'),
+  'patagonia' => array('san-carlos-de-bariloche', 'San Carlos de Bariloche', 'San Carlos de Bariloche'),
+);
+foreach ($destination_tree as $region) {
+  expect_true(
+    $region['leaves'][0] === $expected_first_leaf[$region['key']],
+    'region "' . $region['key'] . '" lists its first research.md destination first, in research.md order'
+  );
+}
+
+$expected_catch_all = array(
+  'buenos-aires' => array('otros-destinos-buenos-aires', 'Otros destinos de Buenos Aires', 'Other Buenos Aires destinations'),
+  'cordoba' => array('otros-destinos-cordoba', 'Otros destinos de Córdoba', 'Other Córdoba destinations'),
+  'cuyo' => array('otros-destinos-cuyo', 'Otros destinos de Cuyo', 'Other Cuyo destinations'),
+  'litoral' => array('otros-destinos-litoral', 'Otros destinos del Litoral', 'Other Litoral destinations'),
+  'norte' => array('otros-destinos-norte', 'Otros destinos del Norte', 'Other Norte destinations'),
+  'patagonia' => array('otros-destinos-patagonia', 'Otros destinos de Patagonia', 'Other Patagonia destinations'),
+);
+foreach ($destination_tree as $region) {
+  $last_leaf = $region['leaves'][count($region['leaves']) - 1];
+  expect_true(
+    $last_leaf === $expected_catch_all[$region['key']],
+    'region "' . $region['key'] . '" lists its "Otros destinos" catch-all leaf last'
+  );
+}
+
+$all_keys = array();
+foreach ($destination_tree as $region) {
+  $all_keys[] = $region['key'];
+  foreach ($region['leaves'] as $leaf) {
+    expect_true(preg_match('/^[a-z0-9-]+$/', $leaf[0]) === 1, 'leaf key "' . $leaf[0] . '" is a lowercase ASCII slug matching ^[a-z0-9-]+$');
+    expect_true($leaf[1] !== '' && $leaf[2] !== '', 'leaf "' . $leaf[0] . '" carries both an es_ES and an en_US name');
+    $all_keys[] = $leaf[0];
+  }
+}
+expect_true(count($all_keys) === count(array_unique($all_keys)), 'every region and leaf key is unique across the whole tree');
+expect_true(count($all_keys) === 57, 'the tree carries 6 region keys plus 51 leaf keys');
 
 echo "Tourist showcase checks passed.\n";
