@@ -57,13 +57,13 @@ Chain strategy: stacked-to-main
 
 ## Phase 4: Dry-Run Only (Production Import Gated)
 
-- [ ] 4.1 Manual dry-run: `php bin/tourist-directory-import.php --file=<seed> --osclass-root=app/osclass` (no `--apply`) against a sample of real seed rows; record output. `--apply` stays blocked until site mail works and `osclass.contactEmail` is real — that is a separate future task, not part of this change's completion criteria.
+- [x] 4.1 Manual dry-run: `php bin/tourist-directory-import.php --file=<seed> --osclass-root=app/osclass` (no `--apply`) against a sample of real seed rows; record output. `--apply` stays blocked until site mail works and `osclass.contactEmail` is real — that is a separate future task, not part of this change's completion criteria.
 
 ## Phase 5: Deployment [USER][AUTH REQUIRED]
 
-- [ ] 5.1 Agent: pre-deploy `mysqldump` backup into `data/osclass/backups/`.
-- [ ] 5.2 [USER] Sync `plugins/tourist-showcase/{tourist-showcase.php,tourist-showcase-lib.php}` flat into `app/osclass/oc-content/plugins/` (read-only) FIRST.
-- [ ] 5.3 [USER] Sync `plugins/tourist-directory/` into `app/osclass/oc-content/plugins/tourist-directory/` (read-only) via `diff -r`.
-- [ ] 5.4 [USER][AUTH REQUIRED] Install `tourist-directory` from oc-admin.
+- [x] 5.1 Agent: pre-deploy `mysqldump` backup into `data/osclass/backups/`.
+- [x] 5.2 [USER] Sync `plugins/tourist-showcase/{tourist-showcase.php,tourist-showcase-lib.php}` flat into `app/osclass/oc-content/plugins/` (read-only) FIRST.
+- [x] 5.3 [USER] Sync `plugins/tourist-directory/` into `app/osclass/oc-content/plugins/tourist-directory/` (read-only) via `diff -r`.
+- [x] 5.4 [USER][AUTH REQUIRED] Install `tourist-directory` from oc-admin.
 - [ ] 5.5 Agent: read-only HTTPS verification — render, no price, guards, dropdown values.
 - [ ] 5.6 [USER][AUTH REQUIRED] Optional smoke test: create one test entry, forge CSRF-valid POSTs over HTTPS to confirm guard rejection, then deactivate the test entry.

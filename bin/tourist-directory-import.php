@@ -45,8 +45,24 @@ if (PHP_SAPI !== 'cli') {
   exit(1);
 }
 
-require_once __DIR__ . '/../plugins/tourist-directory/tourist-directory-lib.php';
-require_once __DIR__ . '/../plugins/tourist-identity/tourist-identity-tree.php';
+// Load the pure libraries from the DEPLOYED plugin copies under --osclass-root, never from this
+// repo's plugins/ sources: Osclass include_once's the deployed copies during bootstrap, and PHP
+// only deduplicates include_once by resolved path, so loading the repo copies first would
+// redeclare the same functions. This also guarantees the importer runs the deployed version.
+$tourist_directory_cli_root = 'app/osclass';
+foreach (array_slice($argv, 1) as $tourist_directory_cli_arg) {
+  if (strpos($tourist_directory_cli_arg, '--osclass-root=') === 0) {
+    $tourist_directory_cli_root = substr($tourist_directory_cli_arg, strlen('--osclass-root='));
+  }
+}
+foreach (array('tourist-directory/tourist-directory-lib.php', 'tourist-identity/tourist-identity-tree.php') as $tourist_directory_cli_rel) {
+  $tourist_directory_cli_lib = realpath(rtrim($tourist_directory_cli_root, '/\\') . '/oc-content/plugins/' . $tourist_directory_cli_rel);
+  if ($tourist_directory_cli_lib === false) {
+    fwrite(STDERR, "Deployed plugin file not found under the Osclass root: {$tourist_directory_cli_rel}. Sync the plugins first.\n");
+    exit(1);
+  }
+  require_once $tourist_directory_cli_lib;
+}
 
 function tourist_directory_cli_print_usage() {
   fwrite(STDERR, "Usage: php bin/tourist-directory-import.php --file=<path> [--osclass-root=<path>] [--apply] [--allow-placeholder-contact] [--allow-reactivate]\n");
