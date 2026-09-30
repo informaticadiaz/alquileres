@@ -2,7 +2,7 @@
 
 function tourist_showcase_definitions() {
   return array(
-    array('name' => 'Tipo de alojamiento', 'slug' => 'tourist_accommodation_type', 'type' => 'DROPDOWN', 'options' => 'Apartamento|Casa|Cabaña|Habitación privada|Hostería|Otro', 'searchable' => true),
+    array('name' => 'Tipo de alojamiento', 'slug' => 'tourist_accommodation_type', 'type' => 'DROPDOWN', 'options' => 'Apartamento|Casa|Cabaña|Habitación privada|Hostería|Apart hotel|Complejo de departamentos|Otro', 'searchable' => true),
     array('name' => 'Huéspedes máximos', 'slug' => 'tourist_max_guests', 'type' => 'NUMBER', 'options' => '', 'searchable' => true),
     array('name' => 'Dormitorios', 'slug' => 'tourist_bedrooms', 'type' => 'NUMBER', 'options' => '', 'searchable' => true),
     array('name' => 'Baños', 'slug' => 'tourist_bathrooms', 'type' => 'NUMBER', 'options' => '', 'searchable' => true),
@@ -26,4 +26,20 @@ function tourist_showcase_is_spanish($locale) {
 function tourist_showcase_configure_url($admin_base_url, $plugin_file, $plugins_path) {
   $plugin = str_replace(str_replace('\\', '/', $plugins_path), '', str_replace('\\', '/', $plugin_file));
   return $admin_base_url . '?' . http_build_query(array('page' => 'plugins', 'action' => 'admin', 'plugin' => $plugin));
+}
+
+// Merges a field's currently stored dropdown options with the plugin's target options, keeping
+// the current order and appending only the values missing from it. Idempotent: merging an
+// already-merged list against the same target returns it unchanged. Used to upgrade an
+// already-installed site's stored s_options without disturbing any admin customization order.
+function tourist_showcase_merge_options(array $current, array $target) {
+  $merged = $current;
+
+  foreach ($target as $value) {
+    if (!in_array($value, $merged, true)) {
+      $merged[] = $value;
+    }
+  }
+
+  return $merged;
 }

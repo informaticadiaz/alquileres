@@ -26,13 +26,13 @@ Chain strategy: stacked-to-main
 
 ## Phase 1: U1 — Showcase Dropdown + Directory Lib (Pure, TDD)
 
-- [ ] 1.1 RED: extend `tests/test_tourist_showcase.php` — two new accommodation-type options and `tourist_showcase_merge_options` idempotence.
-- [ ] 1.2 GREEN: add options to `tourist_showcase_definitions()`; implement `tourist_showcase_merge_options()`/`tourist_showcase_sync_options()` in `plugins/tourist-showcase/tourist-showcase-lib.php` and `plugins/tourist-showcase/tourist-showcase.php`; call sync from install.
-- [ ] 1.3 RED: add tests for `tourist_directory_version`, `_seed_columns`, `_type_map`, `_parse_rows`, `_validate_row` (whitelist, dup id, bad destino/tipo/URL).
-- [ ] 1.4 GREEN: create `plugins/tourist-directory/tourist-directory-lib.php` implementing those five functions.
-- [ ] 1.5 RED: add tests for `_fingerprint`, `_description` (es_ES/en_US), `_locales`, `_text`, `_is_placeholder_email`, `_safe_url`, `_removal_url`, `_should_block` (null -> block).
-- [ ] 1.6 GREEN: implement the eight functions above in `tourist-directory-lib.php`.
-- [ ] 1.7 Verify U1: `php tests/test_tourist_showcase.php` green; `php -l` both lib files; commit.
+- [x] 1.1 RED: extend `tests/test_tourist_showcase.php` — two new accommodation-type options and `tourist_showcase_merge_options` idempotence.
+- [x] 1.2 GREEN: add options to `tourist_showcase_definitions()`; implement `tourist_showcase_merge_options()`/`tourist_showcase_sync_options()` in `plugins/tourist-showcase/tourist-showcase-lib.php` and `plugins/tourist-showcase/tourist-showcase.php`; call sync from install.
+- [x] 1.3 RED: add tests for `tourist_directory_version`, `_seed_columns`, `_type_map`, `_parse_rows`, `_validate_row` (whitelist, dup id, bad destino/tipo/URL).
+- [x] 1.4 GREEN: create `plugins/tourist-directory/tourist-directory-lib.php` implementing those five functions.
+- [x] 1.5 RED: add tests for `_fingerprint`, `_description` (es_ES/en_US), `_locales`, `_text`, `_is_placeholder_email`, `_safe_url`, `_removal_url`, `_should_block` (null -> block).
+- [x] 1.6 GREEN: implement the eight functions above in `tourist-directory-lib.php`.
+- [x] 1.7 Verify U1: `php tests/test_tourist_showcase.php` green; `php -l` both lib files; commit. (Verified green + linted here; commit is the orchestrator's step, not run by this apply batch.)
 
 ## Phase 2: U2 — Plugin Install/Lifecycle/Guards/Rendering/CSS
 

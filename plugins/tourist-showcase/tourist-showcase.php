@@ -38,6 +38,34 @@ function tourist_showcase_install() {
   }
 
   osc_set_preference('category_ids', '', TOURIST_SHOWCASE_SECTION);
+  tourist_showcase_sync_options();
+}
+
+// Updates an already-installed site's stored dropdown options to include any new values from
+// tourist_showcase_definitions(), without disturbing the existing option order. Writes to
+// t_meta_fields.s_options only when the merged list actually differs from what is stored.
+// Called from this plugin's own install (fresh install and every re-run), and from the
+// tourist-directory plugin's install so a directory-only install/reinstall also picks up the
+// current vocabulary.
+function tourist_showcase_sync_options() {
+  foreach (tourist_showcase_definitions() as $definition) {
+    if ($definition['type'] !== 'DROPDOWN' || $definition['options'] === '') {
+      continue;
+    }
+
+    $field = tourist_showcase_field($definition['slug']);
+    if (!$field) {
+      continue;
+    }
+
+    $current_options = ($field['s_options'] !== '' && $field['s_options'] !== null) ? explode('|', $field['s_options']) : array();
+    $target_options = explode('|', $definition['options']);
+    $merged_options = tourist_showcase_merge_options($current_options, $target_options);
+
+    if ($merged_options !== $current_options) {
+      Field::newInstance()->dao->update(DB_TABLE_PREFIX . 't_meta_fields', array('s_options' => implode('|', $merged_options)), array('pk_i_id' => (int)$field['pk_i_id']));
+    }
+  }
 }
 
 function tourist_showcase_selected_categories() {

@@ -3,6 +3,7 @@
 require __DIR__ . '/../plugins/tourist-showcase/tourist-showcase-lib.php';
 require __DIR__ . '/../plugins/tourist-identity/tourist-identity-lib.php';
 require __DIR__ . '/../plugins/tourist-identity/tourist-identity-tree.php';
+require __DIR__ . '/../plugins/tourist-directory/tourist-directory-lib.php';
 
 function expect_true($condition, $message) {
   if (!$condition) {
@@ -36,6 +37,26 @@ expect_true(
   tourist_showcase_configure_url('https://example.test/oc-admin/index.php', '/srv/osclass/oc-content/plugins/tourist-showcase.php', '/srv/osclass/oc-content/plugins/')
     === 'https://example.test/oc-admin/index.php?page=plugins&action=admin&plugin=tourist-showcase.php',
   'configure form posts back to the admin hook with the plugin path relative to the plugins directory'
+);
+
+// --- tourist-showcase: dropdown vocabulary extension + merge_options idempotence (U1) ---
+
+expect_true(
+  strpos(tourist_showcase_definitions()[0]['options'], 'Apart hotel') !== false
+    && strpos(tourist_showcase_definitions()[0]['options'], 'Complejo de departamentos') !== false,
+  'the accommodation type definition offers the two new values alongside the previous ones'
+);
+
+$showcase_current_options = array('Apartamento', 'Casa', 'Cabaña', 'Habitación privada', 'Hostería', 'Otro');
+$showcase_target_options = explode('|', tourist_showcase_definitions()[0]['options']);
+$showcase_merged_options = tourist_showcase_merge_options($showcase_current_options, $showcase_target_options);
+expect_true(
+  $showcase_merged_options === array('Apartamento', 'Casa', 'Cabaña', 'Habitación privada', 'Hostería', 'Otro', 'Apart hotel', 'Complejo de departamentos'),
+  'merging a pre-existing options list with the target keeps the existing order and appends only the missing values'
+);
+expect_true(
+  tourist_showcase_merge_options($showcase_merged_options, $showcase_target_options) === $showcase_merged_options,
+  'merging an already-merged options list with the same target is idempotent'
 );
 
 // --- tourist-identity: Phase 1.1 - version, target prefs, override map/text (incl. OC_ADMIN guard) ---
@@ -713,6 +734,182 @@ expect_true(
 expect_true(
   tourist_identity_showcase_link_needed(array_reverse($reinstall_leaf_ids), $reinstall_leaf_ids) === false,
   'once relinked, a further re-apply leaves the showcase linkage untouched'
+);
+
+// --- tourist-directory: Phase 1.3/1.4 - version, seed columns, type map, parse_rows, validate_row (U1) ---
+
+expect_true(is_string(tourist_directory_version()) && tourist_directory_version() !== '', 'the directory plugin exposes a non-empty version string');
+
+expect_true(
+  tourist_directory_seed_columns() === array('id', 'estado_catalogo', 'nombre', 'localidad', 'destino', 'tipo', 'web'),
+  'the seed whitelist keeps only the control key, the routing state, and the five public fields'
+);
+
+$directory_type_map = tourist_directory_type_map();
+expect_true(
+  $directory_type_map === array(
+    'apart_hotel' => 'Apart hotel',
+    'complejo_departamentos' => 'Complejo de departamentos',
+    'departamentos_con_servicios' => 'Apartamento',
+    'cabanas' => 'Cabaña',
+  ),
+  'the seed tipo map resolves every seed key to its showcase dropdown label'
+);
+
+$seed_header = array('id', 'nombre', 'localidad', 'destino', 'tipo', 'web', 'estado_catalogo', 'contacto', 'notas', 'fuente');
+$seed_rows = array(
+  array('101', 'Cabañas del Lago', 'tandil', 'tandil', 'cabanas', 'https://cabanasdellago.example.com', 'candidato', '+54 11 555', 'nota interna', 'planilla-2026'),
+);
+$parsed_seed_rows = tourist_directory_parse_rows($seed_header, $seed_rows);
+expect_true(count($parsed_seed_rows) === 1, 'parse_rows returns one parsed row per seed row');
+expect_true(
+  $parsed_seed_rows[0] === array(
+    'id' => '101',
+    'estado_catalogo' => 'candidato',
+    'nombre' => 'Cabañas del Lago',
+    'localidad' => 'tandil',
+    'destino' => 'tandil',
+    'tipo' => 'cabanas',
+    'web' => 'https://cabanasdellago.example.com',
+  ),
+  'parse_rows keeps only the seed whitelist columns, dropping contacto/notas/fuente entirely'
+);
+
+$directory_leaf_keys = array('tandil', 'caba');
+$directory_cat_map = array('tandil' => 200, 'caba' => 201);
+
+$valid_row_result = tourist_directory_validate_row($parsed_seed_rows[0], $directory_leaf_keys, $directory_cat_map, 120);
+expect_true($valid_row_result['ok'] === true, 'a well-formed candidato row with a known destino/tipo and a safe URL validates');
+expect_true(
+  $valid_row_result['entry']['tipo'] === 'Cabaña' && $valid_row_result['entry']['web'] === 'https://cabanasdellago.example.com',
+  'a validated row maps its raw tipo key to the showcase label and keeps the safe URL'
+);
+
+$duplicate_result = tourist_directory_validate_row($parsed_seed_rows[0], $directory_leaf_keys, $directory_cat_map, 120, array('101'));
+expect_true(
+  $duplicate_result === array('ok' => false, 'error' => 'duplicate_id', 'id' => '101'),
+  'a row whose id was already seen earlier in this seed pass is rejected as a duplicate'
+);
+
+$unknown_destino_row = $parsed_seed_rows[0];
+$unknown_destino_row['destino'] = 'atlantida-perdida';
+expect_true(
+  tourist_directory_validate_row($unknown_destino_row, $directory_leaf_keys, $directory_cat_map, 120)['error'] === 'unknown_destino',
+  'a destino that is not a known destination-tree leaf is rejected'
+);
+
+expect_true(
+  tourist_directory_validate_row($parsed_seed_rows[0], array('tandil'), array(), 120)['error'] === 'unknown_destino',
+  'a destino that is a tree leaf but missing from the tourist_identity.category_map pref is rejected'
+);
+
+$unknown_tipo_row = $parsed_seed_rows[0];
+$unknown_tipo_row['tipo'] = 'yate_flotante';
+expect_true(
+  tourist_directory_validate_row($unknown_tipo_row, $directory_leaf_keys, $directory_cat_map, 120)['error'] === 'unknown_tipo',
+  'a tipo key absent from the type map is rejected'
+);
+
+$unsafe_url_row = $parsed_seed_rows[0];
+$unsafe_url_row['web'] = 'javascript:alert(1)';
+expect_true(
+  tourist_directory_validate_row($unsafe_url_row, $directory_leaf_keys, $directory_cat_map, 120)['error'] === 'unsafe_url',
+  'a non-http(s) URL scheme is rejected as unsafe'
+);
+
+$missing_web_row = $parsed_seed_rows[0];
+$missing_web_row['web'] = '';
+expect_true(
+  tourist_directory_validate_row($missing_web_row, $directory_leaf_keys, $directory_cat_map, 120)['error'] === 'missing_web',
+  'a candidato row without a web address is rejected'
+);
+
+$long_title_row = $parsed_seed_rows[0];
+$long_title_row['nombre'] = str_repeat('a', 121);
+expect_true(
+  tourist_directory_validate_row($long_title_row, $directory_leaf_keys, $directory_cat_map, 120)['error'] === 'invalid_title',
+  'a title longer than the configured max length is rejected'
+);
+
+// --- tourist-directory: Phase 1.5/1.6 - fingerprint, description, locales/text, placeholder email, safe url, removal url, guard decision (U1) ---
+
+$fingerprint_entry_a = array('nombre' => 'Cabañas del Lago', 'localidad' => 'tandil', 'destino' => 'tandil', 'tipo' => 'Cabaña', 'web' => 'https://cabanasdellago.example.com');
+$fingerprint_entry_b = $fingerprint_entry_a;
+$fingerprint_entry_b['localidad'] = 'caba';
+
+expect_true(
+  tourist_directory_fingerprint($fingerprint_entry_a) === tourist_directory_fingerprint($fingerprint_entry_a),
+  'the same entry data always produces the same fingerprint'
+);
+expect_true(
+  tourist_directory_fingerprint($fingerprint_entry_a) !== tourist_directory_fingerprint($fingerprint_entry_b),
+  'a changed public field produces a different fingerprint, so an update can be detected'
+);
+expect_true(
+  strlen(tourist_directory_fingerprint($fingerprint_entry_a)) === 40,
+  'the fingerprint is a 40-character sha1 hex digest, matching the s_fingerprint CHAR(40) column'
+);
+
+expect_true(
+  tourist_directory_description('Cabañas del Lago', 'cabanas', 'Tandil', 'es_ES')
+    === 'Cabañas del Lago es un Cabaña en Tandil. Ficha informativa con datos públicos; para consultas y reservas visite el sitio oficial.',
+  'the es_ES description is a factual generated sentence built from the mapped type label'
+);
+expect_true(
+  tourist_directory_description('Cabañas del Lago', 'cabanas', 'Tandil', 'en_US')
+    === 'Cabañas del Lago is a Cabaña in Tandil. Informational public-data listing; for enquiries and bookings, please visit the official website.',
+  'the en_US description is generated from the same facts, never a translation of copied marketing text'
+);
+
+expect_true(
+  tourist_directory_locales(array('es_ES', 'en_US', 'fr_FR')) === array('es_ES', 'en_US'),
+  'both known description locales are kept, in fixed order, alongside an unrelated installed locale'
+);
+expect_true(
+  tourist_directory_locales(array('en_US')) === array('en_US'),
+  'a site missing es_ES only plans the description locale it actually has installed'
+);
+
+expect_true(tourist_directory_text('Hola', 'Hello', 'es_ES') === 'Hola', 'an es_ES locale selects the Spanish text');
+expect_true(tourist_directory_text('Hola', 'Hello', 'en_US') === 'Hello', 'a non-Spanish locale selects the English text');
+
+expect_true(tourist_directory_is_placeholder_email('directorio-abc123@directorio.invalid') === true, 'the .invalid placeholder domain is recognized');
+expect_true(tourist_directory_is_placeholder_email('admin@example.com') === true, 'an example.* domain is recognized as a placeholder');
+expect_true(tourist_directory_is_placeholder_email('webmaster@localhost') === true, 'the bare localhost domain is recognized as a placeholder');
+expect_true(tourist_directory_is_placeholder_email('not-an-email') === true, 'a malformed address is treated as a placeholder, never trusted for delivery');
+expect_true(tourist_directory_is_placeholder_email('contacto@alquileres.diazignacio.ar') === false, 'a real, working-looking address is not flagged as a placeholder');
+
+expect_true(tourist_directory_safe_url('https://cabanasdellago.example.com/') === 'https://cabanasdellago.example.com/', 'a well-formed https URL is returned unchanged');
+expect_true(tourist_directory_safe_url('http://cabanasdellago.example.com') === 'http://cabanasdellago.example.com', 'a well-formed http URL is also accepted');
+expect_true(tourist_directory_safe_url('javascript:alert(1)') === false, 'a non-http(s) scheme is rejected');
+expect_true(tourist_directory_safe_url('ftp://example.com/file') === false, 'an ftp URL is rejected');
+expect_true(tourist_directory_safe_url('') === false, 'an empty URL is rejected');
+
+expect_true(
+  tourist_directory_removal_url('https://alquileres.diazignacio.ar/contact', 42) === 'https://alquileres.diazignacio.ar/contact?tourist_directory_removal=42',
+  'a contact URL with no existing query string gets a leading ? separator'
+);
+expect_true(
+  tourist_directory_removal_url('https://alquileres.diazignacio.ar/contact?ref=home', 42) === 'https://alquileres.diazignacio.ar/contact?ref=home&tourist_directory_removal=42',
+  'a contact URL that already carries a query string gets an & separator instead'
+);
+
+expect_true(tourist_directory_should_block(null, 'anything@example.com', 'directorio-abc@directorio.invalid') === true, 'a failed marker lookup (null) fails closed and blocks');
+expect_true(tourist_directory_should_block(true, 'anything@example.com', 'directorio-abc@directorio.invalid') === true, 'a confirmed directory entry always blocks');
+expect_true(tourist_directory_should_block(false, 'directorio-abc@directorio.invalid', 'directorio-abc@directorio.invalid') === true, 'a non-entry item whose contact email still matches the placeholder (an orphan) blocks too');
+expect_true(tourist_directory_should_block(false, 'owner@example.com', 'directorio-abc@directorio.invalid') === false, 'a normal owner item with a real contact email does not block');
+
+// --- tourist-directory: guard fails closed for any lookup result other than an explicit false ---
+
+foreach (array('1', 1, 'true', 0, '0', '', array()) as $ambiguous_lookup) {
+  expect_true(
+    tourist_directory_should_block($ambiguous_lookup, 'owner@complejo.com.ar', 'directorio-abc@directorio.invalid') === true,
+    'an ambiguous marker lookup result (' . var_export($ambiguous_lookup, true) . ') blocks the request'
+  );
+}
+expect_true(
+  tourist_directory_should_block(false, 'owner@complejo.com.ar', 'directorio-abc@directorio.invalid') === false,
+  'only an explicit false lookup lets an owner listing through'
 );
 
 echo "Tourist showcase checks passed.\n";
