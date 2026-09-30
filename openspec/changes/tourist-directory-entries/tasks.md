@@ -48,12 +48,12 @@ Chain strategy: stacked-to-main
 
 ## Phase 3: U3 — Import Planner + CLI + README
 
-- [ ] 3.1 RED: tests for `_plan(valid, existing, flags)` transitions (create/update/skip/retire `missing_item`/reactivate-gated).
-- [ ] 3.2 GREEN: implement `_plan` in `tourist-directory-lib.php`.
-- [ ] 3.3 GREEN: create `bin/tourist-directory-import.php` — CLI bootstrap (`ABS_PATH`, `CLI`, `OC_ADMIN` false, default `$_SERVER` keys); flags `--file=`, `--osclass-root=`, `--apply`, `--allow-placeholder-contact`, `--allow-reactivate`.
-- [ ] 3.4 GREEN: wire production placeholder-contact gate and not-installed refusal; wire dry-run report and `--apply` write path via `Params`+`ItemActions(true)`+`_plan`; call `osc_update_cat_stats()`/`osc_cache_flush()` after apply.
-- [ ] 3.5 GREEN: document CLI usage, flags, seed contract in `plugins/tourist-directory/README.md` and the CLI header comment.
-- [ ] 3.6 Verify U3: `php tests/test_tourist_showcase.php` green; `php -l bin/tourist-directory-import.php`; commit.
+- [x] 3.1 RED: tests for `_plan(valid, existing, flags)` transitions (create/update/skip/retire `missing_item`/reactivate-gated).
+- [x] 3.2 GREEN: implement `_plan` in `tourist-directory-lib.php`.
+- [x] 3.3 GREEN: create `bin/tourist-directory-import.php` — CLI bootstrap (`ABS_PATH`, `CLI`, `OC_ADMIN` false, default `$_SERVER` keys); flags `--file=`, `--osclass-root=`, `--apply`, `--allow-placeholder-contact`, `--allow-reactivate`.
+- [x] 3.4 GREEN: wire production placeholder-contact gate and not-installed refusal; wire dry-run report and `--apply` write path via `Params`+`ItemActions(true)`+`_plan`; call `osc_update_cat_stats()`/`osc_cache_flush()` after apply.
+- [x] 3.5 GREEN: document CLI usage, flags, seed contract in `plugins/tourist-directory/README.md` and the CLI header comment.
+- [x] 3.6 Verify U3: `php tests/test_tourist_showcase.php` green; `php -l bin/tourist-directory-import.php`; commit is the orchestrator's step, not run by this apply batch.
 
 ## Phase 4: Dry-Run Only (Production Import Gated)
 

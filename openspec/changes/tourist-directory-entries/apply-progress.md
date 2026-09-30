@@ -2,10 +2,13 @@
 
 ## Scope covered so far
 
-Phase 1 (U1) and Phase 2 (U2) are complete. Phase 3 (U3: importer CLI + README), Phase 4 (manual
-dry-run) and Phase 5 (deployment, [USER][AUTH REQUIRED]) are NOT started. No commit made in either
-batch (commit is the orchestrator's step, not run by this apply batch). No `app/` file was read
-beyond citation verification and none was ever written. `data/prospeccion/*` was never read.
+Phase 1 (U1), Phase 2 (U2), and Phase 3 (U3: import planner + CLI + README) are complete. Phase 4
+(manual dry-run) and Phase 5 (deployment, [USER][AUTH REQUIRED]) are NOT started -- both are
+explicitly out of scope for an apply batch (Phase 4 requires the real Osclass/DB, Phase 5 is
+[USER][AUTH REQUIRED]). No commit made in any batch (commit is the orchestrator's step, not run by
+this apply batch). No `app/` file was ever written, only read for citation verification.
+`data/prospeccion/*` was never read in any batch; the U3 sample dry-run used a synthetic in-memory
+fixture through the pure planner only.
 
 ## Completed Tasks
 
@@ -29,6 +32,39 @@ beyond citation verification and none was ever written. `data/prospeccion/*` was
 - [x] 2.8 GREEN: created `plugins/tourist-directory/README.md`.
 - [x] 2.9 Verify U2: full suite green (all U1 + U2 + pre-existing tourist-identity/tourist-showcase assertions); `php -l` clean on `index.php`, `tourist-directory-lib.php`, and the test file.
 
+### Phase 3 (U3) — this batch
+- [x] 3.1 RED: added tests for `tourist_directory_plan(valid, existing, flags)` covering create,
+  noop, update, reactivate-gated skip, reactivate (allowed), retire `missing_item` (active and
+  already-retired), retire `baja`, retire `anuncio_propio`, noop-already-retired, skip `no_entry`,
+  skip `not_importable`, and `not_in_seed` reporting; and for `tourist_directory_cli_parse_args`
+  (all flags, defaults, unknown-flag capture) and `tourist_directory_cli_should_refuse` (dry-run
+  never gated, `--apply` gated/overridden by placeholder contact email, not-installed refusal).
+- [x] 3.2 GREEN: implemented `tourist_directory_plan()` (+ two private helpers
+  `tourist_directory_plan_missing_item()`/`tourist_directory_plan_candidato()`/
+  `tourist_directory_plan_retirement()`), `tourist_directory_cli_parse_args()`, and
+  `tourist_directory_cli_should_refuse()` in `tourist-directory-lib.php`.
+- [x] 3.3 GREEN: created `bin/tourist-directory-import.php` (repo root, never synced under `app/`)
+  — CLI bootstrap mirroring `app/osclass/index.php:19-25`/`oc-load.php` (defines `ABS_PATH`/`CLI`,
+  defaults `$_SERVER` HTTP_HOST/REQUEST_URI/REMOTE_ADDR/SERVER_PORT, requires `oc-load.php`, never
+  redefines `OC_ADMIN` — it stays at its `default-constants.php:22-23` default of `false`); flags
+  `--file=`, `--osclass-root=` (default `app/osclass`), `--apply`, `--allow-placeholder-contact`,
+  `--allow-reactivate` via `tourist_directory_cli_parse_args()`.
+- [x] 3.4 GREEN: wired the production placeholder-contact gate and not-installed refusal via
+  `tourist_directory_cli_should_refuse()` (installed detected via
+  `function_exists('tourist_directory_contact_email')` — true only once the *deployed* plugin copy
+  was loaded by `Plugins::init()` inside `oc-load.php`); wired the mandatory auto-link guard
+  (`User::newInstance()->findByEmail(tourist_directory_contact_email())`, checked once before any
+  write); wired the dry-run report (`tourist_directory_cli_print_report()` — seed id + nombre only,
+  per action) and the `--apply` write path via the existing `tourist_directory_create/_update/
+  _retire/_reactivate()` glue from `index.php` driven by `tourist_directory_plan()`'s actions; calls
+  `osc_update_cat_stats()`/`osc_cache_flush()` once after the apply loop.
+- [x] 3.5 GREEN: documented CLI usage/flags/seed contract/gates in the CLI's own header comment and
+  added an "Importer CLI" section to `plugins/tourist-directory/README.md`.
+- [x] 3.6 Verify U3: full suite green (`php tests/test_tourist_showcase.php` → "Tourist showcase
+  checks passed.", exit 0); `php -l` clean on `bin/tourist-directory-import.php`,
+  `tourist-directory-lib.php`, `index.php`, and the test file; commit is the orchestrator's step,
+  not run by this apply batch.
+
 ## Files Changed (this batch, U2)
 
 | File | Action | Lines |
@@ -43,6 +79,21 @@ Total authored for this batch: ~864 changed lines. Combined with U1's ~463, tota
 above the original ~1100 total estimate but consistent with the already-resolved `auto-chain` /
 `stacked-to-main` delivery strategy (tasks.md: "Decision needed before apply: No"); each unit (U1,
 U2) is its own deliverable PR slice.
+
+## Files Changed (this batch, U3)
+
+| File | Action | Lines |
+|---|---|---|
+| `bin/tourist-directory-import.php` | Created | 323 |
+| `plugins/tourist-directory/tourist-directory-lib.php` | Modified (+`tourist_directory_plan()` + 3 private helpers, +`tourist_directory_cli_parse_args()`, +`tourist_directory_cli_should_refuse()`) | +158 |
+| `plugins/tourist-directory/README.md` | Modified (+"Importer CLI" section) | +57/-3 |
+| `tests/test_tourist_showcase.php` | Modified (+U3 RED assertions: plan transitions, CLI arg parsing, mail gate) | +164 |
+
+Total authored for this batch: 323 + 158 + 54 (net README) + 164 = 699 changed lines (`git diff
+--stat` for the 3 modified files: 376 insertions/deletions, plus the new 323-line file), within the
+runtime ledger's 800-line cap for this work unit — no `size:exception` needed for U3, unlike U2.
+Combined with U1 (~463) and U2 (~864), running total so far ~2026, all consistent with the
+already-resolved `auto-chain`/`stacked-to-main` decision (each unit is its own deliverable PR slice).
 
 ## TDD Cycle Evidence (U2)
 
@@ -66,13 +117,80 @@ unit tests either).
 - Pure functions created this batch: 1 (`tourist_directory_item_params`).
 - Glue functions created this batch (index.php, not unit-testable without an Osclass runtime): 33.
 
+## TDD Cycle Evidence (U3)
+
+| Task | Test section | Layer | Safety Net | RED | GREEN | TRIANGULATE | REFACTOR |
+|---|---|---|---|---|---|---|---|
+| 3.1/3.2 `tourist_directory_plan` | "Phase 3.1/3.2 - plan transitions" | Unit | Confirmed — full suite green before the change (baseline, includes every U1+U2 assertion) | Confirmed — ran suite, fatal `Call to undefined function tourist_directory_plan()` at test line 1013 | Confirmed — full suite green after implementing `tourist_directory_plan()` + 3 private helpers in the lib | 12 cases in one call: create, noop, update, reactivate-gated skip, reactivate (allowed, separate call), missing_item (active + already-retired), retire baja, retire anuncio_propio, noop-already-retired, skip no_entry, skip not_importable, not_in_seed reporting, plus a default-flags call | None needed — the missing_item top-level gate was refactored out of the candidato/retirement branches during initial GREEN (not a separate pass) to avoid duplicating the check in both |
+| 3.3/3.4 `tourist_directory_cli_parse_args` / `tourist_directory_cli_should_refuse` | "Phase 3.3/3.4 - CLI argument parsing and production mail gate" | Unit | Confirmed — full suite green before the change | Confirmed — ran suite, fatal `Call to undefined function tourist_directory_cli_parse_args()` at test line 1070 | Confirmed — full suite green after implementing both functions | `parse_args`: 3 cases (every flag set, defaults, unknown-flag capture). `should_refuse`: 6 cases (dry-run never gated, apply+placeholder blocks, apply+placeholder+override passes, apply+real-email passes, not-installed blocks dry-run too, not-installed blocks apply too) | None needed — both functions already minimal |
+
+`bin/tourist-directory-import.php` itself (CLI bootstrap, CSV I/O, DB marker/item-existence queries,
+the `--apply` write loop) is Osclass-bound glue with no Osclass runtime available to this test
+harness — same constraint U1/U2 already documented. It is verified by `php -l`, by a synthetic
+dry-run exercised through the pure planner only (see Work Unit Evidence below — `data/prospeccion/*`
+was never read), and by the vendor `file:line` citations in this file.
+
+### Test Summary (U3)
+- Total tests (assertions) written this batch: 27 new `expect_true` assertions (12 `plan()` action
+  assertions read from one shared result map + 1 `not_in_seed` assertion + 1 separate reactivate-call
+  assertion + 1 default-flags assertion + 3 `parse_args` assertions + 6 `should_refuse` assertions,
+  plus the loop-free literal counts above — 27 total `expect_true` calls added).
+- Total tests passing: all (full suite: every U1+U2 assertion plus these 27, all green).
+- Layers used: Unit only. No integration/E2E layer exists for this stack.
+- Pure functions created this batch: 6 (`tourist_directory_plan`, `tourist_directory_plan_missing_item`,
+  `tourist_directory_plan_candidato`, `tourist_directory_plan_retirement`,
+  `tourist_directory_cli_parse_args`, `tourist_directory_cli_should_refuse`).
+- Glue functions created this batch (`bin/tourist-directory-import.php`, not unit-testable without an
+  Osclass runtime): the CLI bootstrap, CSV read/parse wiring, existing-marker/item-existence DB
+  queries, `tourist_directory_cli_print_report()`, `tourist_directory_cli_print_usage()`, the
+  auto-link guard check, and the `--apply` write loop.
+
 ## Work Unit Evidence (Hard Gate, all modes)
 
 | Evidence | Value |
 |---|---|
-| Focused test command and exact result | `php tests/test_tourist_showcase.php` → `Tourist showcase checks passed.`, exit 0 |
-| Runtime harness command/scenario and exact result | N/A for this batch: manual HTTPS render + forged-CSRF-valid-POST guard check is explicitly a Phase 5 `[USER][AUTH REQUIRED]` step (tasks.md 5.5/5.6), not available in this sandbox (no live DB/site). Every guard/hook claim below is instead grounded in exact vendor `file:line` citations read directly from `app/osclass/` in this session. |
-| Rollback boundary | Delete `plugins/tourist-directory/index.php`, `plugins/tourist-directory/assets/tourist-directory.css`, `plugins/tourist-directory/README.md`; revert the `tourist_directory_item_params()` addition in `tourist-directory-lib.php` and the U2 test section in `tests/test_tourist_showcase.php`. No DB/runtime state was created (the plugin was never installed against a live site in this batch). |
+| Focused test command and exact result | `php tests/test_tourist_showcase.php` → `Tourist showcase checks passed.`, exit 0 (covers U1+U2+U3) |
+| Runtime harness command/scenario and exact result | N/A for U3 in this batch, by explicit scope instruction: the manual dry-run against the real Osclass/DB is Phase 4 (tasks.md 4.1), and Phase 5 deployment is `[USER][AUTH REQUIRED]` — neither runs in this sandbox and neither was attempted; `data/prospeccion/*` was never read. Instead, a synthetic in-memory fixture (invented ids `demo-1..4`, none of them real seed data) was run through the pure planner only (`tourist_directory_parse_rows` → `tourist_directory_validate_row` → `tourist_directory_plan`, no Osclass/DB) and produced the expected `create`/`update`/`retire (baja)`/`unknown_destino` classification, confirming the planner's output shape end-to-end before any glue wiring is trusted. Every CLI bootstrap/guard/hook claim is grounded in exact vendor `file:line` citations read directly from `app/osclass/` this session (see below). |
+| Rollback boundary | Delete `bin/tourist-directory-import.php`; revert the `tourist_directory_plan()`/`tourist_directory_cli_parse_args()`/`tourist_directory_cli_should_refuse()` additions (+3 private plan helpers) in `tourist-directory-lib.php`, the "Importer CLI" section in `plugins/tourist-directory/README.md`, and the U3 test sections in `tests/test_tourist_showcase.php`. No DB/runtime state was created or touched (the CLI was never executed against a live Osclass/DB in this batch). |
+
+## U2's flagged `ItemActions::edit()` verification (resolved this batch)
+
+U2's apply-progress flagged: *"`_update`'s exact `ItemActions::edit()` return-value contract was not
+exhaustively read... before U3 wires the importer's update path."* `ItemActions.php:708-936` (the
+full `edit()` method) was read in full this batch. Findings:
+
+- **Return contract confirmed identical in shape to `add()`**: `$success = $flash_error` (a non-empty
+  string) on validation failure, else `$success = $result` where
+  `$result = $this->manager->update($aUpdate, ['pk_i_id'=>..., 's_secret'=>...])` (`ItemActions.php:
+  868-871,932`) — never a string on the success path. `tourist_directory_update()`'s existing
+  `is_string($result)` check (written in U2, unchanged this batch) is therefore correct.
+- **New finding, not anticipated by design.md**: `edit()` contains its own `userId`-based contact
+  overwrite (`ItemActions.php:829-835`: `if ($aItem['userId'] != '') { $aItem['contactName'] =
+  $user['s_name']; $aItem['contactEmail'] = $user['s_email']; }`), independent of the overwrite
+  already inside `prepareData()` (`ItemActions.php:1806-1810`, U2's cited auto-link risk). Traced the
+  full chain: `prepareData()` sets `$aItem['userId']` from
+  `User::newInstance()->findByEmail(Params::getParam('contactEmail'))` (`ItemActions.php:1785-1788`);
+  when no user owns that email, `$userId` stays `null`, and PHP's `null != ''` evaluates `false`, so
+  `edit()`'s own overwrite block at 829-835 never executes either. **Conclusion: a single guard is
+  sufficient** — as long as no registered user owns `tourist_directory_contact_email()`'s exact
+  address, both `prepareData()`'s and `edit()`'s independent overwrite paths stay inert. This is
+  exactly why `bin/tourist-directory-import.php` checks `User::newInstance()->findByEmail(...)` once,
+  globally, before *any* write (create, update, retire, or reactivate) — not narrowly scoped to
+  create alone, since `edit()` carries the same risk through a second, independent code path.
+- No email is sent by `edit()` in any branch (no `sendEmails()` call anywhere in the method), matching
+  `add()`'s admin-only suppression (`ItemActions.php:311-313`).
+
+## Vendor bootstrap citations for `bin/tourist-directory-import.php` (verified this batch)
+
+| Bootstrap step | This CLI | Vendor precedent |
+|---|---|---|
+| Define `ABS_PATH` | `define('ABS_PATH', $osclassRoot)` from `--osclass-root` | `app/osclass/index.php:19`: `define('ABS_PATH', str_replace(...))` |
+| Define `CLI` | `define('CLI', true)` unconditionally (this script is always CLI-only, gated by the `PHP_SAPI !== 'cli'` check above it) | `app/osclass/index.php:21-23`: `if(PHP_SAPI === 'cli') { define('CLI', true); }` |
+| Require the loader | `require_once ABS_PATH . 'oc-load.php'` | `app/osclass/index.php:25`: `require_once ABS_PATH . 'oc-load.php';` |
+| `OC_ADMIN` | Never defined by this script | `app/osclass/oc-includes/osclass/default-constants.php:22-23`: `if(!defined('OC_ADMIN')) { define('OC_ADMIN', false); }` — defaults to `false`, exactly what an importer (not the backoffice) wants |
+| Default `$_SERVER` keys | `$_SERVER += ['HTTP_HOST'=>'localhost','REQUEST_URI'=>'/','REMOTE_ADDR'=>'127.0.0.1','SERVER_PORT'=>'80']` before `require_once oc-load.php` | `default-constants.php:47-48` reads `$_SERVER['HTTPS']`/`['SERVER_PORT']`/`['HTTP_HOST']` unguarded to build `WEB_PATH`; `oc-includes/osclass/utils.php`'s `osc_get_ip()` reads `$_SERVER['REMOTE_ADDR']`/`HTTP_CLIENT_IP`/`HTTP_X_FORWARDED_FOR` |
+| Skip the page-dispatch switch | Not replicated — this CLI never routes a `page`/`action`, it calls the plugin's glue functions directly | `app/osclass/index.php:27-38` (the `Params::setParam('page', ...)` / upgrade-page block) and `:244-327` (the `switch(Params::getParam('page'))` controller dispatch) apply only to routing an HTTP-shaped request; a standalone operator script has no such request to route |
+| Plugin loading | Not required directly — `Plugins::init()` inside `oc-load.php` loads the deployed plugin | `oc-load.php:326`: `Plugins::init();`, before which `tourist_directory_*` glue functions do not exist; `function_exists('tourist_directory_contact_email')` is the CLI's own "is it installed" signal |
 
 ## Design decisions taken while implementing (not pre-specified verbatim in design.md)
 
@@ -104,15 +222,11 @@ unit tests either).
    chars, else `'Argentina'` — always-valid, harmless placeholders for an unused taxonomy. This is a
    genuine implementation decision beyond design.md's prose (which does not mention geo fields at
    all).
-4. **`_update`'s exact `ItemActions::edit()` return-value contract was not exhaustively read.**
-   `add()`'s contract (string `$flash_error` on validation failure, else int `1`/`2`) was fully
-   verified in vendor source. `edit()` structurally mirrors `add()` (same class, same
-   `if ($flash_error) { $success = $flash_error; } else { ...; $success = $result; }` shape, tail
-   `return $success;` at `ItemActions.php:935`), and `tourist_directory_update()` follows that same
-   `is_string($result)` check. Given U3 (the only caller of `_update`) is explicitly out of scope for
-   this batch, this was not re-verified against `edit()`'s full validation body line-by-line.
-   **Recommend a focused read of `ItemActions::edit()`'s complete flash_error assembly (mirroring
-   the `add()` verification already done) before U3 wires the importer's update path.**
+4. **`_update`'s exact `ItemActions::edit()` return-value contract was not exhaustively read (U2).**
+   **RESOLVED in U3** — see "U2's flagged `ItemActions::edit()` verification (resolved this batch)"
+   below. `edit()` was read in full (`ItemActions.php:708-936`); the return contract is confirmed and
+   a second, independent auto-link overwrite path inside `edit()` itself was found and neutralized by
+   the same global pre-write guard.
 5. **`_lookup_entry` returns `null` (fails closed) for `$itemId <= 0`**, not only on a DB
    error/exception — defense in depth, tightening rather than loosening the design's stated
    tri-state contract.
@@ -232,7 +346,7 @@ see Work Unit Evidence above).
 | `ItemActions::activate($id, $secret=null)` | model method | `oc-includes/osclass/ItemActions.php:1029` | Enable/reactivate |
 | `ItemActions::prepareData($is_add)` — `Params::getParam('price')===''` → `null`; admin `dt_expiration==-1` → `''`; admin `User::findByEmail(contactEmail)` auto-links a matching user | model method | `oc-includes/osclass/ItemActions.php:1778-1982` (price: 1859; expiration: 1942; findByEmail: 1785) | Confirms `_item_params`'s `price=''`/`dt_expiration='-1'` contract, and the auto-link risk the random placeholder avoids |
 | `ItemActions::add()` — returns `$flash_error` string on failure, else int `1`/`2`; `Params::getParam('itemId')` set after insert | model method | `oc-includes/osclass/ItemActions.php:80-338` (return at 338, `itemId` param set at 254) | `_create`'s success/failure contract |
-| `ItemActions::edit()` — structurally mirrors `add()`, tail `return $success` | model method | `oc-includes/osclass/ItemActions.php:708-936` (return at 935) | `_update`'s contract (not fully re-verified — see Design Decision #4) |
+| `ItemActions::edit()` — structurally mirrors `add()`, tail `return $success`; also re-overwrites `contactName`/`contactEmail` from `$aItem['userId']` at 829-835, independent of `prepareData()`'s own overwrite | model method | `oc-includes/osclass/ItemActions.php:708-936` (return at 935; userId overwrite at 829-835) | `_update`'s contract, fully re-verified this batch — see "U2's flagged `ItemActions::edit()` verification" above |
 | `Item::updateExpirationDate($id, $time)` — no-op, returns `false`, when `$time===''` | model method | `oc-includes/osclass/model/Item.php:1198-1201` | Confirms the admin `-1`→`''` expiration path leaves the DB default (`9999-12-31 23:59:59`) intact |
 | `t_item` schema: `s_contact_email VARCHAR(140) NOT NULL`, `i_price BIGINT(20) NULL`, `dt_expiration DATETIME NOT NULL DEFAULT '9999-12-31 23:59:59'` | schema | `oc-includes/osclass/installer/struct.sql:247-283` | Guard's `s_contact_email` field name; price/expiration defaults |
 | `osc_validate_email($email)` | helper | `oc-includes/osclass/helpers/hValidate.php:261-313` | Confirms `directorio-<hex>@directorio.invalid` passes Osclass's own email syntax validator |
@@ -243,18 +357,21 @@ see Work Unit Evidence above).
 | `random_bytes()` (PHP 8.5 core) | language | n/a | Per-install placeholder email generation |
 
 ## Remaining Tasks (NOT started, out of this batch's scope)
-- [ ] Phase 3 (U3): import planner + CLI + README — tasks 3.1-3.6
-- [ ] Phase 4: manual dry-run — task 4.1
+- [ ] Phase 4: manual dry-run against the real Osclass/DB — task 4.1 (explicitly out of scope for
+  this or any apply batch: requires the real server/DB and is gated on Phase 5's deployment)
 - [ ] Phase 5: deployment [USER][AUTH REQUIRED] — tasks 5.1-5.6
 
 ## Workload / PR Boundary
 - Mode: chained PR slice (auto-chain, stacked-to-main per tasks.md forecast)
-- Current work unit: U2 — Plugin install/lifecycle/guards/rendering/CSS
-- Boundary: starts from U1's clean, all-green baseline and ends with U2's full plugin glue
-  (install/uninstall/enable/disable, fail-closed guards wired to all 4 hook points, all 5 rendering
-  hooks + 1 filter, CSS, README, and the create/update/retire/reactivate glue for the future
-  importer), all green and linted, tasks 2.1-2.9 checked off. Next batch starts at Phase 3 (U3),
-  task 3.1.
+- Current work unit: U3 — Import planner + CLI + README
+- Boundary: starts from U2's clean, all-green baseline and ends with U3's full importer surface
+  (`tourist_directory_plan()` + 3 private helpers, `tourist_directory_cli_parse_args()`,
+  `tourist_directory_cli_should_refuse()`, `bin/tourist-directory-import.php`, and the README's
+  "Importer CLI" section), all green and linted, tasks 3.1-3.6 checked off. U1+U2+U3 together
+  complete every apply-phase task in tasks.md (Phases 1-3); only Phase 4 (manual dry-run,
+  requires the real server) and Phase 5 (deployment, `[USER][AUTH REQUIRED]`) remain, and both are
+  explicitly out of scope for an apply batch.
 - Rollback boundary: see Work Unit Evidence above.
-- Estimated review budget impact: ~864 authored changed lines for this slice, above the ~400 U2
-  forecast, consistent with the already-resolved auto-chain/stacked-to-main decision.
+- Estimated review budget impact: ~699 authored changed lines for this slice, within the runtime
+  ledger's 800-line cap for this work unit (no `size:exception` needed for U3, unlike U2), consistent
+  with the already-resolved auto-chain/stacked-to-main decision.

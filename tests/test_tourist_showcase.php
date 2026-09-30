@@ -954,4 +954,168 @@ expect_true(
   'item_params only writes title/description for the locales actually passed in ctx, never a locale the site lacks'
 );
 
+// --- tourist-directory: Phase 3.1/3.2 - plan(valid, existing, flags) transitions (U3) ---
+
+function directory_plan_entry($id, $estado, $localidad = 'Tandil') {
+  return array(
+    'id' => $id,
+    'estado_catalogo' => $estado,
+    'nombre' => 'Cabañas del Lago',
+    'localidad' => $localidad,
+    'destino' => 'tandil',
+    'tipo' => 'Cabaña',
+    'tipo_key' => 'cabanas',
+    'web' => 'https://cabanasdellago.example.com',
+  );
+}
+
+$plan_entry_create = directory_plan_entry('c1', 'candidato');
+$plan_entry_noop = directory_plan_entry('c2', 'candidato');
+$plan_entry_update = directory_plan_entry('c3', 'candidato', 'Tandil Centro');
+$plan_entry_gated = directory_plan_entry('c4', 'candidato');
+$plan_entry_reactivate = directory_plan_entry('c5', 'candidato');
+$plan_entry_missing = directory_plan_entry('c6', 'candidato');
+$plan_entry_missing_retired = directory_plan_entry('c7', 'candidato');
+$plan_entry_baja_active = directory_plan_entry('c8', 'baja');
+$plan_entry_anuncio_active = directory_plan_entry('c9', 'anuncio_propio');
+$plan_entry_baja_retired = directory_plan_entry('c10', 'baja');
+$plan_entry_baja_no_existing = directory_plan_entry('c11', 'baja');
+$plan_entry_other_state = directory_plan_entry('c12', 'publicado');
+
+$plan_valid = array(
+  $plan_entry_create,
+  $plan_entry_noop,
+  $plan_entry_update,
+  $plan_entry_gated,
+  $plan_entry_reactivate,
+  $plan_entry_missing,
+  $plan_entry_missing_retired,
+  $plan_entry_baja_active,
+  $plan_entry_anuncio_active,
+  $plan_entry_baja_retired,
+  $plan_entry_baja_no_existing,
+  $plan_entry_other_state,
+);
+
+$plan_existing = array(
+  'c2' => array('item_id' => 302, 'fingerprint' => tourist_directory_fingerprint($plan_entry_noop), 'retired' => false, 'item_missing' => false),
+  'c3' => array('item_id' => 303, 'fingerprint' => 'stale-fingerprint-does-not-match', 'retired' => false, 'item_missing' => false),
+  'c4' => array('item_id' => 304, 'fingerprint' => 'irrelevant', 'retired' => true, 'item_missing' => false),
+  'c5' => array('item_id' => 305, 'fingerprint' => 'irrelevant', 'retired' => true, 'item_missing' => false),
+  'c6' => array('item_id' => 306, 'fingerprint' => 'irrelevant', 'retired' => false, 'item_missing' => true),
+  'c7' => array('item_id' => 307, 'fingerprint' => 'irrelevant', 'retired' => true, 'item_missing' => true),
+  'c8' => array('item_id' => 308, 'fingerprint' => 'irrelevant', 'retired' => false, 'item_missing' => false),
+  'c9' => array('item_id' => 309, 'fingerprint' => 'irrelevant', 'retired' => false, 'item_missing' => false),
+  'c10' => array('item_id' => 310, 'fingerprint' => 'irrelevant', 'retired' => true, 'item_missing' => false),
+  'gone1' => array('item_id' => 399, 'fingerprint' => 'irrelevant', 'retired' => false, 'item_missing' => false),
+);
+
+$plan_result_gated = tourist_directory_plan($plan_valid, $plan_existing, array('allow_reactivate' => false));
+$plan_actions_gated = array();
+foreach ($plan_result_gated['actions'] as $row) {
+  $plan_actions_gated[$row['id']] = $row;
+}
+
+expect_true($plan_actions_gated['c1']['action'] === 'create' && $plan_actions_gated['c1']['item_id'] === null, 'a candidato row with no existing marker plans a create');
+expect_true($plan_actions_gated['c2']['action'] === 'noop', 'a candidato row whose fingerprint matches the existing marker plans no change');
+expect_true($plan_actions_gated['c3']['action'] === 'update' && $plan_actions_gated['c3']['item_id'] === 303, 'a candidato row whose fingerprint changed plans an update against the existing item id');
+expect_true(
+  $plan_actions_gated['c4']['action'] === 'skip' && $plan_actions_gated['c4']['reason'] === 'reactivate_not_allowed',
+  'a retired candidato row without --allow-reactivate is skipped, never silently reactivated'
+);
+expect_true(
+  $plan_actions_gated['c6']['action'] === 'retire' && $plan_actions_gated['c6']['reason'] === 'missing_item',
+  'a marker whose underlying item is gone is planned for retirement with reason missing_item, not recreated'
+);
+expect_true(
+  $plan_actions_gated['c7']['action'] === 'noop',
+  'a marker whose item is gone but is already retired needs no further action'
+);
+expect_true(
+  $plan_actions_gated['c8']['action'] === 'retire' && $plan_actions_gated['c8']['reason'] === 'baja',
+  'a baja row for an active existing entry plans a retire with reason baja'
+);
+expect_true(
+  $plan_actions_gated['c9']['action'] === 'retire' && $plan_actions_gated['c9']['reason'] === 'anuncio_propio',
+  'an anuncio_propio row for an active existing entry plans a retire with reason anuncio_propio'
+);
+expect_true($plan_actions_gated['c10']['action'] === 'noop', 'a baja row for an already-retired entry plans no further action');
+expect_true(
+  $plan_actions_gated['c11']['action'] === 'skip' && $plan_actions_gated['c11']['reason'] === 'no_entry',
+  'a baja row with no existing entry has nothing to retire and is skipped'
+);
+expect_true(
+  $plan_actions_gated['c12']['action'] === 'skip' && $plan_actions_gated['c12']['reason'] === 'not_importable',
+  'a row whose estado_catalogo is neither candidato, baja, nor anuncio_propio is skipped'
+);
+expect_true(
+  $plan_result_gated['not_in_seed'] === array('gone1'),
+  'an existing marker whose seed id is absent from this pass is only reported, never retired by absence alone'
+);
+
+$plan_result_allowed = tourist_directory_plan(array($plan_entry_reactivate), array('c5' => $plan_existing['c5']), array('allow_reactivate' => true));
+expect_true(
+  $plan_result_allowed['actions'][0]['action'] === 'reactivate' && $plan_result_allowed['actions'][0]['item_id'] === 305,
+  'a retired candidato row is planned for reactivation only when --allow-reactivate is explicitly set'
+);
+
+$plan_result_default_flags = tourist_directory_plan(array($plan_entry_create), array());
+expect_true(
+  $plan_result_default_flags['actions'][0]['action'] === 'create',
+  'plan() defaults allow_reactivate to false when flags is empty, without erroring'
+);
+
+// --- tourist-directory: Phase 3.3/3.4 - CLI argument parsing and production mail gate (U3) ---
+
+$cli_args_full = tourist_directory_cli_parse_args(array('--file=data/prospeccion/seed/complejos.csv', '--osclass-root=app/osclass', '--apply', '--allow-placeholder-contact', '--allow-reactivate'));
+expect_true(
+  $cli_args_full === array(
+    'file' => 'data/prospeccion/seed/complejos.csv',
+    'osclass_root' => 'app/osclass',
+    'apply' => true,
+    'allow_placeholder_contact' => true,
+    'allow_reactivate' => true,
+    'unknown' => array(),
+  ),
+  'the CLI parses every recognized flag, including the required --file and an overridden --osclass-root'
+);
+
+$cli_args_defaults = tourist_directory_cli_parse_args(array('--file=seed.csv'));
+expect_true(
+  $cli_args_defaults['osclass_root'] === 'app/osclass' && $cli_args_defaults['apply'] === false
+    && $cli_args_defaults['allow_placeholder_contact'] === false && $cli_args_defaults['allow_reactivate'] === false,
+  'omitted flags default to a safe dry-run: no --apply, no --osclass-root override, no gate bypass'
+);
+
+$cli_args_unknown = tourist_directory_cli_parse_args(array('--file=seed.csv', '--bogus-flag'));
+expect_true(
+  $cli_args_unknown['unknown'] === array('--bogus-flag'),
+  'an unrecognized argument is collected for reporting instead of being silently ignored'
+);
+
+expect_true(
+  tourist_directory_cli_should_refuse(false, true, true, false) === false,
+  'a dry run (no --apply) is never refused for mail configuration, since it never writes'
+);
+expect_true(
+  tourist_directory_cli_should_refuse(true, true, true, false) === 'placeholder_contact_email',
+  '--apply is refused while osclass.contactEmail is still a placeholder and no override was passed'
+);
+expect_true(
+  tourist_directory_cli_should_refuse(true, true, true, true) === false,
+  '--allow-placeholder-contact explicitly overrides the production mail gate'
+);
+expect_true(
+  tourist_directory_cli_should_refuse(true, true, false, false) === false,
+  '--apply proceeds once osclass.contactEmail is a real, non-placeholder address'
+);
+expect_true(
+  tourist_directory_cli_should_refuse(true, false, false, false) === 'not_installed',
+  'the importer refuses entirely when the tourist-directory plugin is not installed'
+);
+expect_true(
+  tourist_directory_cli_should_refuse(false, false, false, false) === 'not_installed',
+  'the not-installed refusal applies to a dry run too, before any plan can be built'
+);
+
 echo "Tourist showcase checks passed.\n";

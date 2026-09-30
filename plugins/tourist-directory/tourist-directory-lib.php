@@ -261,6 +261,164 @@ function tourist_directory_item_params(array $entry, array $ctx) {
   );
 }
 
+// Plans the transitions for one validated seed pass against the currently known directory markers.
+// $valid is the list of already-validated entries (see tourist_directory_validate_row's 'entry'
+// output), each still carrying its seed 'id' and 'estado_catalogo'. $existing is keyed by seed id,
+// one row per already-imported marker: 'item_id' (int), 'fingerprint' (string), 'retired' (bool),
+// and 'item_missing' (bool -- true when the underlying t_item row for this marker no longer exists;
+// resolved by the caller before calling this function, since checking the database is not a pure
+// operation). $flags carries 'allow_reactivate' (bool, default false).
+//
+// Returns array('actions'=>[...], 'not_in_seed'=>[ids]): 'actions' has one row per valid entry --
+// array('id','action','entry','item_id','reason') -- with action one of 'create', 'update', 'noop',
+// 'retire', 'reactivate', or 'skip' (reason one of 'reactivate_not_allowed', 'missing_item',
+// 'no_entry', 'not_importable'). 'not_in_seed' lists existing marker ids absent from this seed pass
+// entirely, reported only -- absence from the file alone never retires an entry; only an explicit
+// baja/anuncio_propio row does.
+function tourist_directory_plan(array $valid, array $existing, array $flags = array()) {
+  $allow_reactivate = !empty($flags['allow_reactivate']);
+  $actions = array();
+  $seen_ids = array();
+
+  foreach ($valid as $entry) {
+    $id = isset($entry['id']) ? $entry['id'] : '';
+    $estado = isset($entry['estado_catalogo']) ? $entry['estado_catalogo'] : '';
+    $seen_ids[$id] = true;
+    $current = isset($existing[$id]) ? $existing[$id] : null;
+
+    if ($current !== null && !empty($current['item_missing'])) {
+      $actions[] = tourist_directory_plan_missing_item($id, $entry, $current);
+      continue;
+    }
+
+    if ($estado === 'candidato') {
+      $actions[] = tourist_directory_plan_candidato($id, $entry, $current, $allow_reactivate);
+    } elseif ($estado === 'baja' || $estado === 'anuncio_propio') {
+      $actions[] = tourist_directory_plan_retirement($id, $entry, $current, $estado);
+    } else {
+      $actions[] = array(
+        'id' => $id,
+        'action' => 'skip',
+        'entry' => $entry,
+        'item_id' => $current !== null ? $current['item_id'] : null,
+        'reason' => 'not_importable',
+      );
+    }
+  }
+
+  $not_in_seed = array();
+  foreach ($existing as $id => $row) {
+    if (!isset($seen_ids[$id])) {
+      $not_in_seed[] = $id;
+    }
+  }
+
+  return array('actions' => $actions, 'not_in_seed' => $not_in_seed);
+}
+
+// A marker whose underlying item is gone is planned for retirement (reason missing_item) exactly
+// once -- it is never recreated even if the row is still a live candidato -- and needs no further
+// action once it is already retired.
+function tourist_directory_plan_missing_item($id, array $entry, array $current) {
+  if (!empty($current['retired'])) {
+    return array('id' => $id, 'action' => 'noop', 'entry' => $entry, 'item_id' => $current['item_id'], 'reason' => null);
+  }
+
+  return array('id' => $id, 'action' => 'retire', 'entry' => $entry, 'item_id' => $current['item_id'], 'reason' => 'missing_item');
+}
+
+function tourist_directory_plan_candidato($id, array $entry, $current, $allow_reactivate) {
+  if ($current === null) {
+    return array('id' => $id, 'action' => 'create', 'entry' => $entry, 'item_id' => null, 'reason' => null);
+  }
+
+  if (!empty($current['retired'])) {
+    if ($allow_reactivate) {
+      return array('id' => $id, 'action' => 'reactivate', 'entry' => $entry, 'item_id' => $current['item_id'], 'reason' => null);
+    }
+
+    return array('id' => $id, 'action' => 'skip', 'entry' => $entry, 'item_id' => $current['item_id'], 'reason' => 'reactivate_not_allowed');
+  }
+
+  $fingerprint = tourist_directory_fingerprint($entry);
+  if ($fingerprint !== $current['fingerprint']) {
+    return array('id' => $id, 'action' => 'update', 'entry' => $entry, 'item_id' => $current['item_id'], 'reason' => null);
+  }
+
+  return array('id' => $id, 'action' => 'noop', 'entry' => $entry, 'item_id' => $current['item_id'], 'reason' => null);
+}
+
+// A row's estado_catalogo of baja/anuncio_propio retires the corresponding entry only when one
+// exists and is not already retired; a row with nothing to retire, or already retired, changes
+// nothing -- absence of a live entry is not itself an error.
+function tourist_directory_plan_retirement($id, array $entry, $current, $estado) {
+  if ($current === null) {
+    return array('id' => $id, 'action' => 'skip', 'entry' => $entry, 'item_id' => null, 'reason' => 'no_entry');
+  }
+
+  if (!empty($current['retired'])) {
+    return array('id' => $id, 'action' => 'noop', 'entry' => $entry, 'item_id' => $current['item_id'], 'reason' => null);
+  }
+
+  return array('id' => $id, 'action' => 'retire', 'entry' => $entry, 'item_id' => $current['item_id'], 'reason' => $estado);
+}
+
+// ------------------------------------------------------------------------------------------------
+// CLI decisions (bin/tourist-directory-import.php). Pure: no argv/env/Osclass reads happen here --
+// the CLI script resolves the raw values and passes them in.
+// ------------------------------------------------------------------------------------------------
+
+// Parses raw CLI argument strings (argv, excluding the script name) into the importer's flag set.
+// Recognizes --file=<path>, --osclass-root=<path> (default 'app/osclass'), --apply,
+// --allow-placeholder-contact, --allow-reactivate. Every unrecognized argument is collected under
+// 'unknown' so the caller can report it instead of silently ignoring a typo'd flag.
+function tourist_directory_cli_parse_args(array $args) {
+  $flags = array(
+    'file' => null,
+    'osclass_root' => 'app/osclass',
+    'apply' => false,
+    'allow_placeholder_contact' => false,
+    'allow_reactivate' => false,
+    'unknown' => array(),
+  );
+
+  foreach ($args as $arg) {
+    if (strpos($arg, '--file=') === 0) {
+      $flags['file'] = substr($arg, strlen('--file='));
+    } elseif (strpos($arg, '--osclass-root=') === 0) {
+      $flags['osclass_root'] = substr($arg, strlen('--osclass-root='));
+    } elseif ($arg === '--apply') {
+      $flags['apply'] = true;
+    } elseif ($arg === '--allow-placeholder-contact') {
+      $flags['allow_placeholder_contact'] = true;
+    } elseif ($arg === '--allow-reactivate') {
+      $flags['allow_reactivate'] = true;
+    } else {
+      $flags['unknown'][] = $arg;
+    }
+  }
+
+  return $flags;
+}
+
+// Decides whether the importer must refuse to run, before touching anything. Refuses unconditionally
+// when the plugin is not installed ($installed === false; there is no placeholder contact context to
+// even compare against). Otherwise: a dry run ($apply === false) is always allowed -- it never
+// writes, so the mail gate does not apply to it. An --apply run is refused while the current contact
+// email is a placeholder, unless --allow-placeholder-contact was explicitly passed. Returns false
+// (proceed) or a string reason code ('not_installed', 'placeholder_contact_email').
+function tourist_directory_cli_should_refuse($apply, $installed, $contactEmailIsPlaceholder, $allowPlaceholderContact) {
+  if (!$installed) {
+    return 'not_installed';
+  }
+
+  if ($apply && $contactEmailIsPlaceholder && !$allowPlaceholderContact) {
+    return 'placeholder_contact_email';
+  }
+
+  return false;
+}
+
 // Fail-closed contact-guard decision. $isEntry is the tri-state marker lookup result: true (a
 // confirmed directory entry), false (a normal item), or null (the lookup errored/threw). Blocks
 // on true or null (never trust a failed lookup), and also blocks a false result whose stored

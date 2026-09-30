@@ -16,9 +16,60 @@ requirements and `openspec/changes/tourist-directory-entries/design.md` for the 
   guards, rendering hooks, and create/update/retire/reactivate. Requires `ABS_PATH`.
 - `assets/tourist-directory.css` — front-end-only stylesheet; cosmetic, not the enforcement layer.
 
-The importer CLI (`bin/tourist-directory-import.php`) that drives `tourist_directory_create()` /
-`tourist_directory_update()` / `tourist_directory_retire()` / `tourist_directory_reactivate()` is a
-separate, later change; this plugin exposes those functions but does not wire a command to them.
+## Importer CLI
+
+`bin/tourist-directory-import.php` (repo root, **never** synced under `app/osclass/oc-content/
+plugins/` — it is a standalone operator tool, not a plugin) drives `tourist_directory_create()` /
+`tourist_directory_update()` / `tourist_directory_retire()` / `tourist_directory_reactivate()`
+against a seed CSV. See `esquema-seed-complejos.md` for the seed's full column definitions and
+`openspec/changes/tourist-directory-entries/design.md`'s "Seed Contract" section for the exact
+create/update/retire/skip rules.
+
+```
+php bin/tourist-directory-import.php --file=<path> [--osclass-root=<path>] [--apply]
+  [--allow-placeholder-contact] [--allow-reactivate]
+```
+
+- `--file=<path>` (required) — the seed CSV.
+- `--osclass-root=<path>` (default `app/osclass`) — the target Osclass installation root (the
+  directory holding `config.php` and `oc-load.php`).
+- `--apply` — writes changes. Without it, the importer only prints the plan and never touches the
+  database (dry run is the default).
+- `--allow-placeholder-contact` — overrides the production mail gate below. Only for a non-production
+  install.
+- `--allow-reactivate` — lets a previously retired entry whose seed row is back to `candidato` be
+  reactivated. Without it, a retired entry always stays retired, even if its row changes back.
+
+**Seed columns read**: only `id`, `estado_catalogo`, `nombre`, `localidad`, `destino`, `tipo`, `web`
+(`tourist_directory_seed_columns()`). Every other column — `contacto`, `notas`, `fuente`,
+`estado_prospecto`, `fecha_ultimo_contacto`, ... — is dropped by `tourist_directory_parse_rows()`
+before any row is validated, planned, or printed; none of them are ever written to Osclass, logged,
+or shown in the report.
+
+**Per-row outcome** (`tourist_directory_plan()`, unit tested): a `candidato` row with a valid `web`
+creates a new entry when none exists, updates the existing entry only when its public-field
+fingerprint changed, and does nothing when it matches. A `baja`/`anuncio_propio` row retires
+(deactivates, never deletes) an existing active entry; it is a no-op if the entry is already retired
+or does not exist. Every other `estado_catalogo` is skipped. A marker whose underlying item no longer
+exists is reported and retired (`missing_item`) and is never recreated. A seed id present as an
+existing marker but absent from the current file is only reported (`not_in_seed`), never retired by
+absence alone. Invalid rows (duplicate id, unknown `destino`/`tipo`, unsafe URL, missing/too-long
+title) are skipped and reported as validation errors.
+
+**Production mail gate**: with `--apply`, the importer refuses to run while `osclass.contactEmail` is
+still a placeholder (`.invalid`/`.test`/`.example`/`.localhost`, bare `localhost`, or `example.*`),
+unless `--allow-placeholder-contact` is passed. A dry run is never gated — it never writes, regardless
+of mail configuration. The importer also refuses entirely (dry run or `--apply`) when the
+`tourist-directory` plugin is not installed/active on the target Osclass site.
+
+**Auto-link guard**: before any `--apply` write, the importer refuses if a registered Osclass user
+already owns this install's per-plugin placeholder contact address. `ItemActions::prepareData()`
+auto-links an admin-created/edited item to a matching user by email (`ItemActions.php:1785`) and would
+silently replace the placeholder `contactName`/`contactEmail` with that user's real identity —
+checked once, globally, before any row is written.
+
+No email is ever sent by an importer run: `ItemActions::add()` only calls `sendEmails()` for a
+non-admin submission (`ItemActions.php:311-313`), and `ItemActions::edit()` never calls it at all.
 
 ## Install / lifecycle
 
