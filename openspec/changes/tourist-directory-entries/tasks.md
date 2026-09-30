@@ -36,15 +36,15 @@ Chain strategy: stacked-to-main
 
 ## Phase 2: U2 — Plugin Install/Lifecycle/Guards/Rendering/CSS
 
-- [ ] 2.1 RED: tests for `_item_params(entry, ctx)` (price NULL, placeholder `contactEmail`, admin owner fields).
-- [ ] 2.2 GREEN: implement `_item_params` in `tourist-directory-lib.php`.
-- [ ] 2.3 GREEN: create `plugins/tourist-directory/index.php` — install (`t_directory_entry` table, `tourist_directory.contact_email` pref, options sync), `_enable`/`_disable`/`_uninstall` lifecycle.
-- [ ] 2.4 GREEN: implement `_lookup_entry(int)`/`_guard($item=null)`; wire to `init_item`, `pre_item_contact_post`, `pre_item_send_friend_post`, `pre_item_add_comment_post`.
-- [ ] 2.5 GREEN: implement `_create`/`_update`/`_retire`/`_reactivate` (reactivate gated by `--allow-reactivate` in ctx; default: no auto-reactivation).
-- [ ] 2.6 GREEN: implement render hooks (`item_title`, `item_sidebar_top`, `item_loop_title`, `highlight_class`, `show_item` with `sigma_bodyClass` filter + `structured_data_show_{footer,header}_filter=false`) and `tourist_directory_removal_url()`/`init_contact` prefill.
-- [ ] 2.7 GREEN: create `plugins/tourist-directory/assets/tourist-directory.css` hiding contact/comment/price chrome; enqueue on `init`, front-end only.
-- [ ] 2.8 GREEN: create `plugins/tourist-directory/README.md` (install, lifecycle, guard behavior, CSS scope).
-- [ ] 2.9 Verify U2: `php tests/test_tourist_showcase.php` green; `php -l` on all new/changed PHP; note guard tests assume `osc_csrf_check()` runs before `pre_item_*_post` hooks; commit.
+- [x] 2.1 RED: tests for `_item_params(entry, ctx)` (price NULL, placeholder `contactEmail`, admin owner fields).
+- [x] 2.2 GREEN: implement `_item_params` in `tourist-directory-lib.php`.
+- [x] 2.3 GREEN: create `plugins/tourist-directory/index.php` — install (`t_directory_entry` table, `tourist_directory.contact_email` pref, options sync), `_enable`/`_disable`/`_uninstall` lifecycle.
+- [x] 2.4 GREEN: implement `_lookup_entry(int)`/`_guard($item=null)`; wire to `init_item`, `pre_item_contact_post`, `pre_item_send_friend_post`, `pre_item_add_comment_post`.
+- [x] 2.5 GREEN: implement `_create`/`_update`/`_retire`/`_reactivate` (reactivate gated by `--allow-reactivate` in ctx; default: no auto-reactivation).
+- [x] 2.6 GREEN: implement render hooks (`item_title`, `item_sidebar_top`, `item_loop_title`, `highlight_class`, `show_item` with `sigma_bodyClass` filter + `structured_data_show_{footer,header}_filter=false`) and `tourist_directory_removal_url()`/`init_contact` prefill.
+- [x] 2.7 GREEN: create `plugins/tourist-directory/assets/tourist-directory.css` hiding contact/comment/price chrome; enqueue on `header` (front-end only) — see Deviations for why `header`, not literal `init`.
+- [x] 2.8 GREEN: create `plugins/tourist-directory/README.md` (install, lifecycle, guard behavior, CSS scope).
+- [x] 2.9 Verify U2: `php tests/test_tourist_showcase.php` green; `php -l` on all new/changed PHP; note guard tests assume `osc_csrf_check()` runs before `pre_item_*_post` hooks; commit is the orchestrator's step, not run by this apply batch.
 
 ## Phase 3: U3 — Import Planner + CLI + README
 

@@ -1,0 +1,75 @@
+/*
+ * Tourist Directory Entries - front-end stylesheet.
+ *
+ * The guards (index.php: tourist_directory_guard()) are the actual enforcement: they block the
+ * contact, send-friend, and comment POST/GET actions server-side regardless of markup. This
+ * stylesheet is a cosmetic layer only, hiding the still-rendered (but now unreachable) contact,
+ * send-friend, and comment chrome on a directory entry's own detail page, and the price/currency
+ * chrome that the item_price_null filter already blanks out.
+ *
+ * Scoping:
+ * - body.tourist-directory-entry is added by the sigma_bodyClass filter registered in
+ *   tourist_directory_show_item_hook(), only on a confirmed entry's own detail page.
+ * - .tourist-directory-card is echoed by tourist_directory_highlight_class_hook() onto the <li>
+ *   of every entry that appears in a listing loop (category, search, home).
+ */
+
+/* Item detail page: hide the sidebar contact form and the contact_button, entirely unreachable for
+   an entry since every contact/send-friend/comment POST is blocked server-side. */
+body.tourist-directory-entry #contact,
+body.tourist-directory-entry .contact_button,
+body.tourist-directory-entry #comments {
+  display: none;
+}
+
+/* Item detail page: the price div still renders (now empty, via the item_price_null filter), so
+   collapse it instead of leaving a bare empty box. */
+body.tourist-directory-entry .price {
+  display: none;
+}
+
+/* Listing cards (category, search, home): the currency value span is unused for an entry (NULL
+   price never formats to a currency string), so hide the leftover empty span. */
+.tourist-directory-card .currency-value {
+  display: none;
+}
+
+/* The public-directory notice block rendered near the item title (item_title hook). */
+.tourist-directory-notice {
+  margin: 0.5em 0 1em;
+  padding: 0.6em 0.8em;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background: #f7f7f7;
+}
+
+.tourist-directory-notice .tourist-directory-label {
+  margin: 0 0 0.4em;
+  font-weight: bold;
+}
+
+.tourist-directory-notice .tourist-directory-official-link,
+.tourist-directory-notice .tourist-directory-removal-link {
+  margin-right: 0.8em;
+}
+
+/* The short notice repeated at the top of the sidebar (item_sidebar_top hook). */
+.tourist-directory-sidebar-notice {
+  margin: 0 0 0.8em;
+  padding: 0.5em 0.7em;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background: #f7f7f7;
+  font-size: 0.9em;
+}
+
+/* The listing-card badge (item_loop_title hook). */
+.tourist-directory-badge {
+  display: inline-block;
+  margin-left: 0.4em;
+  padding: 0.05em 0.5em;
+  border-radius: 3px;
+  background: #eee;
+  font-size: 0.8em;
+  font-weight: normal;
+}

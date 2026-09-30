@@ -221,6 +221,46 @@ function tourist_directory_removal_url($contactUrl, $id) {
   return $contactUrl . $separator . 'tourist_directory_removal=' . (int)$id;
 }
 
+// Builds the full admin Params map for one validated entry (see tourist_directory_validate_row),
+// ready to be fed one key at a time into Params::setParam() ahead of ItemActions(true)->prepareData()
+// ->add()/->edit(). $ctx carries request-independent context the lib cannot resolve itself:
+// 'catId' (already-resolved destination category id), 'contactEmail' (the per-install placeholder
+// address), and 'locales' (the locales to write title/description for, see
+// tourist_directory_locales()). Price is the empty string, never 0 or null directly: ItemActions
+// ->prepareData() only stores i_price as NULL when Params::getParam('price') === '' (ItemActions.php
+// prepareData(), price line). dt_expiration is the admin-only '-1' sentinel that keeps the item
+// non-expiring (prepareData() only honors -1 when $this->is_admin is true). Never touches the
+// database or Osclass state.
+function tourist_directory_item_params(array $entry, array $ctx) {
+  $cat_id = isset($ctx['catId']) ? $ctx['catId'] : '';
+  $placeholder = isset($ctx['contactEmail']) ? $ctx['contactEmail'] : '';
+  $locales = isset($ctx['locales']) && is_array($ctx['locales']) ? $ctx['locales'] : array();
+
+  $name = isset($entry['nombre']) ? $entry['nombre'] : '';
+  $type_key = isset($entry['tipo_key']) ? $entry['tipo_key'] : '';
+  $locality = isset($entry['localidad']) ? $entry['localidad'] : '';
+
+  $title = array();
+  $description = array();
+  foreach ($locales as $locale) {
+    $title[$locale] = $name;
+    $description[$locale] = tourist_directory_description($name, $type_key, $locality, $locale);
+  }
+
+  return array(
+    'catId' => $cat_id,
+    'title' => $title,
+    'description' => $description,
+    'contactName' => 'Directorio público',
+    'contactEmail' => $placeholder,
+    'showEmail' => 0,
+    'showPhone' => 0,
+    'price' => '',
+    'dt_expiration' => '-1',
+    'city' => $locality,
+  );
+}
+
 // Fail-closed contact-guard decision. $isEntry is the tri-state marker lookup result: true (a
 // confirmed directory entry), false (a normal item), or null (the lookup errored/threw). Blocks
 // on true or null (never trust a failed lookup), and also blocks a false result whose stored

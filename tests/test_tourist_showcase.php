@@ -912,4 +912,46 @@ expect_true(
   'only an explicit false lookup lets an owner listing through'
 );
 
+// --- tourist-directory: Phase 2.1/2.2 - item_params (price NULL, placeholder contactEmail, admin owner fields) (U2) ---
+
+$item_params_entry = array(
+  'id' => '101',
+  'estado_catalogo' => 'candidato',
+  'nombre' => 'Cabañas del Lago',
+  'localidad' => 'Tandil',
+  'destino' => 'tandil',
+  'tipo' => 'Cabaña',
+  'tipo_key' => 'cabanas',
+  'web' => 'https://cabanasdellago.example.com',
+);
+$item_params_ctx = array(
+  'catId' => 200,
+  'contactEmail' => 'directorio-abc123@directorio.invalid',
+  'locales' => array('es_ES', 'en_US'),
+);
+
+$item_params_result = tourist_directory_item_params($item_params_entry, $item_params_ctx);
+
+expect_true($item_params_result['price'] === '', 'item_params sets an empty-string price so ItemActions stores i_price as NULL, never 0');
+expect_true($item_params_result['contactEmail'] === 'directorio-abc123@directorio.invalid', 'item_params uses the per-install placeholder contact email from ctx, never a real address');
+expect_true($item_params_result['contactName'] === 'Directorio público', 'item_params sets the public-directory contact name, not an owner name');
+expect_true($item_params_result['showEmail'] === 0 && $item_params_result['showPhone'] === 0, 'item_params never exposes email or phone for a directory entry');
+expect_true($item_params_result['dt_expiration'] === '-1', 'item_params requests a non-expiring listing (admin-only sentinel, per prepareData)');
+expect_true($item_params_result['catId'] === 200, 'item_params carries the resolved category id from ctx unchanged');
+expect_true(
+  $item_params_result['title']['es_ES'] === 'Cabañas del Lago' && $item_params_result['title']['en_US'] === 'Cabañas del Lago',
+  'item_params keeps the entry name as-is for both installed locales (title is not translated)'
+);
+expect_true(
+  $item_params_result['description']['es_ES'] === tourist_directory_description('Cabañas del Lago', 'cabanas', 'Tandil', 'es_ES')
+    && $item_params_result['description']['en_US'] === tourist_directory_description('Cabañas del Lago', 'cabanas', 'Tandil', 'en_US'),
+  'item_params generates the factual per-locale description via tourist_directory_description, never copied text'
+);
+
+$item_params_single_locale = tourist_directory_item_params($item_params_entry, array('catId' => 5, 'contactEmail' => 'x@directorio.invalid', 'locales' => array('en_US')));
+expect_true(
+  array_keys($item_params_single_locale['title']) === array('en_US') && array_keys($item_params_single_locale['description']) === array('en_US'),
+  'item_params only writes title/description for the locales actually passed in ctx, never a locale the site lacks'
+);
+
 echo "Tourist showcase checks passed.\n";
