@@ -657,4 +657,42 @@ expect_true(!in_array(47, $protected_plan['delete'], true), 'a protected anchor 
 expect_true(!in_array(47, $protected_plan['disable'], true), 'a protected anchor category is never disabled by the uninstall plan; its snapshot restores it');
 expect_true(in_array(200, $protected_plan['delete'], true), 'an empty created leaf under the protected anchor is still deleted');
 
+// --- tourist-destination-categories: Phase 3.1 - tree locales (fixed es_ES/en_US set, intersected with what is installed) ---
+
+expect_true(
+  tourist_identity_tree_locales(array('es_ES', 'en_US', 'fr_FR')) === array('es_ES', 'en_US'),
+  'both known tree locales are kept, in fixed order, when installed alongside an unrelated locale'
+);
+expect_true(
+  tourist_identity_tree_locales(array('en_US')) === array('en_US'),
+  'a site missing es_ES only writes descriptions for the locale it actually has installed'
+);
+expect_true(
+  tourist_identity_tree_locales(array('fr_FR')) === array(),
+  'a site with neither tree locale installed plans no description locales at all'
+);
+
+// --- tourist-destination-categories: Phase 3.1 - rows excluding ids (tree-managed rows are not "others") ---
+
+$all_category_rows = array(
+  array('pk_i_id' => 4, 'b_enabled' => 1, 'fk_i_parent_id' => null),
+  array('pk_i_id' => 47, 'b_enabled' => 1, 'fk_i_parent_id' => null),
+  array('pk_i_id' => 200, 'b_enabled' => 1, 'fk_i_parent_id' => 47),
+  array('pk_i_id' => 12, 'b_enabled' => 0, 'fk_i_parent_id' => 4),
+);
+$rows_excluding_tree = tourist_identity_rows_excluding_ids($all_category_rows, array(47, 200));
+expect_true(
+  count($rows_excluding_tree) === 2,
+  'excluding the anchor and a tree-created leaf leaves only the non-tree rows'
+);
+$remaining_ids = array_map(function ($row) { return $row['pk_i_id']; }, $rows_excluding_tree);
+expect_true(
+  $remaining_ids === array(4, 12),
+  'the remaining rows keep their original relative order after exclusion'
+);
+expect_true(
+  tourist_identity_rows_excluding_ids($all_category_rows, array()) === $all_category_rows,
+  'excluding no ids returns every row unchanged'
+);
+
 echo "Tourist showcase checks passed.\n";

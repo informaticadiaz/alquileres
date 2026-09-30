@@ -42,7 +42,7 @@ The system MUST capture prior values (core prefs, category `b_enabled`/parent st
 
 ### Requirement: Restore on Uninstall
 
-The system MUST restore all snapshotted values (prefs, category 47's flags/parent/name/description, currency flags/default, logo) when the plugin is uninstalled, and MUST leave the ARS currency row present but disabled. For every category row created by the tree apply routine, the system MUST delete rows with zero linked items and MUST disable (not delete) rows holding items, keeping their ids in the created-id map for future reuse.
+The system MUST restore all snapshotted values (prefs, category 47's flags/parent/name/description, currency flags/default, logo) when the plugin is uninstalled, and MUST leave the ARS currency row present but disabled. For every category row created by the tree apply routine, the system MUST delete rows with zero linked items and MUST disable (not delete) rows holding items, keeping their ids in the created-id map for future reuse. Every id the routine deletes MUST also be removed from `tourist_showcase.category_ids`, if the `tourist-showcase` plugin is active, so that showcase linkage never references a category that no longer exists.
 (Previously: restore covered prefs, category 47 flags/parent, currency, and logo only, with no handling for plugin-created rows.)
 
 #### Scenario: Uninstall reverts identity changes
@@ -71,6 +71,13 @@ The system MUST restore all snapshotted values (prefs, category 47's flags/paren
 - WHEN the plugin is uninstalled
 - THEN every plugin-created row with zero linked items is deleted
 - AND every plugin-created row holding items is disabled, with its id kept in the created-id map
+
+#### Scenario: Showcase linkage is pruned of deleted categories
+
+- GIVEN the `tourist-showcase` plugin is active and its `category_ids` preference lists leaf ids the tree apply routine created
+- WHEN the plugin is uninstalled and some of those leaf ids are deleted for holding zero items
+- THEN the deleted ids no longer appear in `tourist_showcase.category_ids`
+- AND any surviving (disabled, not deleted) id remains in `tourist_showcase.category_ids`
 
 ### Requirement: HTTPS-Verifiable Success
 

@@ -52,15 +52,15 @@ Files: `plugins/tourist-identity/tourist-identity-lib.php` unless noted.
 
 Files: `plugins/tourist-identity/index.php` unless noted.
 
-- [ ] 3.1 GREEN: add `_read_descriptions($ids)`, `_item_count($id)` (DAO `COUNT(*)`, `false`⇒`null`), `_ensure_tree_snapshot()` (writes `snapshot_tree` only if absent).
-- [ ] 3.2 GREEN: add `_apply_tree()`: `Category::insert()` with explicit `i_position` (regions then leaves, save `category_map` per insert), DAO updates, description writes via `tourist_identity_resolve_slug()`.
-- [ ] 3.3 GREEN: update `tourist_identity_apply()` to call `_ensure_tree_snapshot()` + `_apply_tree()`; link all 51 leaf ids via the showcase-link step.
-- [ ] 3.4 GREEN: add `_restore_tree()`: restore 47 from `snapshot_tree`, run the uninstall plan (vendor `deleteByPrimaryKey()` only when own item count is 0, no surviving children, leaves before regions), save the reduced map, prune `tourist_showcase.category_ids`.
-- [ ] 3.5 GREEN: call `_restore_tree()` from `tourist_identity_uninstall()`; bump plugin header to `1.1.0`.
-- [ ] 3.6 GREEN: update `tourist_identity_configure()` to persist and render the last re-apply count inline, independent of the flash message.
-- [ ] 3.7 DOCS: update `plugins/tourist-identity/README.md` — tree, `snapshot_tree`/`category_map` prefs, Re-apply upgrade (no version hook), rollback.
-- [ ] 3.8 SPEC: add a scenario under "Restore on Uninstall" in `openspec/changes/tourist-destination-categories/specs/identity-setup-lifecycle/spec.md`: prune `tourist_showcase.category_ids` of ids deleted on uninstall.
-- [ ] 3.9 VERIFY: test green, `php -l` on the 3 touched files; commit Unit 3.
+- [x] 3.1 GREEN: add `_read_descriptions($ids)`, `_item_count($id)` (DAO `COUNT(*)`, `false`⇒`null`), `_ensure_tree_snapshot()` (writes `snapshot_tree` only if absent).
+- [x] 3.2 GREEN: add `_apply_tree()`: `Category::insert()` with explicit `i_position` (regions then leaves, save `category_map` per insert), DAO updates, description writes via `tourist_identity_resolve_slug()`.
+- [x] 3.3 GREEN: update `tourist_identity_apply()` to call `_ensure_tree_snapshot()` + `_apply_tree()`; link all 51 leaf ids via the showcase-link step.
+- [x] 3.4 GREEN: add `_restore_tree()`: restore 47 from `snapshot_tree`, run the uninstall plan (vendor `deleteByPrimaryKey()` only when own item count is 0, no surviving children, leaves before regions), save the reduced map, prune `tourist_showcase.category_ids`.
+- [x] 3.5 GREEN: call `_restore_tree()` from `tourist_identity_uninstall()`; bump plugin header to `1.1.0`.
+- [x] 3.6 GREEN: update `tourist_identity_configure()` to persist and render the last re-apply count inline, independent of the flash message.
+- [x] 3.7 DOCS: update `plugins/tourist-identity/README.md` — tree, `snapshot_tree`/`category_map` prefs, Re-apply upgrade (no version hook), rollback.
+- [x] 3.8 SPEC: add a scenario under "Restore on Uninstall" in `openspec/changes/tourist-destination-categories/specs/identity-setup-lifecycle/spec.md`: prune `tourist_showcase.category_ids` of ids deleted on uninstall.
+- [x] 3.9 VERIFY: test green, `php -l` on the 3 touched files; commit Unit 3. (test + lint green; commit intentionally deferred — orchestrator scope for this apply batch excludes commit/push)
 
 ## Phase 4: Deployment [USER] [AUTH REQUIRED]
 

@@ -400,6 +400,30 @@ function tourist_identity_tree_plan_row($id, array $names, $slug, $parent_id, $p
   }
 }
 
+// Intersects the destination tree's two known description locales (es_ES, en_US, in that fixed
+// order) with $installedCodes (whatever locale codes actually exist on this site). Any other
+// installed locale is left untouched by the tree apply routine: it keeps whatever name/description
+// it already had, since the tree only ever carries es_ES/en_US copy.
+function tourist_identity_tree_locales(array $installedCodes) {
+  return array_values(array_intersect(array('es_ES', 'en_US'), $installedCodes));
+}
+
+// Returns only the rows from $rows whose pk_i_id is not in $excludedIds, preserving relative
+// order. Used to keep the legacy "disable every non-kept category" plan from re-disabling rows
+// that the destination-tree apply routine manages on its own (the anchor plus every created id).
+function tourist_identity_rows_excluding_ids(array $rows, array $excludedIds) {
+  $excluded = array_flip(array_map('intval', $excludedIds));
+  $kept = array();
+
+  foreach ($rows as $row) {
+    if (!isset($excluded[(int)$row['pk_i_id']])) {
+      $kept[] = $row;
+    }
+  }
+
+  return $kept;
+}
+
 // Plans the destination tree against current DB state, without touching the database.
 // Buenos Aires reuses the pre-existing anchor row ($anchorRow); every other region/leaf is
 // resolved through the persisted id map, and re-inserted if its mapped id no longer has a row.
