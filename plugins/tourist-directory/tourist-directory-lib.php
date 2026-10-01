@@ -651,6 +651,13 @@ function tourist_directory_removal_route_regexp() {
   return 'directorio/solicitar-baja/([0-9]+)';
 }
 
+// The POST field that carries the admin request action. It must not be "action": Params merges
+// $_GET and $_POST with POST winning, so a posted "action" would override the action=renderplugin
+// that oc-admin/plugins.php needs to fire renderplugin_controller, and the handler would never run.
+function tourist_directory_admin_action_param() {
+  return 'td_action';
+}
+
 function tourist_directory_admin_transition($status, $action, $confirm) {
   if ($action === 'mark_processed') {
     if ($status !== 'pending') {

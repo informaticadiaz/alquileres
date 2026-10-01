@@ -1099,7 +1099,7 @@ function tourist_directory_admin_requests_handle_post() {
   $locale = osc_current_admin_locale();
   $redirectUrl = osc_route_admin_url(TOURIST_DIRECTORY_ADMIN_ROUTE);
   $requestId = (int) Params::getParam('id');
-  $action = (string) Params::getParam('action');
+  $action = (string) Params::getParam(tourist_directory_admin_action_param());
   $confirm = (int) Params::getParam('confirm');
 
   $row = tourist_directory_removal_request_row($requestId);

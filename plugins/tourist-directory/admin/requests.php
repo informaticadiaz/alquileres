@@ -69,7 +69,7 @@ $tourist_directory_admin_action_url = osc_route_admin_url(TOURIST_DIRECTORY_ADMI
               <form method="post" action="<?php echo osc_esc_html($tourist_directory_admin_action_url); ?>" class="tourist-directory-admin-inline-form">
                 <?php echo osc_csrf_token_form(); ?>
                 <input type="hidden" name="id" value="<?php echo (int) $tourist_directory_request_row['pk_i_id']; ?>" />
-                <input type="hidden" name="action" value="mark_processed" />
+                <input type="hidden" name="<?php echo osc_esc_html(tourist_directory_admin_action_param()); ?>" value="mark_processed" />
                 <button type="submit"><?php echo osc_esc_html(tourist_directory_text('Marcar procesada', 'Mark processed', $tourist_directory_admin_locale)); ?></button>
               </form>
               <?php endif; ?>
@@ -78,7 +78,7 @@ $tourist_directory_admin_action_url = osc_route_admin_url(TOURIST_DIRECTORY_ADMI
               <form method="post" action="<?php echo osc_esc_html($tourist_directory_admin_action_url); ?>" class="tourist-directory-admin-inline-form">
                 <?php echo osc_csrf_token_form(); ?>
                 <input type="hidden" name="id" value="<?php echo (int) $tourist_directory_request_row['pk_i_id']; ?>" />
-                <input type="hidden" name="action" value="reactivate" />
+                <input type="hidden" name="<?php echo osc_esc_html(tourist_directory_admin_action_param()); ?>" value="reactivate" />
                 <label class="tourist-directory-admin-confirm">
                   <input type="checkbox" name="confirm" value="1" />
                   <?php echo osc_esc_html(tourist_directory_text('Confirmo la reactivación (ej. solicitud abusiva)', 'I confirm the reactivation (e.g. abusive request)', $tourist_directory_admin_locale)); ?>

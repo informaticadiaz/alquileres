@@ -1251,4 +1251,17 @@ expect_true(
   'the fingerprint carries a format version so entries imported before the type fix are updated once'
 );
 
+// --- tourist-directory: admin forms never post a field named "action" ---
+// Params merges $_GET and $_POST with POST winning, so a posted "action" overrides the
+// action=renderplugin that oc-admin needs to reach the plugin's renderplugin_controller hook.
+
+expect_true(tourist_directory_admin_action_param() !== 'action', 'the admin request action uses its own parameter, not the reserved "action"');
+$admin_requests_view = file_get_contents(__DIR__ . '/../plugins/tourist-directory/admin/requests.php');
+expect_true(strpos($admin_requests_view, 'name="action"') === false, 'the admin requests view posts no field named "action"');
+$directory_index = file_get_contents(__DIR__ . '/../plugins/tourist-directory/index.php');
+expect_true(
+  strpos($directory_index, "\$action = (string) Params::getParam(tourist_directory_admin_action_param());") !== false,
+  'the admin POST handler reads the request action from its own parameter'
+);
+
 echo "Tourist showcase checks passed.\n";
