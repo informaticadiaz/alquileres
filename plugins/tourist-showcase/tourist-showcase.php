@@ -132,13 +132,16 @@ function tourist_showcase_search_filters() {
   if (!$type || !$guests || !$bedrooms) {
     return;
   }
+  $category = tourist_showcase_category_param(osc_search_category_id());
+  $selected_type = tourist_showcase_normalize_type(Params::getParam('tourist_type'), $type['s_options']);
   ?>
   <form class="tourist-showcase-filters" method="get" action="<?php echo osc_esc_html(osc_base_url()); ?>">
     <input type="hidden" name="page" value="search" />
+    <?php if ($category !== '') { ?><input type="hidden" name="sCategory" value="<?php echo osc_esc_html($category); ?>" /><?php } ?>
     <fieldset>
       <legend><?php echo tourist_showcase_text('Alojamiento turístico', 'Tourist accommodation'); ?></legend>
       <label><?php echo tourist_showcase_text('Tipo', 'Type'); ?>
-        <select name="meta[<?php echo (int)$type['pk_i_id']; ?>]"><option value=""><?php echo tourist_showcase_text('Cualquiera', 'Any'); ?></option><?php foreach (explode('|', $type['s_options']) as $option) { ?><option value="<?php echo osc_esc_html($option); ?>"><?php echo osc_esc_html($option); ?></option><?php } ?></select>
+        <select name="tourist_type"><option value=""><?php echo tourist_showcase_text('Cualquiera', 'Any'); ?></option><?php foreach (explode('|', $type['s_options']) as $option) { ?><option value="<?php echo osc_esc_html($option); ?>"<?php echo $option === $selected_type ? ' selected' : ''; ?>><?php echo osc_esc_html($option); ?></option><?php } ?></select>
       </label>
       <label><?php echo tourist_showcase_text('Huéspedes mínimos', 'Minimum guests'); ?>
         <input type="number" min="1" max="100" name="tourist_min_guests" value="<?php echo osc_esc_html(tourist_showcase_normalize_positive_integer(Params::getParam('tourist_min_guests'))); ?>" />
@@ -161,6 +164,16 @@ function tourist_showcase_search_conditions($search) {
     if ($value !== '' && $field) {
       $field_id = (int)$field['pk_i_id'];
       $search->addConditions(DB_TABLE_PREFIX . 't_item.pk_i_id IN (SELECT fk_i_item_id FROM ' . DB_TABLE_PREFIX . 't_item_meta WHERE fk_i_field_id = ' . $field_id . ' AND CAST(s_value AS UNSIGNED) >= ' . (int)$value . ')');
+    }
+  }
+
+  // Applied here instead of through meta[...]: Osclass only honors meta for fields linked to the
+  // searched category, which silently dropped the type in region and uncategorized searches.
+  $type = tourist_showcase_field('tourist_accommodation_type');
+  if ($type) {
+    $value = tourist_showcase_normalize_type(Params::getParam('tourist_type'), $type['s_options']);
+    if ($value !== '') {
+      $search->addConditions(tourist_showcase_type_condition(DB_TABLE_PREFIX, (int)$type['pk_i_id'], $search->dao->escape($value)));
     }
   }
 }

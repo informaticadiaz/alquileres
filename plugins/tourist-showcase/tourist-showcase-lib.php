@@ -19,6 +19,26 @@ function tourist_showcase_normalize_positive_integer($value) {
   return $number > 0 && $number <= 100 ? (string)$number : '';
 }
 
+// Accepts only a value that exactly matches one of the field's pipe-separated dropdown options.
+function tourist_showcase_normalize_type($value, $options) {
+  if (!is_scalar($value) || (string)$value === '') {
+    return '';
+  }
+
+  return in_array((string)$value, explode('|', (string)$options), true) ? (string)$value : '';
+}
+
+// $escaped_value must already be quoted and escaped by the Osclass DAO.
+function tourist_showcase_type_condition($table_prefix, $field_id, $escaped_value) {
+  return $table_prefix . 't_item.pk_i_id IN (SELECT fk_i_item_id FROM ' . $table_prefix . 't_item_meta WHERE fk_i_field_id = ' . (int)$field_id . ' AND s_value = ' . $escaped_value . ')';
+}
+
+// The searched category the filter form must resubmit, so applying filters keeps the scope.
+function tourist_showcase_category_param(array $category_ids) {
+  $first = reset($category_ids);
+  return is_scalar($first) && preg_match('/^[1-9]\d*$/', (string)$first) ? (string)$first : '';
+}
+
 function tourist_showcase_is_spanish($locale) {
   return strpos((string)$locale, 'es_') === 0 || strpos((string)$locale, 'es-') === 0;
 }

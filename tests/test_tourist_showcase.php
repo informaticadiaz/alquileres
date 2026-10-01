@@ -1264,4 +1264,22 @@ expect_true(
   'the admin POST handler reads the request action from its own parameter'
 );
 
+// --- tourist-showcase: the type filter is applied by the plugin in every category scope ---
+// Osclass only applies meta[...] for fields linked to the searched category, so a region or an
+// uncategorized search silently ignored the type. The plugin now owns the condition.
+
+$showcase_type_options = tourist_showcase_definitions()[0]['options'];
+expect_true(tourist_showcase_normalize_type('Cabaña', $showcase_type_options) === 'Cabaña', 'a known accommodation type is accepted');
+expect_true(tourist_showcase_normalize_type('cabaña', $showcase_type_options) === '', 'the type must match an option exactly');
+expect_true(tourist_showcase_normalize_type("Cabaña' OR 1=1", $showcase_type_options) === '', 'an unknown type value is rejected');
+expect_true(tourist_showcase_normalize_type('', $showcase_type_options) === '', 'an empty type means no filter');
+expect_true(tourist_showcase_normalize_type(array('Cabaña'), $showcase_type_options) === '', 'a non-scalar type is rejected');
+expect_true(
+  tourist_showcase_type_condition('oc_', 1, "'Cabaña'") === "oc_t_item.pk_i_id IN (SELECT fk_i_item_id FROM oc_t_item_meta WHERE fk_i_field_id = 1 AND s_value = 'Cabaña')",
+  'the type condition matches items whose type meta equals the escaped value'
+);
+expect_true(tourist_showcase_category_param(array(104, 47)) === '104', 'the filter form keeps the first searched category');
+expect_true(tourist_showcase_category_param(array()) === '', 'without a searched category no category is kept');
+expect_true(tourist_showcase_category_param(array('abc', 0)) === '', 'invalid category ids are not kept');
+
 echo "Tourist showcase checks passed.\n";
