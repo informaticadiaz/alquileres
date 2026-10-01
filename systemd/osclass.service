@@ -1,5 +1,5 @@
 [Unit]
-Description=Osclass marketplace (alquileres.diazignacio.ar) on 127.0.0.1:8783
+Description=Osclass marketplace (alquileres.diazignacio.ar) on 127.0.0.1:8784 behind nginx on 127.0.0.1:8783
 Documentation=file:///home/ignacio/fewohbee/osclass-instalacion-minima.md
 After=network.target mysql.service
 ConditionPathExists=%h/fewohbee/app/osclass/index.php
@@ -9,7 +9,7 @@ ConditionPathExists=%h/fewohbee/app/osclass/config.php
 Type=simple
 WorkingDirectory=%h/fewohbee/app/osclass
 Environment=PHP_CLI_SERVER_WORKERS=4
-ExecStart=/usr/bin/php -d opcache.enable_cli=1 -S 127.0.0.1:8783 -t %h/fewohbee/app/osclass
+ExecStart=/usr/bin/php -d opcache.enable_cli=1 -S 127.0.0.1:8784 -t %h/fewohbee/app/osclass
 Restart=on-failure
 RestartSec=5
 NoNewPrivileges=yes
