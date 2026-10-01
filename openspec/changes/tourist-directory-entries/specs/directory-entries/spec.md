@@ -18,13 +18,15 @@ The system MUST render a directory entry in its destination category, search res
 
 ### Requirement: No Intermediated Contact UI
 
-The system MUST NOT render a contact form, "send to a friend" form, or comment form/list on a directory entry's detail page.
+The system MUST NOT make a contact form, "send to a friend" form, or comment form/list visible or usable on a directory entry's detail page. Theme markup that the plugin cannot omit without editing vendor files MAY remain in the HTML only if it is hidden from display and assistive technology (`display: none`) and every submission it could produce is blocked server-side by the Fail-Closed Contact Guards.
 
-#### Scenario: Contact chrome hidden on entry detail page
+#### Scenario: Contact chrome not visible on entry detail page
 
 - GIVEN a directory entry's public detail page
-- WHEN a visitor loads it over HTTPS
-- THEN no contact form, send-to-friend form, or comment UI is rendered
+- WHEN a visitor loads it over HTTPS with the site styles applied
+- THEN no contact form, send-to-friend form, or comment UI is visible
+- AND any such markup still present in the HTML is hidden with `display: none`
+- AND submitting it is blocked by the Fail-Closed Contact Guards
 
 ### Requirement: Fail-Closed Contact Guards
 
