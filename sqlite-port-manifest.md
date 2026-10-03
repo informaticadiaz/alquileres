@@ -1,5 +1,8 @@
 # Manifiesto de port SQLite — Fases 0, 1 y 2 (primer corte)
 
+> **Documento histórico.** FewohBee fue retirado el 2026-09-27; este archivo
+> no describe el estado vigente. Ver `CODEX_STATE.md`.
+
 **Estado:** Fases 0 y 1 completadas; Fase 2 tiene baseline y un primer
 `app:first-run` SQLite sin red. No es todavía un baseline operativo completo.
 

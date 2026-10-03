@@ -1,5 +1,8 @@
 # FewohBee — plan de trabajo
 
+> **Documento histórico.** FewohBee fue retirado el 2026-09-27; este archivo
+> no describe el estado vigente. Ver `CODEX_STATE.md`.
+
 ## Estado actual
 
 **Demo publicada** en https://alquileres.diazignacio.ar (Fase P). Fase 4 con pendientes bloqueados externamente. El objetivo es

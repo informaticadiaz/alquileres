@@ -1,5 +1,8 @@
 # Diseño: fork FewohBee con SQLite para validación local
 
+> **Documento histórico.** FewohBee fue retirado el 2026-09-27; este archivo
+> no describe el estado vigente. Ver `CODEX_STATE.md`.
+
 Este documento define un **fork de validación de mercado**, de una sola máquina y baja concurrencia de escritura. No pretende convertir FewohBee en una aplicación multiinstancia ni reemplazar el soporte oficial de MySQL/MariaDB. La decisión reduce infraestructura para probar el producto, pero acepta un coste de mantenimiento explícito por cada actualización upstream.
 
 ## Decisión y límite

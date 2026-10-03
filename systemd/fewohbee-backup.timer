@@ -1,3 +1,5 @@
+# HISTORICAL: FewohBee was retired on 2026-09-27. This unit is not installed
+# and does not describe the current deployment; see CODEX_STATE.md.
 [Unit]
 Description=Daily verified backup of the FewohBee SQLite demo
 

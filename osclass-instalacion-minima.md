@@ -12,7 +12,9 @@ retirado de FewohBee en el puerto local `127.0.0.1:8783`.
 - Código oficial extraído en `app/osclass`.
 - Base local `osclass_local`, con usuario exclusivo `osclass_local`.
 - Servicio de usuario `osclass.service`, habilitado y limitado a
-  `127.0.0.1:8783`; Cloudflare Tunnel es el único ingreso público.
+  `127.0.0.1:8783`; Cloudflare Tunnel es el único ingreso público. Desde el
+  2026-10-02 el servicio escucha en `127.0.0.1:8784` y nginx ocupa `8783`
+  (ver `osclass-nginx-frente.md`).
 - `WEB_PATH` configurado como `https://alquileres.diazignacio.ar/`, para que
   enlaces y redirecciones no expongan el origen local.
 
@@ -75,12 +77,14 @@ sin redirección a `http://` ni a `127.0.0.1`.
 ## Limitaciones conocidas
 
 - El servicio usa el servidor incorporado de PHP porque es el mecanismo mínimo
-  ya utilizado por el origen reemplazado. Es adecuado para la validación
-  inicial, no sustituye Nginx/PHP-FPM antes de una operación con tráfico real.
+  ya utilizado por el origen reemplazado. Desde el 2026-10-02 nginx está
+  delante (ver `osclass-nginx-frente.md`); PHP-FPM sigue pendiente antes de una
+  operación con tráfico real.
 - El correo queda sin configurar. Se usó una dirección local no entregable en
   el asistente y su intento de envío no fue exitoso.
-- No se importaron ubicaciones, no se configuraron tareas programadas y no se
-  instalaron plugins ni temas adicionales.
+- No se importaron ubicaciones ni se configuraron tareas programadas. Los
+  plugins propios instalados después se documentan en `plugins/` y en
+  `CODEX_STATE.md`.
 
 ## Paquete de idioma español
 
@@ -139,6 +143,7 @@ Fuentes primarias:
 
 ## Próximo paso
 
-Definir el primer recorte funcional del marketplace y, antes de tráfico real o
-datos personales, migrar el origen a Nginx/PHP-FPM, configurar correo/cron y
-revisar copias de seguridad con los workspaces `servidor` y `cloudflare`.
+El estado y el próximo paso vigentes están en `CODEX_STATE.md`. Antes de
+tráfico real o datos personales siguen pendientes PHP-FPM, correo/cron y copias
+de seguridad automáticas, coordinados con los workspaces `servidor` y
+`cloudflare`.

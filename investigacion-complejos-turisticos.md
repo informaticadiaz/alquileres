@@ -101,12 +101,22 @@ completo, cargado o autorizado por el propietario.
   responde que la inclusión no tiene costo.
 - La monetización se definirá por otra vía, sin cobrar la inclusión.
 
+## Decisiones resueltas
+
+- Fichas de directorio en Osclass sin formulario de consulta ni precio:
+  implementadas el 2026-09-30 con el plugin `tourist-directory` (spec en
+  `openspec/specs/directory-entries/spec.md`); 25 fichas de Villa Gesell y Mar
+  de las Pampas publicadas, con formulario de baja propio que no depende del
+  correo.
+
 ## Decisiones pendientes
 
-- Cómo implementar las fichas de directorio en Osclass sin formulario de
-  consulta ni precio (hoy todo anuncio muestra el contacto nativo).
-- Canal de contacto (correo, formulario web, WhatsApp comercial). Hay un
-  borrador del mensaje en `data/prospeccion/borrador-invitacion.md`.
+- Canal de contacto: propuesto correo individual para 21 complejos y una
+  versión breve para los 4 que sólo tienen formulario web, sin WhatsApp ni
+  teléfono por ahora. El contacto quedó **postergado por el usuario el
+  2026-10-01**. Hay un borrador del mensaje en
+  `data/prospeccion/borrador-invitacion.md`, que debe actualizarse para avisar
+  que el complejo ya figura con una ficha informativa.
 - Modelo de monetización (no basado en cobrar la inclusión).
-- Correo propio del sitio para prospección (hoy el correo de Osclass no está
-  configurado).
+- Correo propio del sitio para prospección y bajas (hoy el correo de Osclass no
+  está configurado; también postergado).

@@ -1,6 +1,28 @@
-# Estado operativo — FewohBee
+# Estado operativo — Alquileres Temporarios (Osclass)
 
-## Estado
+## Resumen vigente (2026-10-02)
+
+- **Producto:** vitrina pública `https://alquileres.diazignacio.ar` sobre
+  Osclass 8.3.1 con los plugins propios `tourist-identity` 1.1.0,
+  `tourist-showcase` y `tourist-directory` 0.2.0. Sin reservas, pagos ni datos
+  de huéspedes.
+- **Origen:** Cloudflare Tunnel → nginx de sistema en `127.0.0.1:8783`
+  (`nginx/alquileres.conf`) → `osclass.service` (systemd --user, servidor
+  incorporado de PHP) en `127.0.0.1:8784` → MySQL 8.4.11 (`osclass_local`).
+- **FewohBee:** retirado el 2026-09-27; `fewohbee.service` y su timer de backup
+  ya no existen. Los documentos `task.md`, `port-sqlite-design.md`,
+  `sqlite-port-manifest.md` y `systemd/fewohbee*` son históricos.
+- **Repositorio:** rama `osclass` publicada y sincronizada con
+  `origin/osclass` (`informaticadiaz/alquileres`); `main` conserva la historia
+  de FewohBee.
+- **Copias de seguridad:** sólo manuales, antes de cada cambio, en
+  `data/osclass/backups/`. No hay copia automática de la base.
+- **Cambios SDD abiertos:** ninguno.
+
+El historial siguiente registra cada etapa con la fecha en que se verificó; los
+datos que contradigan este resumen corresponden a ese momento.
+
+## Historial
 
 - **Retirado localmente el 2026-09-27** por decisión del usuario: FewohBee no corresponde al producto buscado, una vidriera pública multipropietario.
 - **Alternativa en evaluación desde 2026-09-29:** Osclass, plataforma autoalojable de clasificados y marketplace. Se confirmó que no reemplaza funciones de reservas en su núcleo; la evaluación parte de sus capacidades de publicaciones, búsqueda, usuarios, moderación y extensiones.
@@ -30,9 +52,14 @@
 
 ## Límites pendientes
 
-- El origen mínimo usa el servidor incorporado de PHP; antes de tráfico real o datos personales debe migrarse a Nginx/PHP-FPM y definirse copias de seguridad.
+- nginx ya está delante del origen (2026-10-02), pero PHP sigue sirviendo con su servidor incorporado; la migración a PHP-FPM (opción B de `osclass-nginx-frente.md`, requiere instalar `php8.5-fpm`) queda pendiente antes de tráfico real o datos personales.
+- No hay copias de seguridad automáticas de la base MySQL ni copia fuera del host; deben definirse con `../servidor/` antes de tráfico real.
+- Correo del sitio y cron de Osclass sin configurar.
 - No reinstalar ni exponer FewohBee sin una nueva autorización explícita.
+- Pendiente por decisión del usuario (2026-10-02): resolver la incongruencia de nombres. La carpeta se llama `fewohbee/`, el remoto `alquileres` y el producto es Osclass; `main` conserva la historia de FewohBee y la línea vigente es `osclass`. Renombrar la carpeta exige actualizar `systemd/osclass.service`, `nginx/alquileres.conf`, la unidad instalada, los runbooks de `../cloudflare/` y `../servidor/`, el registro y el `AGENTS.md` raíz; decidir además si `osclass` reemplaza a `main`.
 
 ## Próximo paso recomendado
 
-No hay cambios SDD abiertos. Contacto con complejos **postergado por el usuario (2026-10-01)**. Cuando se retome: (1) decidir desde qué dirección de correo se escribe y se reciben respuestas y bajas (propuesta: una dirección del dominio reenviada a Gmail, o una cuenta de Gmail dedicada; explicarlo con ejemplos concretos); (2) actualizar `data/prospeccion/borrador-invitacion.md` para avisar que el complejo ya figura con una ficha informativa, con el enlace a la ficha y al formulario de baja; (3) canal propuesto: correo individual para 21 complejos y la versión breve para los 4 que sólo tienen formulario web, sin WhatsApp ni teléfono por ahora. Siguiente paso: revisar legalmente el aviso y, cuando se retome el correo del sitio, probar consultas, plantillas de correo y textos del tema antes de tráfico real. El idioma predeterminado de administración continúa en inglés y cualquier cambio allí se decide por separado. Consultar `osclass-instalacion-minima.md` antes de cambios de servicio, correo, cron o exposición adicional.
+No hay cambios SDD abiertos. Contacto con complejos **postergado por el usuario (2026-10-01)**. Cuando se retome: (1) decidir desde qué dirección de correo se escribe y se reciben respuestas y bajas (propuesta: una dirección del dominio reenviada a Gmail, o una cuenta de Gmail dedicada; explicarlo con ejemplos concretos); (2) actualizar `data/prospeccion/borrador-invitacion.md` para avisar que el complejo ya figura con una ficha informativa, con el enlace a la ficha y al formulario de baja; (3) canal propuesto: correo individual para 21 complejos y la versión breve para los 4 que sólo tienen formulario web, sin WhatsApp ni teléfono por ahora.
+
+Antes de tráfico real: (a) copias de seguridad automáticas de la base, coordinadas con `../servidor/`; (b) revisión legal liviana del aviso del pie; (c) cuando se retome el correo del sitio, probar consultas, plantillas de correo y textos del tema; (d) PHP-FPM (opción B). Pendientes menores: la pantalla *Configure* de `tourist-showcase` se muestra sin el diseño del panel, y una traducción de administración `es_ES` quedó sin reparar. Sin decidir: modelo de monetización. El idioma predeterminado de administración continúa en inglés y cualquier cambio allí se decide por separado. Consultar `osclass-instalacion-minima.md` antes de cambios de servicio, correo, cron o exposición adicional.
