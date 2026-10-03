@@ -86,10 +86,6 @@ estas condiciones:
 | Baja a pedido | Un enlace o dato de contacto permite pedir la baja; se elimina sin demora. |
 | Registro de origen | En `data/prospeccion/` se registra la fuente y la fecha de consulta de cada ficha. |
 
-Antes de publicar fichas en volumen, conviene una consulta breve con un abogado,
-en especial sobre la presentación de la ficha (lealtad comercial y marcas) y los
-datos de personas físicas.
-
 Cuando el complejo acepta sumarse, la ficha se reemplaza por su anuncio
 completo, cargado o autorizado por el propietario.
 

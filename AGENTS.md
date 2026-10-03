@@ -55,6 +55,8 @@ se actualiza al sumar o retirar una solución.
   `scripts/osclass-backup.sh` y `nginx/alquileres.conf` son las fuentes
   versionadas de la configuración desplegada; `osclass-backups.md` documenta
   las copias automáticas y la restauración.
+- `plan-tandas-complejos.md` define el orden, el circuito y el avance de las
+  tandas de población del directorio.
 - `task.md`, `port-sqlite-design.md`, `sqlite-port-manifest.md` y
   `systemd/fewohbee*` son registros históricos de FewohBee; no describen el
   estado vigente.

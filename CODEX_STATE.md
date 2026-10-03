@@ -66,6 +66,8 @@ datos que contradigan este resumen corresponden a ese momento.
 
 ## Próximo paso recomendado
 
+**Tarea abierta (2026-10-02): población del directorio por tandas**, ordenadas por temporada, en `plan-tandas-complejos.md`. Próxima: tanda 2 (Pinamar y Cariló, San Bernardo y Costa Esmeralda, Mar del Plata).
+
 No hay cambios SDD abiertos. Contacto con complejos **postergado por el usuario (2026-10-01)**. Cuando se retome: (1) decidir desde qué dirección de correo se escribe y se reciben respuestas y bajas (propuesta: una dirección del dominio reenviada a Gmail, o una cuenta de Gmail dedicada; explicarlo con ejemplos concretos); (2) actualizar `data/prospeccion/borrador-invitacion.md` para avisar que el complejo ya figura con una ficha informativa, con el enlace a la ficha y al formulario de baja; (3) canal propuesto: correo individual para 21 complejos y la versión breve para los 4 que sólo tienen formulario web, sin WhatsApp ni teléfono por ahora.
 
 Antes de tráfico real: (a) copia de seguridad fuera del host (fase 2 de `osclass-backups.md`), coordinada con `../vps/` y `../servidor/`; (b) revisión legal liviana del aviso del pie; (c) cuando se retome el correo del sitio, probar consultas, plantillas de correo y textos del tema; (d) PHP-FPM (opción B). Pendientes menores: la pantalla *Configure* de `tourist-showcase` se muestra sin el diseño del panel, y una traducción de administración `es_ES` quedó sin reparar. Sin decidir: modelo de monetización. El idioma predeterminado de administración continúa en inglés y cualquier cambio allí se decide por separado. Consultar `osclass-instalacion-minima.md` antes de cambios de servicio, correo, cron o exposición adicional.
