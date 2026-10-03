@@ -1,6 +1,6 @@
 # Osclass detrás de Nginx — procedimiento
 
-Estado: **preparado, pendiente de ejecución por el usuario** (2026-10-01).
+Estado: **aplicado y verificado** (2026-10-02). Nginx sirve `127.0.0.1:8783` y PHP corre en `127.0.0.1:8784`; por HTTPS, las páginas públicas responden `200`, `oc-admin` redirige a su login HTTPS, los archivos internos responden `404` y están presentes los encabezados de seguridad.
 
 ## Objetivo
 
