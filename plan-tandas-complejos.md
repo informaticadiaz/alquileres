@@ -75,4 +75,19 @@ Notas por tanda:
 | Tanda | Estado | Fichas publicadas | Fecha |
 | --- | --- | --- | --- |
 | 1 (piloto) | Cerrada | 25 | 2026-09-30 |
-| 2 | Pendiente | — | — |
+| 2 | En curso: seed cargado, falta simular y aplicar | — | — |
+
+### Tanda 2 — estado al 2026-10-02
+
+- Relevamiento hecho (fuentes: pinamar.tur.ar, lacosta.tur.ar, buscador
+  provincial y EMTUR sólo para descubrir nombres). 83 filas sumadas al seed:
+  Pinamar y Cariló 35 + 1 `sin_web`; San Bernardo y Costa Esmeralda 18 + 7;
+  Mar del Plata 14 + 8. Costa Esmeralda no aportó complejos.
+- Copia previa del seed: `data/prospeccion/seed/complejos.pre-tanda2-20261002.csv`.
+- 6 filas con tipo dudoso (apart u hotel) quedaron fuera del seed, en
+  `data/prospeccion/seed/revision-tanda2.csv`, hasta revisarlas una por una.
+- En Pinamar la verificación fue liviana (título, contactos y palabras clave de
+  la portada) y quedan unos 30 complejos válidos más en Valeria del Mar y Cariló.
+- Próximo paso: simular (resultado esperado: 67 create, 0 update, 25 noop,
+  21 skip, 0 errores), copia de seguridad de la base, `--apply` con
+  autorización y verificación por HTTPS.
