@@ -51,8 +51,10 @@ se actualiza al sumar o retirar una solución.
   próximo paso.
 - `osclass-instalacion-minima.md` y `osclass-nginx-frente.md` documentan la
   instalación, el servicio, el frente nginx y su vuelta atrás.
-- `systemd/osclass.service` y `nginx/alquileres.conf` son las fuentes
-  versionadas de la configuración desplegada.
+- `systemd/osclass.service`, `systemd/osclass-backup.{service,timer}`,
+  `scripts/osclass-backup.sh` y `nginx/alquileres.conf` son las fuentes
+  versionadas de la configuración desplegada; `osclass-backups.md` documenta
+  las copias automáticas y la restauración.
 - `task.md`, `port-sqlite-design.md`, `sqlite-port-manifest.md` y
   `systemd/fewohbee*` son registros históricos de FewohBee; no describen el
   estado vigente.

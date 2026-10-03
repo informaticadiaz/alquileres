@@ -1,0 +1,12 @@
+[Unit]
+Description=Verified backup of the Osclass instance (MySQL dump, config.php, uploads)
+Documentation=file:///home/ignacio/fewohbee/osclass-backups.md
+After=mysql.service
+
+[Service]
+Type=oneshot
+ExecStart=%h/fewohbee/scripts/osclass-backup.sh
+NoNewPrivileges=yes
+UMask=0077
+Nice=10
+IOSchedulingClass=idle

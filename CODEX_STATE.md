@@ -16,8 +16,11 @@
   `origin/osclass` (`informaticadiaz/alquileres`). Desde el 2026-10-02, la
   rama `fewohbee` conserva la historia de FewohBee (`769228c`) y `main`
   (`d04524d`, rama por defecto) es un índice de ramas/soluciones sin código.
-- **Copias de seguridad:** sólo manuales, antes de cada cambio, en
-  `data/osclass/backups/`. No hay copia automática de la base.
+- **Copias de seguridad:** automáticas y diarias desde el 2026-10-02
+  (`osclass-backup.timer`, 03:30, 14 conjuntos verificados de base, `config.php`
+  y `uploads/` en `data/osclass/backups/auto/`; ver `osclass-backups.md`).
+  Siguen siendo obligatorias las copias manuales antes de cada cambio. No hay
+  copia fuera del host.
 - **Cambios SDD abiertos:** ninguno.
 
 El historial siguiente registra cada etapa con la fecha en que se verificó; los
@@ -51,10 +54,12 @@ datos que contradigan este resumen corresponden a ese momento.
 
 - **Nginx delante de Osclass, aplicado y verificado el 2026-10-02 (opción A):** el procedimiento completo, con verificación y vuelta atrás, está en `osclass-nginx-frente.md`. Nginx (ya instalado) toma `127.0.0.1:8783`, el puerto del túnel, y reenvía todo a PHP, que pasa a `8784`. Bloquea archivos internos que hoy se leen públicamente (changelog, `.gitignore`, SQL del instalador, READMEs de plugins, catálogos) y agrega encabezados de seguridad. Probado con una copia sin privilegios en `18783`. Verificado por HTTPS: páginas públicas `200`, `oc-admin` redirige a su login HTTPS, archivos internos `404` y encabezados `nosniff`, `SAMEORIGIN` y `strict-origin-when-cross-origin` presentes. Opción B (PHP-FPM, requiere instalar `php8.5-fpm`) queda como pendiente futuro.
 
+- **Copias automáticas activas el 2026-10-02 (fase 1):** `scripts/osclass-backup.sh` con `systemd/osclass-backup.{service,timer}` (instaladas como unidades de usuario, timer habilitado). Credenciales en `data/osclass/backup.my.cnf` (`0600`). Verificado: prueba aislada con rotación y fallos limpios (código 2), restauración en una instancia MySQL temporal idéntica a la base en vivo (41 tablas, 25 anuncios, 151 categorías) y primera corrida real `osclass-20261002T222153`. Procedimiento y restauración en `osclass-backups.md`.
+
 ## Límites pendientes
 
 - nginx ya está delante del origen (2026-10-02), pero PHP sigue sirviendo con su servidor incorporado; la migración a PHP-FPM (opción B de `osclass-nginx-frente.md`, requiere instalar `php8.5-fpm`) queda pendiente antes de tráfico real o datos personales.
-- No hay copias de seguridad automáticas de la base MySQL ni copia fuera del host; deben definirse con `../servidor/` antes de tráfico real.
+- Las copias automáticas (fase 1, 2026-10-02) están en el mismo y único disco del servidor; falta la copia fuera del host (fase 2, candidato el VPS, con `../vps/` y `../servidor/`) antes de tráfico real.
 - Correo del sitio y cron de Osclass sin configurar.
 - No reinstalar ni exponer FewohBee sin una nueva autorización explícita.
 - Pendiente por decisión del usuario (2026-10-02): resolver la incongruencia de nombres. La carpeta se llama `fewohbee/`, el remoto `alquileres` y el producto es Osclass. Renombrar la carpeta exige actualizar `systemd/osclass.service`, `nginx/alquileres.conf`, la unidad instalada, los runbooks de `../cloudflare/` y `../servidor/`, el registro y el `AGENTS.md` raíz. (La parte de ramas quedó resuelta el 2026-10-02: `main` es índice y `fewohbee` conserva la historia retirada.)
@@ -63,4 +68,4 @@ datos que contradigan este resumen corresponden a ese momento.
 
 No hay cambios SDD abiertos. Contacto con complejos **postergado por el usuario (2026-10-01)**. Cuando se retome: (1) decidir desde qué dirección de correo se escribe y se reciben respuestas y bajas (propuesta: una dirección del dominio reenviada a Gmail, o una cuenta de Gmail dedicada; explicarlo con ejemplos concretos); (2) actualizar `data/prospeccion/borrador-invitacion.md` para avisar que el complejo ya figura con una ficha informativa, con el enlace a la ficha y al formulario de baja; (3) canal propuesto: correo individual para 21 complejos y la versión breve para los 4 que sólo tienen formulario web, sin WhatsApp ni teléfono por ahora.
 
-Antes de tráfico real: (a) copias de seguridad automáticas de la base, coordinadas con `../servidor/`; (b) revisión legal liviana del aviso del pie; (c) cuando se retome el correo del sitio, probar consultas, plantillas de correo y textos del tema; (d) PHP-FPM (opción B). Pendientes menores: la pantalla *Configure* de `tourist-showcase` se muestra sin el diseño del panel, y una traducción de administración `es_ES` quedó sin reparar. Sin decidir: modelo de monetización. El idioma predeterminado de administración continúa en inglés y cualquier cambio allí se decide por separado. Consultar `osclass-instalacion-minima.md` antes de cambios de servicio, correo, cron o exposición adicional.
+Antes de tráfico real: (a) copia de seguridad fuera del host (fase 2 de `osclass-backups.md`), coordinada con `../vps/` y `../servidor/`; (b) revisión legal liviana del aviso del pie; (c) cuando se retome el correo del sitio, probar consultas, plantillas de correo y textos del tema; (d) PHP-FPM (opción B). Pendientes menores: la pantalla *Configure* de `tourist-showcase` se muestra sin el diseño del panel, y una traducción de administración `es_ES` quedó sin reparar. Sin decidir: modelo de monetización. El idioma predeterminado de administración continúa en inglés y cualquier cambio allí se decide por separado. Consultar `osclass-instalacion-minima.md` antes de cambios de servicio, correo, cron o exposición adicional.

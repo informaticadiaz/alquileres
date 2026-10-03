@@ -1,0 +1,11 @@
+[Unit]
+Description=Daily verified backup of the Osclass instance
+
+[Timer]
+OnCalendar=*-*-* 03:30:00
+RandomizedDelaySec=15min
+# Runs on the next boot or resume when the machine was off or suspended at 03:30.
+Persistent=true
+
+[Install]
+WantedBy=timers.target
