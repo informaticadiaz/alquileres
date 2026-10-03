@@ -11,7 +11,9 @@ reservas, pagos ni contrataciones.
 El nombre de la carpeta (`fewohbee/`) es histórico: FewohBee fue evaluado,
 publicado como demo y retirado el 2026-09-27 porque no correspondía al producto
 buscado. El repositorio remoto es `informaticadiaz/alquileres`; la rama de
-trabajo vigente es `osclass`, y `main` conserva la historia de FewohBee.
+trabajo vigente es `osclass`; `fewohbee` conserva la historia de FewohBee, y
+`main` es sólo un índice de ramas/soluciones (un `README.md`, sin código) que
+se actualiza al sumar o retirar una solución.
 
 ## Alcance
 

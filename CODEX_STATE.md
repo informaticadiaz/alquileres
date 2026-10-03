@@ -13,8 +13,9 @@
   ya no existen. Los documentos `task.md`, `port-sqlite-design.md`,
   `sqlite-port-manifest.md` y `systemd/fewohbee*` son históricos.
 - **Repositorio:** rama `osclass` publicada y sincronizada con
-  `origin/osclass` (`informaticadiaz/alquileres`); `main` conserva la historia
-  de FewohBee.
+  `origin/osclass` (`informaticadiaz/alquileres`). Desde el 2026-10-02, la
+  rama `fewohbee` conserva la historia de FewohBee (`769228c`) y `main`
+  (`d04524d`, rama por defecto) es un índice de ramas/soluciones sin código.
 - **Copias de seguridad:** sólo manuales, antes de cada cambio, en
   `data/osclass/backups/`. No hay copia automática de la base.
 - **Cambios SDD abiertos:** ninguno.
@@ -56,7 +57,7 @@ datos que contradigan este resumen corresponden a ese momento.
 - No hay copias de seguridad automáticas de la base MySQL ni copia fuera del host; deben definirse con `../servidor/` antes de tráfico real.
 - Correo del sitio y cron de Osclass sin configurar.
 - No reinstalar ni exponer FewohBee sin una nueva autorización explícita.
-- Pendiente por decisión del usuario (2026-10-02): resolver la incongruencia de nombres. La carpeta se llama `fewohbee/`, el remoto `alquileres` y el producto es Osclass; `main` conserva la historia de FewohBee y la línea vigente es `osclass`. Renombrar la carpeta exige actualizar `systemd/osclass.service`, `nginx/alquileres.conf`, la unidad instalada, los runbooks de `../cloudflare/` y `../servidor/`, el registro y el `AGENTS.md` raíz; decidir además si `osclass` reemplaza a `main`.
+- Pendiente por decisión del usuario (2026-10-02): resolver la incongruencia de nombres. La carpeta se llama `fewohbee/`, el remoto `alquileres` y el producto es Osclass. Renombrar la carpeta exige actualizar `systemd/osclass.service`, `nginx/alquileres.conf`, la unidad instalada, los runbooks de `../cloudflare/` y `../servidor/`, el registro y el `AGENTS.md` raíz. (La parte de ramas quedó resuelta el 2026-10-02: `main` es índice y `fewohbee` conserva la historia retirada.)
 
 ## Próximo paso recomendado
 
