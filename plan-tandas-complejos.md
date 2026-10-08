@@ -75,9 +75,9 @@ Notas por tanda:
 | Tanda | Estado | Fichas publicadas | Fecha |
 | --- | --- | --- | --- |
 | 1 (piloto) | Cerrada | 25 | 2026-09-30 |
-| 2 | En curso: seed cargado, falta simular y aplicar | — | — |
+| 2 | Cerrada | 67 | 2026-10-08 |
 
-### Tanda 2 — estado al 2026-10-02
+### Tanda 2 — cerrada el 2026-10-08
 
 - Relevamiento hecho (fuentes: pinamar.tur.ar, lacosta.tur.ar, buscador
   provincial y EMTUR sólo para descubrir nombres). 83 filas sumadas al seed:
@@ -88,6 +88,16 @@ Notas por tanda:
   `data/prospeccion/seed/revision-tanda2.csv`, hasta revisarlas una por una.
 - En Pinamar la verificación fue liviana (título, contactos y palabras clave de
   la portada) y quedan unos 30 complejos válidos más en Valeria del Mar y Cariló.
-- Próximo paso: simular (resultado esperado: 67 create, 0 update, 25 noop,
-  21 skip, 0 errores), copia de seguridad de la base, `--apply` con
-  autorización y verificación por HTTPS.
+- La importación quedó persistida de forma idempotente: la simulación final
+  informó 0 altas, 0 cambios, 92 sin cambios, 21 omisiones y 0 errores. La
+  base confirma 92 marcadores y 92 fichas activas: 25 del piloto más 67 de esta
+  tanda (35 en Pinamar/Cariló, 18 en San Bernardo/Costa Esmeralda y 14 en Mar
+  del Plata).
+- Copia inmediata previa verificada: conjunto
+  `data/osclass/backups/auto/osclass-20261008T114118` (sumas SHA-256 y pruebas
+  `zstd` correctas; el volcado termina en `-- Dump completed`). Los conjuntos
+  anteriores prueban el salto de 25 a 92 marcadores entre `113503` y `113618`.
+- Verificación HTTPS correcta: las búsquedas de Mar del Plata (14),
+  Pinamar/Cariló (35) y San Bernardo/Costa Esmeralda (18) respondieron 200; el
+  filtro Apart hotel de Pinamar/Cariló devolvió 19; la ficha aleatoria Green
+  Sea (#42) y su formulario de baja respondieron 200.

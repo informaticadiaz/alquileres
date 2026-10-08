@@ -66,7 +66,14 @@ datos que contradigan este resumen corresponden a ese momento.
 
 ## Próximo paso recomendado
 
-**Tarea abierta (2026-10-02): población del directorio por tandas**, ordenadas por temporada, en `plan-tandas-complejos.md`. Tanda 2 en curso (2026-10-02): 83 filas cargadas en el seed; falta simular, respaldar, aplicar con autorización y verificar. Detalle en la sección "Tanda 2" del plan.
+**Población del directorio por tandas:** Tanda 2 cerrada el 2026-10-08. Las 83
+filas del seed se resolvieron en 67 fichas publicadas y 16 filas `sin_web` (más
+5 omisiones heredadas del piloto, total 21). La simulación final informa 0
+altas y 0 cambios pendientes; la base tiene 92 marcadores/fichas activas (25
+del piloto + 67 de la tanda). Se verificaron por HTTPS los tres destinos,
+filtro por tipo, una ficha y su formulario de baja. La copia inmediata previa
+verificada es `data/osclass/backups/auto/osclass-20261008T114118`; ver detalle
+en la sección "Tanda 2" de `plan-tandas-complejos.md`.
 
 No hay cambios SDD abiertos. Contacto con complejos **postergado por el usuario (2026-10-01)**. Cuando se retome: (1) decidir desde qué dirección de correo se escribe y se reciben respuestas y bajas (propuesta: una dirección del dominio reenviada a Gmail, o una cuenta de Gmail dedicada; explicarlo con ejemplos concretos); (2) actualizar `data/prospeccion/borrador-invitacion.md` para avisar que el complejo ya figura con una ficha informativa, con el enlace a la ficha y al formulario de baja; (3) canal propuesto: correo individual para 21 complejos y la versión breve para los 4 que sólo tienen formulario web, sin WhatsApp ni teléfono por ahora.
 
