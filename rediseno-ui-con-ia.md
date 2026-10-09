@@ -132,4 +132,6 @@ Referencias de estudio (sin verificar su vigencia en esta fecha):
 - Etapa 2 cerrada el 2026-10-09: `brief-ui.md`.
 - Etapa 3 cerrada el 2026-10-09: `sistema-diseno/` (v1, con pendientes
   anotados en su `README.md`).
-- Etapa 5 (migración a Osclass) pendiente.
+- Etapa 5 en curso: tema `themes/alquileres/` activo desde el 2026-10-09 con
+  inicio, resultados y ficha rediseñados. Pendientes: publicar, contacto,
+  registro y cuenta.

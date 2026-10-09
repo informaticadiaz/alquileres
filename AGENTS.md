@@ -61,7 +61,8 @@ se actualiza al sumar o retirar una solución.
   asistencia de IA y su aplicación a este sitio; `diagnostico-ui.md` registra
   la auditoría del sitio actual; `brief-ui.md` fija audiencia, tono,
   referencias y restricciones; `sistema-diseno/` guarda tokens, guía de marca
-  y componentes; `prototipo-ui/` guarda las
+  y componentes; `themes/alquileres/` es la fuente del tema de Osclass
+  activo; `prototipo-ui/` guarda las
   fuentes versionadas de los prototipos.
 - `task.md`, `port-sqlite-design.md`, `sqlite-port-manifest.md` y
   `systemd/fewohbee*` son registros históricos de FewohBee; no describen el
