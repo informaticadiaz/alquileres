@@ -4,6 +4,9 @@ Guía para planificar y ejecutar un rediseño completo de interfaz con asistenci
 de IA. La primera parte es general y reutilizable; la última aplica el proceso
 a Alquileres Temporarios (tema Osclass `sigma` más plugins propios).
 
+La versión general y reutilizable de este proceso, el caso documentado y la
+skill `rediseno-ui` viven en `../trabajo-con-ia/`.
+
 ## Por qué fallan los intentos
 
 Los intentos de rediseño con IA suelen fracasar por falta de proceso, no de
