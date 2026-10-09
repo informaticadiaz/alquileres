@@ -126,5 +126,7 @@ Referencias de estudio (sin verificar su vigencia en esta fecha):
 
 ## Estado
 
-Etapa 4 adelantada por decisión del usuario: prototipo v1 (inicio, destino y
-ficha) en `prototipo-ui/`. Las etapas 1 a 3 siguen sin formalizar.
+- Etapa 1 cerrada el 2026-10-09: `diagnostico-ui.md`.
+- Etapa 4 adelantada por decisión del usuario: prototipo v1 (inicio, destino y
+  ficha) en `prototipo-ui/`.
+- Etapas 2 y 3 pendientes.
