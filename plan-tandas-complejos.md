@@ -76,6 +76,7 @@ Notas por tanda:
 | --- | --- | --- | --- |
 | 1 (piloto) | Cerrada | 25 | 2026-09-30 |
 | 2 | Cerrada | 67 | 2026-10-08 |
+| 3 | Cerrada | 26 | 2026-10-08 |
 
 ### Tanda 2 — cerrada el 2026-10-08
 
@@ -101,3 +102,20 @@ Notas por tanda:
   Pinamar/Cariló (35) y San Bernardo/Costa Esmeralda (18) respondieron 200; el
   filtro Apart hotel de Pinamar/Cariló devolvió 19; la ficha aleatoria Green
   Sea (#42) y su formulario de baja respondieron 200.
+
+### Tanda 3 — cerrada el 2026-10-08
+
+- Se publicaron 26 fichas: Villa Carlos Paz 3, La Cumbre/La Falda 9, Villa
+  General Belgrano 7, Mina Clavero 5 y La Cumbrecita 2. La ficha de Complejo
+  Augusta se mantuvo tras revalidar que su web propia responde 200; su URL
+  sigue siendo HTTP, no HTTPS.
+- Copia inmediata previa verificada: conjunto
+  `data/osclass/backups/auto/osclass-20261008T133629` (sumas SHA-256,
+  descompresión `zstd` y terminación `-- Dump completed` correctas).
+- La importación creó 26 fichas, sin actualizaciones ni fallos. La simulación
+  posterior informó 0 altas, 0 cambios, 118 sin cambios, 21 omisiones y 0
+  errores.
+- Verificación HTTPS correcta: los cinco destinos respondieron 200 y mostraron
+  3, 9, 7, 5 y 2 fichas respectivamente; el filtro Cabaña de Villa Carlos Paz
+  devolvió 3. La ficha Cabañas Nazareth (#95) y su formulario de baja
+  respondieron 200.

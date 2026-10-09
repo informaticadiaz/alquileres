@@ -66,14 +66,16 @@ datos que contradigan este resumen corresponden a ese momento.
 
 ## Próximo paso recomendado
 
-**Población del directorio por tandas:** Tanda 2 cerrada el 2026-10-08. Las 83
-filas del seed se resolvieron en 67 fichas publicadas y 16 filas `sin_web` (más
-5 omisiones heredadas del piloto, total 21). La simulación final informa 0
-altas y 0 cambios pendientes; la base tiene 92 marcadores/fichas activas (25
-del piloto + 67 de la tanda). Se verificaron por HTTPS los tres destinos,
-filtro por tipo, una ficha y su formulario de baja. La copia inmediata previa
-verificada es `data/osclass/backups/auto/osclass-20261008T114118`; ver detalle
-en la sección "Tanda 2" de `plan-tandas-complejos.md`.
+**Población del directorio por tandas:** Tanda 3 cerrada el 2026-10-08. El seed
+tiene 118 fichas activas sin cambios pendientes (25 del piloto, 67 de la Tanda
+2 y 26 de la Tanda 3) y 21 filas `sin_web` omitidas. La importación de la
+Tanda 3 creó 26 fichas, sin cambios ni fallos; la simulación posterior informó
+0 altas, 0 cambios y 0 errores. Se verificaron por HTTPS sus cinco destinos,
+un filtro por tipo, una ficha y su formulario de baja. La copia inmediata
+previa verificada es `data/osclass/backups/auto/osclass-20261008T133629`; ver
+detalle en la sección "Tanda 3" de `plan-tandas-complejos.md`. Complejo
+Augusta se publicó después de revalidar su sitio propio por HTTP; sigue sin
+HTTPS y debe revisarse si se endurece ese criterio.
 
 No hay cambios SDD abiertos. Contacto con complejos **postergado por el usuario (2026-10-01)**. Cuando se retome: (1) decidir desde qué dirección de correo se escribe y se reciben respuestas y bajas (propuesta: una dirección del dominio reenviada a Gmail, o una cuenta de Gmail dedicada; explicarlo con ejemplos concretos); (2) actualizar `data/prospeccion/borrador-invitacion.md` para avisar que el complejo ya figura con una ficha informativa, con el enlace a la ficha y al formulario de baja; (3) canal propuesto: correo individual para 21 complejos y la versión breve para los 4 que sólo tienen formulario web, sin WhatsApp ni teléfono por ahora.
 
