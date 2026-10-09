@@ -134,5 +134,5 @@ Referencias de estudio (sin verificar su vigencia en esta fecha):
   anotados en su `README.md`).
 - Etapa 5 en curso: tema `themes/alquileres/` activo desde el 2026-10-09 con
   inicio, resultados, ficha y formularios (publicar, contacto, registro,
-  ingreso, cuenta) rediseñados. Pendiente: revisar las páginas de cuenta con
-  un usuario.
+  ingreso, cuenta) rediseñados y auditados, incluidas las páginas de cuenta con
+  un usuario de prueba.

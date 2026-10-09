@@ -29,13 +29,13 @@ function sidebar(){
 }
 osc_add_filter('meta_title_filter','custom_meta_title');
 function custom_meta_title($data){
-  return 'Guardar cambios';
+  return 'Mis datos';
 }
 osc_current_web_theme_path('header.php') ;
 $osc_user = osc_user();
 ?>
 
-<h1><?php echo 'Guardar cambios'; ?></h1>
+<h1>Mis datos</h1>
 
 <?php UserForm::location_javascript(); ?>
 
@@ -67,26 +67,26 @@ $osc_user = osc_user();
 
 
       <div class="control-group">
-        <label class="control-label" for="name"><?php echo 'Nombre'; ?></label>
+        <label class="control-label" for="s_name"><?php echo 'Nombre'; ?></label>
         <div class="controls">
           <?php UserForm::name_text(osc_user()); ?>
         </div>
       </div>
       <div class="control-group">
-        <label class="control-label" for="user_type"><?php echo 'Tipo de cuenta'; ?></label>
+        <label class="control-label" for="b_company"><?php echo 'Tipo de cuenta'; ?></label>
         <div class="controls">
           <?php UserForm::is_company_select(osc_user()); ?>
         </div>
       </div>
 
       <div class="control-group">
-        <label class="control-label" for="phoneMobile"><?php echo 'Celular'; ?></label>
+        <label class="control-label" for="s_phone_mobile"><?php echo 'Celular'; ?></label>
         <div class="controls">
           <?php UserForm::mobile_text(osc_user()); ?>
         </div>
       </div>
       <div class="control-group">
-        <label class="control-label" for="phoneLand"><?php echo 'Teléfono fijo'; ?></label>
+        <label class="control-label" for="s_phone_land"><?php echo 'Teléfono fijo'; ?></label>
         <div class="controls">
           <?php UserForm::phone_land_text(osc_user()); ?>
         </div>
@@ -110,31 +110,31 @@ $osc_user = osc_user();
         </div>
       </div>
       <div class="control-group">
-        <label class="control-label" for="city_area"><?php echo 'Barrio'; ?></label>
+        <label class="control-label" for="cityArea"><?php echo 'Barrio'; ?></label>
         <div class="controls">
           <?php UserForm::city_area_text(osc_user()); ?>
         </div>
       </div>
       <div class="control-group">
-        <label class="control-label" for="city_area"><?php echo 'Código postal'; ?></label>
+        <label class="control-label" for="zip"><?php echo 'Código postal'; ?></label>
         <div class="controls">
           <?php UserForm::zip_text(osc_user()); ?>
         </div>
       </div>
       <div class="control-group">
-        <label class="control-label"l for="address"><?php echo 'Dirección'; ?></label>
+        <label class="control-label" for="address"><?php echo 'Dirección'; ?></label>
         <div class="controls">
           <?php UserForm::address_text(osc_user()); ?>
         </div>
       </div>
       <div class="control-group">
-        <label class="control-label" for="webSite"><?php echo 'Sitio web'; ?></label>
+        <label class="control-label" for="s_website"><?php echo 'Sitio web'; ?></label>
         <div class="controls">
           <?php UserForm::website_text(osc_user()); ?>
         </div>
       </div>
       <div class="control-group">
-        <label class="control-label" for="s_info"><?php echo 'Descripción'; ?></label>
+        <label class="control-label" for="s_info<?php echo osc_locale_code(); ?>"><?php echo 'Descripción'; ?></label>
         <div class="controls">
           <?php UserForm::info_textarea('s_info', osc_locale_code(), @$osc_user['locale'][osc_locale_code()]['s_info']); ?>
         </div>

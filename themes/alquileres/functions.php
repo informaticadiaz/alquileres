@@ -940,3 +940,18 @@ function at_listing_row($show_place = false) {
 
 // The home page renders its own "Recién sumados" list; drop Sigma's latest-items grid.
 osc_remove_hook('before-main', 'sigma_home_latest');
+
+// Account menu with the site's own labels. Osclass core already defines get_user_menu(), so the
+// Sigma copy above (guarded by function_exists) never runs; user-sidebar.php calls this instead.
+function at_user_menu() {
+  return array(
+    array('name' => 'Mis alojamientos', 'url' => osc_user_list_items_url(), 'class' => 'opt_items'),
+    array('name' => 'Mis datos', 'url' => osc_user_profile_url(), 'class' => 'opt_account'),
+    array('name' => 'Alertas', 'url' => osc_user_alerts_url(), 'class' => 'opt_alerts'),
+    array('name' => 'Perfil público', 'url' => osc_user_public_profile_url(), 'class' => 'opt_publicprofile'),
+    array('name' => 'Cambiar correo', 'url' => osc_change_user_email_url(), 'class' => 'opt_change_email'),
+    array('name' => 'Cambiar nombre de usuario', 'url' => osc_change_user_username_url(), 'class' => 'opt_change_username'),
+    array('name' => 'Cambiar contraseña', 'url' => osc_change_user_password_url(), 'class' => 'opt_change_password'),
+    array('name' => 'Eliminar cuenta', 'url' => '#', 'class' => 'opt_delete_account'),
+  );
+}

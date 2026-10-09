@@ -198,16 +198,4 @@
     <?php osc_run_hook('item_publish_after'); ?>
   </form>
 </div>
-<script>
-  // Uppy (core photo uploader) renders unlabeled file inputs; give them an accessible name.
-  (function () {
-    function nameInputs() {
-      document.querySelectorAll('.uppy-Dashboard-input:not([aria-label]), .at-upload input[type=file]:not([aria-label])').forEach(function (el) {
-        el.setAttribute('aria-label', 'Elegir fotos del alojamiento');
-      });
-    }
-    nameInputs();
-    new MutationObserver(nameInputs).observe(document.body, { childList: true, subtree: true });
-  })();
-</script>
 <?php osc_current_web_theme_path('footer.php'); ?>

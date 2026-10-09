@@ -19,8 +19,8 @@
 
 <?php
   $js_lang = array(
-    'delete' => __('Delete', 'sigma'),
-    'cancel' => __('Cancel', 'sigma')
+    'delete' => 'Eliminar',
+    'cancel' => 'Cancelar'
   );
 
   osc_enqueue_script('jquery');

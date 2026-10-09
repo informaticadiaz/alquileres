@@ -21,8 +21,14 @@ Parte de una copia de Sigma 1.7.0 y aplica `../../sistema-diseno/`.
 | `index.php` | Metadatos del tema. |
 
 Ninguna página usa la miga de pan genérica de Osclass (etiquetas en inglés);
-resultados y ficha dibujan la suya. Las páginas de cuenta se verificaron sólo
-sin sesión (redirigen al ingreso); falta revisarlas con un usuario.
+resultados y ficha dibujan la suya. El menú de cuenta sale de `at_user_menu()`:
+el núcleo de Osclass ya define `get_user_menu()`, así que la copia de Sigma
+nunca se ejecuta. En celular el menú se muestra arriba del contenido.
+
+Las páginas de cuenta se auditan con `../playwright/projects/alquileres-cuenta.mjs`
+y el usuario de prueba `prueba-ui` (credenciales en
+`data/osclass/usuario-prueba-ui.txt`, ignorado por Git), pasadas por
+`AT_EMAIL` y `AT_PASSWORD`.
 
 ## Despliegue
 

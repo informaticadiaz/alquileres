@@ -53,6 +53,22 @@
 
 <?php osc_run_hook('footer_after'); ?>
 
+<script>
+  // jQuery UI's default close label is English; the site speaks Spanish.
+  if (window.jQuery && jQuery.ui && jQuery.ui.dialog) { jQuery.ui.dialog.prototype.options.closeText = 'Cerrar'; }
+
+  // Uppy (core uploader for listing and profile photos) renders unlabeled file inputs.
+  (function () {
+    function nameUploadInputs() {
+      document.querySelectorAll('.uppy-Dashboard-input:not([aria-label])').forEach(function (el) {
+        el.setAttribute('aria-label', 'Elegir fotos');
+      });
+    }
+    nameUploadInputs();
+    new MutationObserver(nameUploadInputs).observe(document.body, { childList: true, subtree: true });
+  })();
+</script>
+
 <link href="<?php echo osc_assets_url('css/jquery-ui/jquery-ui.css'); ?>" rel="stylesheet" type="text/css" />
 
 </body>

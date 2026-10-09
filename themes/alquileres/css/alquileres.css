@@ -320,3 +320,28 @@ html body .uppy-Dashboard .uppy-Dashboard-close span { color: var(--ink); }
 html body.item-post > section, html body.contact > section, html body.register > section, html body.login > section,
 html body.recover > section, html body.forgot > section, html body.user > section { background: var(--surface); }
 html body .at-form section.at-form-section { padding: var(--space-5) 0 0; background: none; float: none; }
+
+/* Sigma buttons use two-class selectors (.btn.btn-primary); match them to win. */
+html body .btn.btn-primary, html body button.btn, html body a.btn.btn-primary, html body #sidebar button, html body #sidebar .btn {
+  float: none; clear: none; width: auto; font-family: var(--font-sans); font-size: 16px; font-weight: 700; line-height: 1;
+  min-height: var(--target-min); padding: 0 var(--space-5); border-radius: var(--radius-md); border: 2px solid var(--ink);
+  background: var(--ink); color: var(--on-ink); box-shadow: none; display: inline-flex; align-items: center; justify-content: center; text-decoration: none; }
+html body .btn.btn-primary:hover, html body a.btn.btn-primary:hover, html body button.btn:hover { background: var(--ink); border-color: var(--ink); color: var(--on-ink); text-decoration: underline; }
+html body .btn.btn-secondary, html body a.btn.btn-secondary { float: none; background: var(--surface); color: var(--ink); border: 2px solid var(--ink); border-radius: var(--radius-md); min-height: var(--target-min); }
+html body.user #sidebar { background: none; padding: 0; }
+html body.user .form-container .controls.checkbox, html body.user .form-container .controls { margin-left: 0; }
+html body.user .form-horizontal .actions, html body.user .form-container .control-group:last-child .controls { text-align: left; }
+html body.user #main .empty, html body.user #main p.empty { background: var(--surface-alt); color: var(--ink-soft); border-radius: var(--radius-lg); padding: var(--space-5); text-align: left; }
+
+/* jQuery UI dialogs (delete account, delete alert). */
+html body .ui-dialog { font-family: var(--font-sans); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: var(--space-4); }
+html body .ui-dialog .ui-dialog-titlebar { background: none; border: 0; color: var(--ink); font-weight: 700; }
+html body .ui-dialog .ui-button { font-family: var(--font-sans); font-weight: 700; min-height: var(--target-min); padding: 0 var(--space-5); border-radius: var(--radius-md); border: 2px solid var(--ink); background: var(--surface); color: var(--ink); }
+html body .ui-dialog .ui-dialog-buttonset .ui-button:first-child { background: var(--ink); color: var(--on-ink); }
+html body .ui-dialog .ui-dialog-titlebar-close { min-height: 0; padding: 0; width: 32px; height: 32px; background: var(--surface); color: var(--ink); border: 1px solid var(--border-control); }
+
+/* Sigma hides the account menu on small screens behind a toggle; show it inline instead. */
+html body.user #sidebar.fixed-layout { display: block; position: static; transform: none; left: auto; top: auto; width: auto; height: auto; max-width: none; flex: 1 1 100%; overflow: visible; box-shadow: none; z-index: auto; }
+@media (min-width: 768px) { html body.user #sidebar.fixed-layout { flex: 1 1 220px; max-width: 280px; } }
+html body.user .form-container .controls { text-align: left; }
+html body.user #sidebar li a, html body.user #sidebar li ul { border: 0; box-shadow: none; }

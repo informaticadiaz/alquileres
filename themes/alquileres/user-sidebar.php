@@ -26,7 +26,7 @@ if(osc_user_id() <= 0) {
 
 <div id="sidebar" class="fixed-layout">
   <div class="fixed-close"><i class="fas fa-times"></i></div>
-  <?php echo osc_private_user_menu( get_user_menu() ); ?>
+  <nav aria-label="Mi cuenta"><?php echo osc_private_user_menu( at_user_menu() ); ?></nav>
 </div>
 
 <div id="dialog-delete-account" title="<?php echo osc_esc_html('Eliminar cuenta'); ?>" style="display:none;"><?php echo '¿Seguro que querés eliminar tu cuenta? No se puede deshacer.'; ?></div>
