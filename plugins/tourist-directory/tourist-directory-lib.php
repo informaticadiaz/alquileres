@@ -158,6 +158,24 @@ function tourist_directory_text($es, $en, $locale) {
   return (strpos((string)$locale, 'es_') === 0 || strpos((string)$locale, 'es-') === 0) ? $es : $en;
 }
 
+// Pure metadata for the two public card variants. Rendering remains in index.php so this copy
+// contract can be unit-tested without bootstrapping Osclass.
+function tourist_directory_listing_presentation($kind, $locale) {
+  if ($kind === 'directory') {
+    return array(
+      'class' => 'tourist-directory-card',
+      'badge' => tourist_directory_text('Ficha informativa', 'Informational listing', $locale),
+      'status' => tourist_directory_text('Información pública, no gestionada por el complejo', 'Public listing, not managed by the property', $locale),
+    );
+  }
+
+  return array(
+    'class' => 'tourist-owner-card',
+    'badge' => tourist_directory_text('Publicado por el alojamiento', 'Published by the property', $locale),
+    'status' => tourist_directory_text('Gestionado por el alojamiento', 'Managed by the property', $locale),
+  );
+}
+
 // True when $email is not safe to trust for delivery: malformed, or a known placeholder domain
 // (.invalid/.test/.example/.localhost suffix, bare localhost, or example.*). Used both for the
 // per-entry placeholder contact address and for the production import mail gate.

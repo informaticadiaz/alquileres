@@ -1,0 +1,116 @@
+/* Public search filters. The form stays semantic and usable without this stylesheet. */
+.tourist-showcase-filter-form {
+  margin: 1rem 0;
+  padding: 1rem;
+  border: 1px solid #cbd5db;
+  border-radius: 0.5rem;
+  background: #f7f9fa;
+}
+
+.tourist-showcase-filter-form fieldset {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.8rem;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.tourist-showcase-filter-form legend {
+  grid-column: 1 / -1;
+  margin-bottom: 0.2rem;
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.tourist-showcase-filter-field {
+  display: grid;
+  gap: 0.35rem;
+  color: #263640;
+  font-weight: 600;
+}
+
+.tourist-showcase-filter-field select,
+.tourist-showcase-filter-field input {
+  width: 100%;
+  min-height: 2.75rem;
+  box-sizing: border-box;
+  padding: 0.45rem 0.55rem;
+  border: 1px solid #9aa9b3;
+  border-radius: 0.3rem;
+  background: #fff;
+  color: #17212b;
+}
+
+.tourist-showcase-filter-actions {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.tourist-showcase-filter-actions button,
+.tourist-showcase-filter-actions a {
+  min-height: 2.75rem;
+  padding: 0.55rem 0.85rem;
+}
+
+.tourist-showcase-filter-actions a {
+  display: inline-flex;
+  align-items: center;
+  font-weight: 600;
+}
+
+.tourist-showcase-filter-form :focus-visible {
+  outline: 3px solid #075b5e;
+  outline-offset: 2px;
+}
+
+.tourist-showcase-card-attributes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin: 0.75rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tourist-showcase-card-attribute {
+  display: inline-flex;
+  gap: 0.25rem;
+  padding: 0.25rem 0.45rem;
+  border-radius: 0.25rem;
+  background: #edf3f4;
+  color: #31434c;
+  font-size: 0.85rem;
+  line-height: 1.3;
+}
+
+.tourist-showcase-card-attribute-label {
+  font-weight: 700;
+}
+
+.listing-grid .tourist-showcase-card-attributes {
+  display: none;
+}
+
+@media (max-width: 640px) {
+  .tourist-showcase-filter-form fieldset {
+    grid-template-columns: 1fr;
+  }
+
+  .tourist-showcase-filter-actions {
+    display: grid;
+  }
+
+  .tourist-showcase-filter-actions button,
+  .tourist-showcase-filter-actions a {
+    width: 100%;
+    justify-content: center;
+    box-sizing: border-box;
+  }
+
+  .listing-grid .tourist-showcase-card-attributes {
+    display: flex;
+  }
+}

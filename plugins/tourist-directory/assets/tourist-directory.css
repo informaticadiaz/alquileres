@@ -36,11 +36,12 @@ body.tourist-directory-entry .price {
 
 /* The public-directory notice block rendered near the item title (item_title hook). */
 .tourist-directory-notice {
-  margin: 0.5em 0 1em;
-  padding: 0.6em 0.8em;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  background: #f7f7f7;
+  margin: 0.7em 0 1.2em;
+  padding: 1em;
+  border: 1px solid #cbd5db;
+  border-left: 4px solid #667788;
+  border-radius: 0.4em;
+  background: #f7f9fa;
 }
 
 .tourist-directory-notice .tourist-directory-label {
@@ -50,7 +51,9 @@ body.tourist-directory-entry .price {
 
 .tourist-directory-notice .tourist-directory-official-link,
 .tourist-directory-notice .tourist-directory-removal-link {
-  margin-right: 0.8em;
+  display: inline-block;
+  margin: 0.25em 0.8em 0.1em 0;
+  font-weight: 600;
 }
 
 /* The short notice repeated at the top of the sidebar (item_sidebar_top hook). */
@@ -63,15 +66,127 @@ body.tourist-directory-entry .price {
   font-size: 0.9em;
 }
 
-/* The listing-card badge (item_loop_title hook). */
-.tourist-directory-badge {
+/* Listing-card variants. The theme owns the layout; these rules add hierarchy without depending
+   on a photo, price or copied marketing copy. */
+.tourist-directory-card,
+.tourist-owner-card {
+  position: relative;
+}
+
+.tourist-listing-badge {
   display: inline-block;
-  margin-left: 0.4em;
-  padding: 0.05em 0.5em;
-  border-radius: 3px;
-  background: #eee;
+  margin: 0.45em 0 0;
+  padding: 0.2em 0.55em;
+  border: 1px solid currentColor;
+  border-radius: 999px;
   font-size: 0.8em;
-  font-weight: normal;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.tourist-directory-card .tourist-listing-badge,
+.tourist-directory-card-badge {
+  color: #485766;
+  background: #f1f4f6;
+}
+
+.tourist-owner-card .tourist-listing-badge,
+.tourist-owner-card-badge {
+  color: #075b5e;
+  background: #e8f6f3;
+}
+
+.tourist-owner-status {
+  display: inline-block;
+  margin: 0.5em 0 1em;
+  padding: 0.25em 0.65em;
+  border-radius: 999px;
+  background: #e8f6f3;
+  color: #075b5e;
+  font-size: 0.8em;
+  font-weight: 600;
+}
+
+/* Shared catalogue-card treatment. Sigma's markup stays intact: the two semantic classes emitted
+   by the plugin only control the publication-state accent and never manufacture price, images or
+   availability where the record does not provide them. */
+.listing-card-list .listing-card.tourist-directory-card,
+.listing-card-list .listing-card.tourist-owner-card {
+  margin-bottom: 1rem;
+  padding: 1rem;
+  border: 1px solid #d4dfe4;
+  border-radius: 0.6rem;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(18, 43, 56, 0.06);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.listing-card-list .listing-card.tourist-directory-card {
+  border-left: 4px solid #667788;
+}
+
+.listing-card-list .listing-card.tourist-owner-card {
+  border-left: 4px solid #0b7774;
+}
+
+.listing-card-list .listing-card.tourist-directory-card:hover,
+.listing-card-list .listing-card.tourist-owner-card:hover {
+  border-color: #78909c;
+  box-shadow: 0 5px 14px rgba(18, 43, 56, 0.11);
+}
+
+.listing-card-list .listing-card .listing-basicinfo > a.title {
+  color: #17212b;
+  font-size: 1.15rem;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.listing-card-list .listing-card .listing-details {
+  color: #54636d;
+}
+
+.listing-card-list .listing-card .listing-thumb img {
+  border-radius: 0.35rem;
+}
+
+.listing-card-list.listing-grid .listing-card.tourist-directory-card,
+.listing-card-list.listing-grid .listing-card.tourist-owner-card {
+  margin-bottom: 1.25rem;
+  padding: 0;
+  overflow: hidden;
+}
+
+.listing-card-list.listing-grid .listing-card .listing-data {
+  padding: 1rem;
+}
+
+.listing-card-list.listing-grid .listing-card .tourist-listing-badge {
+  margin-top: 0;
+}
+
+@media (max-width: 640px) {
+  .listing-card-list .listing-card.tourist-directory-card,
+  .listing-card-list .listing-card.tourist-owner-card {
+    padding: 0.8rem;
+  }
+
+  .listing-card-list.listing-grid .listing-card.tourist-directory-card,
+  .listing-card-list.listing-grid .listing-card.tourist-owner-card {
+    padding: 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .tourist-directory-notice {
+    padding: 0.8em;
+  }
+
+  .tourist-directory-notice .tourist-directory-official-link,
+  .tourist-directory-notice .tourist-directory-removal-link {
+    display: block;
+    margin: 0.65em 0 0;
+  }
 }
 
 /* ------------------------------------------------------------------------------------------------

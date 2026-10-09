@@ -39,6 +39,58 @@ function tourist_showcase_category_param(array $category_ids) {
   return is_scalar($first) && preg_match('/^[1-9]\d*$/', (string)$first) ? (string)$first : '';
 }
 
+// Builds the reset target for the public filters. The category remains selected so visitors do
+// not lose their destination context when they clear type, guest, or bedroom criteria.
+function tourist_showcase_clear_filters_url($base_url, $category) {
+  $params = array('page' => 'search');
+  if (is_scalar($category) && preg_match('/^[1-9]\d*$/', (string)$category)) {
+    $params['sCategory'] = (string)$category;
+  }
+
+  return rtrim((string)$base_url, '/') . '/?' . http_build_query($params);
+}
+
+// Selects the concise metadata suitable for a result card. Amenities are deliberately excluded:
+// they belong to the detail page and make a scan-oriented result list noisy.
+function tourist_showcase_card_attributes(array $meta, $locale) {
+  $values = array();
+  foreach ($meta as $field) {
+    if (!is_array($field) || !isset($field['s_slug']) || !isset($field['s_value']) || !is_scalar($field['s_value'])) {
+      continue;
+    }
+
+    $value = trim((string)$field['s_value']);
+    if ($value !== '') {
+      $values[$field['s_slug']] = $value;
+    }
+  }
+
+  $spanish = tourist_showcase_is_spanish($locale);
+  $attributes = array();
+  $definitions = array(
+    'tourist_accommodation_type' => array('key' => 'type', 'label' => $spanish ? 'Tipo' : 'Type'),
+    'tourist_max_guests' => array('key' => 'guests', 'label' => $spanish ? 'Hasta' : 'Up to'),
+    'tourist_bedrooms' => array('key' => 'bedrooms', 'label' => $spanish ? 'Dormitorios' : 'Bedrooms'),
+    'tourist_bathrooms' => array('key' => 'bathrooms', 'label' => $spanish ? 'Baños' : 'Bathrooms'),
+  );
+
+  foreach ($definitions as $slug => $definition) {
+    if (!isset($values[$slug])) {
+      continue;
+    }
+
+    $value = $values[$slug];
+    if ($slug === 'tourist_max_guests') {
+      $plural = $value === '1' ? ($spanish ? 'huésped' : 'guest') : ($spanish ? 'huéspedes' : 'guests');
+      $value .= ' ' . $plural;
+    }
+
+    $attributes[] = array('key' => $definition['key'], 'label' => $definition['label'], 'value' => $value);
+  }
+
+  return $attributes;
+}
+
 function tourist_showcase_is_spanish($locale) {
   return strpos((string)$locale, 'es_') === 0 || strpos((string)$locale, 'es-') === 0;
 }

@@ -462,11 +462,13 @@ function tourist_directory_item_title_hook() {
   $id = osc_item_id();
   $row = tourist_directory_entry_row($id);
 
-  if (!is_array($row)) {
+  if (is_array($row)) {
+    echo tourist_directory_render_notice_html($id, $row);
     return null;
   }
 
-  echo tourist_directory_render_notice_html($id, $row);
+  $presentation = tourist_directory_listing_presentation('owner', osc_current_user_locale());
+  echo '<p class="tourist-owner-status">' . osc_esc_html($presentation['status']) . '</p>';
 
   return null;
 }
@@ -495,13 +497,8 @@ function tourist_directory_item_loop_title_hook() {
   $id = osc_item_id();
   $row = tourist_directory_entry_row($id);
 
-  if (!is_array($row)) {
-    return;
-  }
-
-  $badge = tourist_directory_text('Ficha de directorio', 'Directory listing', osc_current_user_locale());
-
-  echo ' <span class="tourist-directory-badge">' . osc_esc_html($badge) . '</span>';
+  $presentation = tourist_directory_listing_presentation(is_array($row) ? 'directory' : 'owner', osc_current_user_locale());
+  echo ' <span class="tourist-listing-badge ' . osc_esc_html($presentation['class']) . '-badge">' . osc_esc_html($presentation['badge']) . '</span>';
 }
 
 // Pure void hook, echoed inline inside a class="..." attribute (loop-single.php:21): a trailing
@@ -510,9 +507,8 @@ function tourist_directory_highlight_class_hook() {
   $id = osc_item_id();
   $row = tourist_directory_entry_row($id);
 
-  if (is_array($row)) {
-    echo 'tourist-directory-card ';
-  }
+  $presentation = tourist_directory_listing_presentation(is_array($row) ? 'directory' : 'owner', osc_current_user_locale());
+  echo $presentation['class'] . ' ';
 }
 
 // item_price_null is a single-purpose value filter (only call site: hItems.php:1487, inside
@@ -565,8 +561,9 @@ function tourist_directory_enqueue_css() {
     return;
   }
 
-  $url = osc_plugins_url() . TOURIST_DIRECTORY_CSS_REL_PATH;
-  echo '<link rel="stylesheet" type="text/css" href="' . osc_esc_html($url) . '" />' . "\n";
+  $file = __DIR__ . '/assets/tourist-directory.css';
+  $version = is_file($file) ? (string) filemtime($file) : '1';
+  osc_enqueue_style('tourist-directory', osc_plugins_url() . TOURIST_DIRECTORY_CSS_REL_PATH . '?v=' . rawurlencode($version));
 }
 
 osc_add_hook('header', 'tourist_directory_enqueue_css');

@@ -130,9 +130,10 @@ other than `false`.
 An entry's detail page shows a public-directory notice near the title (label, "Visitar sitio
 oficial" link to the official website, "Solicitar baja" removal link), a short repeated notice at
 the top of the sidebar, no price, and no contact/send-friend/comment UI. Listing cards (category,
-search, home) show a small "Ficha de directorio" badge next to the title and a `tourist-directory-
-card` class on the card for the stylesheet to key off. Structured data (`Product` JSON-LD, Open
-Graph/Twitter price and rating tags) is suppressed on an entry's own page only.
+search, home) show a "Ficha informativa" badge and a `tourist-directory-card` class. Other public
+listings receive a distinct "Publicado por el alojamiento" badge and a `tourist-owner-card` class;
+their detail page identifies them as managed by the property. Structured data (`Product` JSON-LD,
+Open Graph/Twitter price and rating tags) is suppressed on an entry's own page only.
 
 "Solicitar baja" links to `osc_route_url('tourist-directory-removal', ['entry' => $id])` — the
 plugin's own route-based removal form (see "Removal request channel" below), omitted from the

@@ -16,6 +16,7 @@ require_once __DIR__ . '/tourist-showcase-lib.php';
 
 define('TOURIST_SHOWCASE_PLUGIN', osc_plugin_path(__FILE__));
 define('TOURIST_SHOWCASE_SECTION', 'tourist_showcase');
+define('TOURIST_SHOWCASE_CSS_REL_PATH', 'tourist-showcase/assets/tourist-showcase.css');
 
 function tourist_showcase_text($spanish, $english) {
   return tourist_showcase_is_spanish(osc_current_user_locale()) ? $spanish : $english;
@@ -134,22 +135,28 @@ function tourist_showcase_search_filters() {
   }
   $category = tourist_showcase_category_param(osc_search_category_id());
   $selected_type = tourist_showcase_normalize_type(Params::getParam('tourist_type'), $type['s_options']);
+  $minimum_guests = tourist_showcase_normalize_positive_integer(Params::getParam('tourist_min_guests'));
+  $minimum_bedrooms = tourist_showcase_normalize_positive_integer(Params::getParam('tourist_min_bedrooms'));
+  $has_active_filters = $selected_type !== '' || $minimum_guests !== '' || $minimum_bedrooms !== '';
   ?>
-  <form class="tourist-showcase-filters" method="get" action="<?php echo osc_esc_html(osc_base_url()); ?>">
+  <form class="tourist-showcase-filters tourist-showcase-filter-form" method="get" action="<?php echo osc_esc_html(osc_base_url()); ?>">
     <input type="hidden" name="page" value="search" />
     <?php if ($category !== '') { ?><input type="hidden" name="sCategory" value="<?php echo osc_esc_html($category); ?>" /><?php } ?>
     <fieldset>
       <legend><?php echo tourist_showcase_text('Alojamiento turístico', 'Tourist accommodation'); ?></legend>
-      <label><?php echo tourist_showcase_text('Tipo', 'Type'); ?>
+      <label class="tourist-showcase-filter-field"><?php echo tourist_showcase_text('Tipo', 'Type'); ?>
         <select name="tourist_type"><option value=""><?php echo tourist_showcase_text('Cualquiera', 'Any'); ?></option><?php foreach (explode('|', $type['s_options']) as $option) { ?><option value="<?php echo osc_esc_html($option); ?>"<?php echo $option === $selected_type ? ' selected' : ''; ?>><?php echo osc_esc_html($option); ?></option><?php } ?></select>
       </label>
-      <label><?php echo tourist_showcase_text('Huéspedes mínimos', 'Minimum guests'); ?>
-        <input type="number" min="1" max="100" name="tourist_min_guests" value="<?php echo osc_esc_html(tourist_showcase_normalize_positive_integer(Params::getParam('tourist_min_guests'))); ?>" />
+      <label class="tourist-showcase-filter-field"><?php echo tourist_showcase_text('Huéspedes mínimos', 'Minimum guests'); ?>
+        <input type="number" min="1" max="100" name="tourist_min_guests" value="<?php echo osc_esc_html($minimum_guests); ?>" />
       </label>
-      <label><?php echo tourist_showcase_text('Dormitorios mínimos', 'Minimum bedrooms'); ?>
-        <input type="number" min="1" max="100" name="tourist_min_bedrooms" value="<?php echo osc_esc_html(tourist_showcase_normalize_positive_integer(Params::getParam('tourist_min_bedrooms'))); ?>" />
+      <label class="tourist-showcase-filter-field"><?php echo tourist_showcase_text('Dormitorios mínimos', 'Minimum bedrooms'); ?>
+        <input type="number" min="1" max="100" name="tourist_min_bedrooms" value="<?php echo osc_esc_html($minimum_bedrooms); ?>" />
       </label>
-      <button type="submit"><?php echo tourist_showcase_text('Aplicar filtros', 'Apply filters'); ?></button>
+      <div class="tourist-showcase-filter-actions">
+        <button type="submit"><?php echo tourist_showcase_text('Aplicar filtros', 'Apply filters'); ?></button>
+        <?php if ($has_active_filters) { ?><a href="<?php echo osc_esc_html(tourist_showcase_clear_filters_url(osc_base_url(), $category)); ?>"><?php echo tourist_showcase_text('Limpiar filtros', 'Clear filters'); ?></a><?php } ?>
+      </div>
     </fieldset>
   </form>
   <?php
@@ -178,7 +185,51 @@ function tourist_showcase_search_conditions($search) {
   }
 }
 
+// The loop hook is shared by category, search and home cards. Memoizing avoids duplicate meta
+// queries when a theme renders the same item more than once in a request.
+function tourist_showcase_item_loop_attributes() {
+  static $cache = array();
+
+  $item_id = (int) osc_item_id();
+  if ($item_id <= 0) {
+    return;
+  }
+
+  if (!array_key_exists($item_id, $cache)) {
+    $cache[$item_id] = Item::newInstance()->metaFields($item_id);
+  }
+
+  $attributes = tourist_showcase_card_attributes($cache[$item_id], osc_current_user_locale());
+  if (!$attributes) {
+    return;
+  }
+
+  echo '<ul class="tourist-showcase-card-attributes">';
+  foreach ($attributes as $attribute) {
+    echo '<li class="tourist-showcase-card-attribute tourist-showcase-card-attribute-' . osc_esc_html($attribute['key']) . '">';
+    echo '<span class="tourist-showcase-card-attribute-label">' . osc_esc_html($attribute['label']) . '</span> ';
+    echo '<span class="tourist-showcase-card-attribute-value">' . osc_esc_html($attribute['value']) . '</span>';
+    echo '</li>';
+  }
+  echo '</ul>';
+}
+
 osc_register_plugin(TOURIST_SHOWCASE_PLUGIN, 'tourist_showcase_install');
 osc_add_hook(TOURIST_SHOWCASE_PLUGIN . '_configure', 'tourist_showcase_configure');
 osc_add_hook('search_items_filter', 'tourist_showcase_search_filters');
 osc_add_hook('sql_search_conditions_before', 'tourist_showcase_search_conditions');
+osc_add_hook('item_loop_description', 'tourist_showcase_item_loop_attributes');
+
+function tourist_showcase_enqueue_css() {
+  if (defined('OC_ADMIN') && OC_ADMIN === true) {
+    return;
+  }
+
+  // This plugin's active PHP entry point lives at oc-content/plugins/, while its assets live in
+  // oc-content/plugins/tourist-showcase/. Resolve from Osclass's plugin root, not __DIR__.
+  $file = osc_plugins_path() . TOURIST_SHOWCASE_CSS_REL_PATH;
+  $version = is_file($file) ? (string) filemtime($file) : '1';
+  osc_enqueue_style('tourist-showcase', osc_plugins_url() . TOURIST_SHOWCASE_CSS_REL_PATH . '?v=' . rawurlencode($version));
+}
+
+osc_add_hook('header', 'tourist_showcase_enqueue_css');

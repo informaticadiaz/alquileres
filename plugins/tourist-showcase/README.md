@@ -11,6 +11,16 @@ Este plugin de Osclass agrega metadatos y filtros para publicar alojamientos tur
 
 La activación crea campos de Osclass reutilizables, pero no crea categorías ni anuncios. La configuración vincula esos campos a las categorías elegidas.
 
+## Despliegue
+
+La entrada activa del plugin es
+`app/osclass/oc-content/plugins/tourist-showcase.php`, no el directorio anidado
+`tourist-showcase/`. Para desplegar esta fuente hay que copiar
+`tourist-showcase.php` y `tourist-showcase-lib.php` a la raíz de
+`oc-content/plugins/`, y `assets/` a
+`oc-content/plugins/tourist-showcase/assets/`. Copiar sólo el directorio fuente
+no actualiza el código activo del plugin.
+
 ## Comportamiento público
 
 | Área | Comportamiento |
