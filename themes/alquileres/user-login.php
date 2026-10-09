@@ -22,51 +22,35 @@
     sigma_add_body_class('login');
     osc_current_web_theme_path('header.php');
 ?>
-<div class="form-container form-horizontal form-container-box">
-    <div class="header">
-        <h1><?php _e('Access to your account', 'sigma'); ?></h1>
+<div class="at-container at-form-page at-form-narrow">
+  <h1 class="at-form-title">Ingresá a tu cuenta</h1>
+
+  <form class="at-form" action="<?php echo osc_base_url(true); ?>" method="post">
+    <input type="hidden" name="page" value="login" />
+    <input type="hidden" name="action" value="login_post" />
+
+    <?php osc_run_hook('user_pre_login_form'); ?>
+
+    <div class="at-field">
+      <label for="email">Correo</label>
+      <?php UserForm::email_login_text(); ?>
     </div>
-    <div class="resp-wrapper">
-        <form action="<?php echo osc_base_url(true); ?>" method="post" >
-            <input type="hidden" name="page" value="login" />
-            <input type="hidden" name="action" value="login_post" />
-            
-            <?php osc_run_hook('user_pre_login_form'); ?>
-            
-            <div class="control-group">
-                <label class="control-label" for="email"><?php _e('E-mail', 'sigma'); ?></label>
-                <div class="controls">
-                    <?php UserForm::email_login_text(); ?>
-                </div>
-            </div>
-            <div class="control-group">
-                <label class="control-label" for="password"><?php _e('Password', 'sigma'); ?></label>
-                <div class="controls">
-                    <?php UserForm::password_login_text(); ?>
-                </div>
-            </div>
-
-            <div class="control-group remember">
-                <div class="controls checkbox">
-                    <?php UserForm::rememberme_login_checkbox();?> <label for="remember"><?php _e('Remember me', 'sigma'); ?></label>
-                </div>
-            </div>
-
-            <?php osc_run_hook('user_login_form'); ?>
-
-            <div class="control-group"><?php osc_show_recaptcha('login'); ?></div>
-            
-            <div class="control-group butt">
-                <div class="controls">
-                    <button type="submit" class="btn btn-primary"><?php _e("Log in", 'sigma');?></button>
-                </div>
-            </div>
-
-            <div class="control-group act">
-                <a href="<?php echo osc_register_account_url(); ?>" class="rg"><?php _e("Register for a free account", 'sigma'); ?></a>
-                <a href="<?php echo osc_recover_user_password_url(); ?>" class="lg"><?php _e("Forgot password?", 'sigma'); ?></a>
-            </div>
-        </form>
+    <div class="at-field">
+      <label for="password">Contraseña</label>
+      <?php UserForm::password_login_text(); ?>
     </div>
+    <div class="at-check">
+      <?php UserForm::rememberme_login_checkbox(); ?> <label for="remember">Mantener la sesión iniciada</label>
+    </div>
+
+    <?php osc_run_hook('user_login_form'); ?>
+    <div class="at-recaptcha"><?php osc_show_recaptcha('login'); ?></div>
+
+    <div class="at-form-actions">
+      <button type="submit" class="at-btn at-btn-primary">Ingresar</button>
+      <p class="at-form-alt"><a href="<?php echo osc_recover_user_password_url(); ?>">¿Olvidaste tu contraseña?</a></p>
+      <p class="at-form-alt">¿No tenés cuenta? <a href="<?php echo osc_register_account_url(); ?>">Creá una</a></p>
+    </div>
+  </form>
 </div>
 <?php osc_current_web_theme_path('footer.php') ; ?>

@@ -236,3 +236,87 @@ html body .at-container { margin-left: auto; margin-right: auto; }
 html body .at-container, html body section[class*="at-"] { float: none; clear: both; }
 html body .at-item section.at-panel { padding: var(--space-5); }
 html body footer.at-footer { padding: 0; }
+
+/* ---------- Forms (publish, contact, register, login) ---------- */
+html body.item-post #content, html body.contact #content, html body.register #content, html body.login #content,
+html body.recover #content, html body.forgot #content { width: auto; max-width: none; padding: 0; margin: 0; float: none; }
+html body.item-post #main, html body.contact #main, html body.register #main, html body.login #main,
+html body.recover #main, html body.forgot #main { width: auto; float: none; margin: 0; padding: 0; text-align: left; }
+html body.item-post > section, html body.contact > section, html body.register > section, html body.login > section { padding: 0; }
+
+.at-form-page { max-width: 760px; padding-block: var(--space-6) var(--space-7); }
+.at-form-narrow { max-width: 520px; }
+html body .at-form-title { margin: 0; padding: 0; font-stretch: 125%; font-weight: 800; font-size: 34px; line-height: 1.05; letter-spacing: -0.02em; color: var(--ink); text-align: left; }
+@media (min-width: 720px) { html body .at-form-title { font-size: 44px; } }
+.at-form-intro { margin: var(--space-3) 0 0; color: var(--ink-muted); max-width: var(--measure); }
+html body .at-form { margin-top: var(--space-6); display: flex; flex-direction: column; gap: var(--space-5); }
+html body .at-form fieldset { border: 0; margin: 0; padding: 0; }
+.at-form-section { display: flex; flex-direction: column; gap: var(--space-4); padding-top: var(--space-5); border-top: 1px solid var(--border); }
+html body .at-form-section h2 { margin: 0; padding: 0; font-size: 22px; line-height: 1.25; font-weight: 700; font-family: var(--font-sans); }
+html body .at-field { display: flex; flex-direction: column; gap: 6px; min-width: 0; margin: 0; }
+html body .at-field > label, html body .at-form .control-label { font-size: 14px; font-weight: 600; line-height: 1.4; color: var(--ink); width: auto; float: none; padding: 0; text-align: left; }
+.at-optional { font-weight: 400; color: var(--ink-muted); }
+html body .at-help { margin: 0; font-size: 13px; line-height: 1.4; color: var(--ink-muted); }
+.at-error { margin: 0; font-size: 14px; color: var(--region-cuyo); font-weight: 600; }
+html body .at-form input[type=text], html body .at-form input[type=email], html body .at-form input[type=password],
+html body .at-form input[type=tel], html body .at-form input[type=number], html body .at-form select, html body .at-form textarea {
+  font: inherit; font-size: 16px; width: 100%; max-width: 100%; box-sizing: border-box; min-height: 48px; height: auto; margin: 0;
+  padding: 10px 14px; border: 1px solid var(--border-control); border-radius: var(--radius-md); background: var(--surface); color: var(--ink); box-shadow: none; }
+html body .at-form textarea { min-height: 160px; resize: vertical; }
+html body .at-check { display: flex; align-items: center; gap: var(--space-2); min-height: var(--target-min); }
+html body .at-check input[type=checkbox] { width: 20px; height: 20px; margin: 0; accent-color: var(--ink); flex: 0 0 auto; }
+html body .at-check label { font-size: 15px; font-weight: 400; margin: 0; padding: 0; width: auto; }
+.at-form-actions { display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-3); padding-top: var(--space-5); border-top: 1px solid var(--border); }
+.at-form-alt { margin: 0; font-size: 15px; color: var(--ink-muted); }
+#error_list:empty { display: none; }
+html body #error_list { margin: 0; padding: var(--space-3) var(--space-4); list-style: none; background: var(--surface-alt); border-radius: var(--radius-md); color: var(--region-cuyo); font-weight: 600; }
+
+/* Plugin-provided fields (tourist-showcase custom fields) inside the publish form. */
+.at-plugin-fields:empty { display: none; }
+html body .at-plugin-fields table { width: 100%; border-collapse: collapse; }
+html body .at-plugin-fields td { display: block; padding: 0 0 6px; width: auto; }
+html body .at-plugin-fields label { font-size: 14px; font-weight: 600; float: none; width: auto; padding: 0; text-align: left; }
+html body .at-plugin-fields .meta, html body .at-plugin-fields .control-group { margin: 0 0 var(--space-4); }
+html body .at-plugin-fields ul.checkbox-list, html body .at-plugin-fields .meta ul { width: 100%; list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: var(--space-2) var(--space-4); }
+.at-upload .qq-upload-button, .at-upload .qq-upload-drop-area { border-radius: var(--radius-md); }
+html body .at-upload .qq-upload-button { background: var(--surface); color: var(--ink); border: 2px solid var(--ink); font-weight: 700; min-height: var(--target-min); box-shadow: none; }
+
+/* ---------- Account pages (Sigma markup, restyled) ---------- */
+html body.user #content.wrapper { width: auto; max-width: var(--container-max); margin: 0 auto; padding: var(--space-5) var(--space-4) var(--space-7); box-sizing: border-box; display: flex; flex-wrap: wrap; gap: var(--space-5) var(--space-7); align-items: flex-start; }
+@media (min-width: 640px) { html body.user #content.wrapper { padding-inline: var(--space-5); } }
+html body.user #sidebar { float: none; width: auto; flex: 1 1 220px; max-width: 280px; position: static; }
+html body.user #main { float: none; width: auto; flex: 999 1 480px; min-width: 0; text-align: left; }
+html body.user #sidebar ul { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--border); }
+html body.user #sidebar li { margin: 0; border-bottom: 1px solid var(--border); background: none; }
+html body.user #sidebar li a { display: flex; align-items: center; min-height: var(--target-min); padding: 0 var(--space-2); color: var(--ink); text-decoration: none; font-size: 16px; }
+html body.user #sidebar li a:hover { text-decoration: underline; }
+html body.user #sidebar li.opt_delete_account a { color: var(--region-cuyo); }
+html body.user #sidebar .fixed-close, html body.user .actions .show-menu-btn { display: none; }
+html body.user h1 { font-family: var(--font-sans); font-stretch: 125%; font-weight: 800; font-size: 32px; line-height: 1.1; color: var(--ink); border-bottom: 0; padding: 0; margin: 0 0 var(--space-5); }
+html body.user h2 { font-family: var(--font-sans); font-size: 22px; font-weight: 700; color: var(--ink); }
+
+/* Shared restyle for Sigma's .form-container forms (account, password recovery). */
+html body .form-container .header h1, html body .form-container-box .header h1 { font-family: var(--font-sans); font-stretch: 125%; font-weight: 800; font-size: 34px; line-height: 1.05; text-align: left; margin: 0 0 var(--space-5); }
+html body .form-container .control-group { margin: 0 0 var(--space-4); display: flex; flex-direction: column; gap: 6px; }
+html body .form-container .control-label { float: none; width: auto; padding: 0; text-align: left; font-size: 14px; font-weight: 600; color: var(--ink); }
+html body .form-container .controls { margin: 0; padding: 0; width: auto; }
+html body .form-container input[type=text], html body .form-container input[type=email], html body .form-container input[type=password],
+html body .form-container input[type=tel], html body .form-container select, html body .form-container textarea {
+  font: inherit; font-size: 16px; width: 100%; max-width: 520px; box-sizing: border-box; min-height: 48px; height: auto; margin: 0;
+  padding: 10px 14px; border: 1px solid var(--border-control); border-radius: var(--radius-md); background: var(--surface); color: var(--ink); box-shadow: none; }
+html body .form-container textarea { max-width: 100%; min-height: 140px; }
+html body .btn, html body .btn-primary, html body button.btn { font-family: var(--font-sans); font-size: 16px; font-weight: 700; min-height: var(--target-min); padding: 0 var(--space-5); border-radius: var(--radius-md); border: 2px solid var(--ink); background: var(--ink); color: var(--on-ink); box-shadow: none; text-shadow: none; line-height: 1; display: inline-flex; align-items: center; justify-content: center; }
+html body .btn-secondary { background: var(--surface); color: var(--ink); }
+html body .form-container-box { max-width: 520px; margin: var(--space-6) auto var(--space-7); padding: 0 var(--space-4); float: none; }
+
+/* Uppy uploader (Osclass core). Its dashboard modal is appended to <body>, outside the form. */
+html body .uppy-Dashboard .uppy-Dashboard-browse { color: var(--ink); font-weight: 700; text-decoration: underline; }
+html body .uppy-Dashboard .uppy-Dashboard-note, html body .uppy-Dashboard .uppy-Dashboard-AddFiles-info,
+html body .at-upload .qq-upload-drop-area span { color: var(--ink-muted); }
+html body .uppy-Dashboard .uppy-Dashboard-close { color: var(--ink); background: var(--surface); border-radius: var(--radius-pill); width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center; }
+html body .uppy-Dashboard .uppy-Dashboard-close span { color: var(--ink); }
+
+/* Form pages: white ground and no generic <section> padding inside the form. */
+html body.item-post > section, html body.contact > section, html body.register > section, html body.login > section,
+html body.recover > section, html body.forgot > section, html body.user > section { background: var(--surface); }
+html body .at-form section.at-form-section { padding: var(--space-5) 0 0; background: none; float: none; }

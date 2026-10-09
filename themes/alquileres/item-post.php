@@ -18,9 +18,8 @@
 
   // meta tag robots
   osc_add_hook('header','sigma_nofollow_construct');
-  
+
   osc_enqueue_script('jquery-validate');
-  //osc_enqueue_script('tabber');
 
   sigma_add_body_class('item item-post');
   $action = 'item_add_post';
@@ -29,6 +28,12 @@
     $action = 'item_edit_post';
     $edit = true;
   }
+
+  $at_locale = osc_current_user_locale();
+  $at_title_id = 'title' . $at_locale;
+  $at_desc_id = 'description' . $at_locale;
+  // Privacy by default: a new listing starts with email and phone hidden.
+  $at_privacy_item = $edit ? null : array('b_show_email' => false, 'b_show_phone' => false);
 ?>
 
 <?php osc_current_web_theme_path('header.php') ; ?>
@@ -39,260 +44,170 @@
   } else {
     ItemForm::location_javascript_new();
   }
-  
+
   if(osc_images_enabled_at_items())  {
     ItemForm::photos_javascript();
   }
 ?>
 
-  <div class="form-container form-horizontal">
-    <div class="resp-wrapper">
-      <div class="header">
-        <h1><?php _e('Publish a listing', 'sigma'); ?></h1>
+<div class="at-container at-form-page">
+  <h1 class="at-form-title"><?php echo $edit ? 'Editá tu alojamiento' : 'Publicá tu alojamiento'; ?></h1>
+  <?php if (!$edit) { ?>
+    <p class="at-form-intro">Tu alojamiento aparece en el destino que elijas. Los huéspedes te escriben directamente; no cobramos comisión ni intervenimos en la reserva.</p>
+  <?php } ?>
+
+  <ul id="error_list"></ul>
+  <form name="item" action="<?php echo osc_base_url(true);?>" method="post" enctype="multipart/form-data" id="item-post" class="at-form">
+    <input type="hidden" name="action" value="<?php echo $action; ?>" />
+    <input type="hidden" name="page" value="item" />
+    <?php if($edit){ ?>
+      <input type="hidden" name="id" value="<?php echo osc_item_id();?>" />
+      <input type="hidden" name="secret" value="<?php echo osc_item_secret();?>" />
+    <?php } ?>
+    <?php osc_run_hook('item_publish_top'); ?>
+
+    <section class="at-form-section" aria-labelledby="t-aloj">
+      <h2 id="t-aloj">El alojamiento</h2>
+
+      <div class="at-field">
+        <label for="catId">Destino</label>
+        <?php ItemForm::category_select(null, null, 'Elegí el destino'); ?>
+        <p class="at-help">Elegí la ciudad, el valle o la costa donde está el alojamiento.</p>
       </div>
-      <ul id="error_list"></ul>
-        <form name="item" action="<?php echo osc_base_url(true);?>" method="post" enctype="multipart/form-data" id="item-post">
-          <fieldset>
-          <input type="hidden" name="action" value="<?php echo $action; ?>" />
-            <input type="hidden" name="page" value="item" />
-          <?php if($edit){ ?>
-            <input type="hidden" name="id" value="<?php echo osc_item_id();?>" />
-            <input type="hidden" name="secret" value="<?php echo osc_item_secret();?>" />
-          <?php } ?>
-            <?php osc_run_hook('item_publish_top'); ?>
-            
-            <h2 class="gen"><?php _e('General Information', 'sigma'); ?></h2>
-            <div class="control-group categ">
-              <label class="control-label" for="select_1"><?php _e('Category', 'sigma'); ?></label>
-              <div class="controls">
-                <?php ItemForm::category_select(null, null, __('Select a category', 'sigma')); ?>
-              </div>
-            </div>
-            
-            <?php osc_run_hook('item_publish_category'); ?>
-            
-            <div class="control-group title">
-              <label class="control-label" for="title[<?php echo osc_current_user_locale(); ?>]"><?php _e('Title', 'sigma'); ?></label>
-              <div class="controls">
-                <?php ItemForm::title_input('title',osc_current_user_locale(), osc_esc_html( sigma_item_title() )); ?>
-              </div>
-            </div>
-            
-            <div class="control-group descr">
-              <label class="control-label" for="description[<?php echo osc_current_user_locale(); ?>]"><?php _e('Description', 'sigma'); ?></label>
-              <div class="controls">
-                <?php ItemForm::description_textarea('description',osc_current_user_locale(), osc_esc_html( sigma_item_description() )); ?>
-              </div>
-            </div>
-            
-            <?php osc_run_hook('item_publish_description'); ?>
-            
-            <?php if( osc_price_enabled_at_items() ) { ?>
-              <div class="control-group control-group-price">
-                <label class="control-label" for="price"><?php _e('Price', 'sigma'); ?></label>
-                <div class="controls">
-                  <?php ItemForm::price_input_text(); ?>
-                  <?php ItemForm::currency_select(); ?>
-                </div>
-              </div>
-              
-              <?php osc_run_hook('item_publish_price'); ?>
-            <?php } ?>
 
-            <div class="control-group img upload-photos">
-              <?php if( osc_images_enabled_at_items() ) {
-                ItemForm::ajax_photos();
-              } ?>
-            </div>
-            
-            <?php osc_run_hook('item_publish_images'); ?>
-            
-            <div class="box location">
-              <h2><?php _e('Listing Location', 'sigma'); ?></h2>
-              <?php if(count(osc_get_countries()) > 1) { ?>
-              <div class="control-group">
-                <label class="control-label" for="country"><?php _e('Country', 'sigma'); ?></label>
-                <div class="controls">
-                  <?php ItemForm::country_select(osc_get_countries(), osc_user()); ?>
-                </div>
-              </div>
-              <div class="control-group">
-                <label class="control-label" for="regionId"><?php _e('Region', 'sigma'); ?></label>
-                <div class="controls">
-                  <?php
-                  if (sigma_default_location_show_as() == 'dropdown') {
-                    if($edit) {
-                      ItemForm::region_select(osc_get_regions(osc_item_country_code()), osc_item());
-                    } else {
-                      ItemForm::region_select(osc_get_regions(osc_user_field('fk_c_country_code')), osc_user());
-                    }
-                  } else {
-                    if($edit) {
-                      ItemForm::region_text(osc_item());
-                    } else {
-                      ItemForm::region_text(osc_user());
-                    }
-                  }
-                  ?>
-                </div>
-              </div>
-              <?php
-              } else {
-                $aCountries = osc_get_countries();
-                $aRegions = osc_get_regions($aCountries[0]['pk_c_code']);
-                ?>
-              <input type="hidden" id="countryId" name="countryId" value="<?php echo osc_esc_html($aCountries[0]['pk_c_code']); ?>"/>
-              <div class="control-group">
-                <label class="control-label" for="region"><?php _e('Region', 'sigma'); ?></label>
-                <div class="controls">
-                  <?php
-                  if (sigma_default_location_show_as() == 'dropdown') {
-                    if($edit) {
-                      ItemForm::region_select(null, osc_item());
-                    } else {
-                      ItemForm::region_select(null, osc_user());
-                    }
-                  } else {
-                    if($edit) {
-                      ItemForm::region_text(osc_item());
-                    } else {
-                      ItemForm::region_text(osc_user());
-                    }
-                  }
-                  ?>
-                </div>
-              </div>
-              <?php } ?>
+      <?php osc_run_hook('item_publish_category'); ?>
 
-              <div class="control-group">
-                <label class="control-label" for="city"><?php _e('City', 'sigma'); ?></label>
-                <div class="controls">
-                  <?php
-                  if (sigma_default_location_show_as() == 'dropdown') {
-                    if($edit) {
-                      ItemForm::city_select(null, osc_item());
-                    } else { // add new item
-                      ItemForm::city_select(null, osc_user());
-                    }
-                  } else {
-                    ItemForm::city_text(osc_user());
-                  }
-                  ?>
-                </div>
-              </div>
-              <div class="control-group">
-                <label class="control-label" for="cityArea"><?php _e('City Area', 'sigma'); ?></label>
-                <div class="controls">
-                  <?php ItemForm::city_area_text(osc_user()); ?>
-                </div>
-              </div>
-              <div class="control-group">
-                <label class="control-label" for="address"><?php _e('Address', 'sigma'); ?></label>
-                <div class="controls">
-                  <?php ItemForm::address_text(osc_user()); ?>
-                </div>
-              </div>
-            </div>
-            
-            <?php osc_run_hook('item_publish_location'); ?>
-
-            <!-- seller info -->
-            <div class="box seller_info">
-              <h2><?php _e("Seller's information", 'sigma'); ?></h2>
-
-              <?php if(!osc_is_web_user_logged_in() ) { ?>
-                <div class="control-group">
-                  <label class="control-label" for="contactName"><?php _e('Name', 'sigma'); ?></label>
-                  <div class="controls">
-                    <?php ItemForm::contact_name_text(); ?>
-                  </div>
-                </div>
-
-                <div class="control-group">
-                  <label class="control-label" for="contactEmail"><?php _e('E-mail', 'sigma'); ?></label>
-                  <div class="controls">
-                    <?php ItemForm::contact_email_text(); ?>
-                  </div>
-                </div>
-
-                <div class="control-group">
-                  <div class="controls checkbox">
-                    <?php ItemForm::show_email_checkbox(); ?> <label for="showEmail"><?php _e('Show e-mail on the listing page', 'sigma'); ?></label>
-                  </div>
-                </div>
-              <?php } ?>
-
-              <div class="control-group">
-                <label class="control-label" for="contactPhone"><?php _e('Phone number', 'sigma'); ?></label>
-                <div class="controls">
-                  <?php ItemForm::contact_phone_text(); ?>
-                </div>
-              </div>
-
-              <div class="control-group">
-                <div class="controls checkbox">
-                  <?php ItemForm::show_phone_checkbox(); ?> <label for="showPhone"><?php _e('Show phone on the listing page', 'sigma'); ?></label>
-                </div>
-              </div>
-
-              <div class="control-group">
-                <label class="control-label" for="contactOther"><?php _e('Other contact', 'sigma'); ?></label>
-                <div class="controls">
-                  <?php ItemForm::contact_other_text(); ?>
-                </div>
-              </div>
-            </div>
-            
-            <?php osc_run_hook('item_publish_seller'); ?>
-
-            <div class="hooks"><?php if($edit) { ItemForm::plugin_edit_item(); } else { ItemForm::plugin_post_item(); } ?></div>
-
-            <?php osc_run_hook('item_publish_hook'); ?>
-            <?php osc_run_hook('item_publish_bottom'); ?>
-            
-            <div class="control-group">
-              <?php if( osc_recaptcha_items_enabled() ) { ?>
-                <div class="controls recpt"><?php osc_show_recaptcha(); ?></div>
-              <?php }?>
-
-              <div class="controls pblbt">
-                <button type="submit" class="btn btn-primary pbl"><?php if($edit) { _e("Update", 'sigma'); } else { _e("Publish", 'sigma'); } ?></button>
-                <?php osc_run_hook('item_publish_buttons'); ?>
-              </div>
-            </div>
-          </fieldset>
-          
-          <?php osc_run_hook('item_publish_after'); ?>
-        </form>
+      <div class="at-field">
+        <label for="<?php echo $at_title_id; ?>">Nombre del alojamiento</label>
+        <?php ItemForm::title_input('title', $at_locale, osc_esc_html( sigma_item_title() )); ?>
+        <p class="at-help">Como figura en tu cartel o en tu sitio oficial.</p>
       </div>
+
+      <div class="at-field">
+        <label for="<?php echo $at_desc_id; ?>">Descripción</label>
+        <?php ItemForm::description_textarea('description', $at_locale, osc_esc_html( sigma_item_description() )); ?>
+        <p class="at-help">Contá qué ofrecés: unidades, capacidad, servicios y cómo se llega.</p>
+      </div>
+
+      <?php osc_run_hook('item_publish_description'); ?>
+
+      <div class="at-plugin-fields"><?php if($edit) { ItemForm::plugin_edit_item(); } else { ItemForm::plugin_post_item(); } ?></div>
+    </section>
+
+    <?php if( osc_images_enabled_at_items() ) { ?>
+      <section class="at-form-section" aria-labelledby="t-fotos">
+        <h2 id="t-fotos">Fotos</h2>
+        <p class="at-help">Opcional. Sumá fotos propias del alojamiento.</p>
+        <div class="at-upload"><?php ItemForm::ajax_photos(); ?></div>
+        <?php osc_run_hook('item_publish_images'); ?>
+      </section>
+    <?php } ?>
+
+    <section class="at-form-section" aria-labelledby="t-ubic">
+      <h2 id="t-ubic">Ubicación</h2>
+      <?php if(count(osc_get_countries()) > 1) { ?>
+        <div class="at-field">
+          <label for="countryId">País</label>
+          <?php ItemForm::country_select(osc_get_countries(), osc_user()); ?>
+        </div>
+      <?php } else {
+        // The instance may have no country configured; only send countryId when one exists.
+        $aCountries = osc_get_countries();
+        if (isset($aCountries[0]['pk_c_code'])) { ?>
+          <input type="hidden" id="countryId" name="countryId" value="<?php echo osc_esc_html($aCountries[0]['pk_c_code']); ?>"/>
+        <?php }
+      } ?>
+
+      <div class="at-field">
+        <?php
+          // region_select() falls back to a text input (#region) when the country has no regions.
+          $at_countries = osc_get_countries();
+          $at_region_select = sigma_default_location_show_as() == 'dropdown' && isset($at_countries[0]['pk_c_code']) && count(osc_get_regions($at_countries[0]['pk_c_code'])) > 0;
+        ?>
+        <label for="<?php echo $at_region_select ? 'regionId' : 'region'; ?>">Provincia</label>
+        <?php
+          $at_loc_item = $edit ? osc_item() : osc_user();
+          if (sigma_default_location_show_as() == 'dropdown') {
+            ItemForm::region_select(null, $at_loc_item);
+          } else {
+            ItemForm::region_text($at_loc_item);
+          }
+        ?>
+      </div>
+
+      <div class="at-field">
+        <label for="<?php echo sigma_default_location_show_as() == 'dropdown' ? 'cityId' : 'city'; ?>">Localidad</label>
+        <?php
+          if (sigma_default_location_show_as() == 'dropdown') {
+            ItemForm::city_select(null, $at_loc_item);
+          } else {
+            ItemForm::city_text(osc_user());
+          }
+        ?>
+      </div>
+
+      <div class="at-field">
+        <label for="address">Dirección <span class="at-optional">(opcional)</span></label>
+        <?php ItemForm::address_text(osc_user()); ?>
+      </div>
+      <?php osc_run_hook('item_publish_location'); ?>
+    </section>
+
+    <section class="at-form-section" aria-labelledby="t-contacto">
+      <h2 id="t-contacto">Contacto</h2>
+      <p class="at-help">Los huéspedes te escriben con el formulario de la ficha. Mostrar tu correo o teléfono es opcional.</p>
+
+      <?php if(!osc_is_web_user_logged_in() ) { ?>
+        <div class="at-field">
+          <label for="contactName">Tu nombre</label>
+          <?php ItemForm::contact_name_text(); ?>
+        </div>
+        <div class="at-field">
+          <label for="contactEmail">Tu correo</label>
+          <?php ItemForm::contact_email_text(); ?>
+        </div>
+        <div class="at-check">
+          <?php ItemForm::show_email_checkbox($at_privacy_item); ?> <label for="showEmail">Mostrar mi correo en la ficha</label>
+        </div>
+      <?php } ?>
+
+      <div class="at-field">
+        <label for="contactPhone">Teléfono <span class="at-optional">(opcional)</span></label>
+        <?php ItemForm::contact_phone_text(); ?>
+      </div>
+      <div class="at-check">
+        <?php ItemForm::show_phone_checkbox($at_privacy_item); ?> <label for="showPhone">Mostrar mi teléfono en la ficha</label>
+      </div>
+
+      <div class="at-field">
+        <label for="contactOther">Sitio web u otro contacto <span class="at-optional">(opcional)</span></label>
+        <?php ItemForm::contact_other_text(); ?>
+      </div>
+      <?php osc_run_hook('item_publish_seller'); ?>
+    </section>
+
+    <?php osc_run_hook('item_publish_hook'); ?>
+    <?php osc_run_hook('item_publish_bottom'); ?>
+
+    <div class="at-form-actions">
+      <?php if( osc_recaptcha_items_enabled() ) { ?><div class="at-recaptcha"><?php osc_show_recaptcha(); ?></div><?php } ?>
+      <button type="submit" class="at-btn at-btn-primary"><?php echo $edit ? 'Guardar cambios' : 'Publicar alojamiento'; ?></button>
+      <?php osc_run_hook('item_publish_buttons'); ?>
     </div>
-    <script type="text/javascript">
-      $('#price').bind('hide-price', function(){
-        $('.control-group-price').hide();
-      });
 
-      $('#price').bind('show-price', function(){
-        $('.control-group-price').show();
+    <?php osc_run_hook('item_publish_after'); ?>
+  </form>
+</div>
+<script>
+  // Uppy (core photo uploader) renders unlabeled file inputs; give them an accessible name.
+  (function () {
+    function nameInputs() {
+      document.querySelectorAll('.uppy-Dashboard-input:not([aria-label]), .at-upload input[type=file]:not([aria-label])').forEach(function (el) {
+        el.setAttribute('aria-label', 'Elegir fotos del alojamiento');
       });
-
-  <?php if(osc_locale_thousands_sep()!='' || osc_locale_dec_point() != '') { ?>
-  $().ready(function(){
-    $("#price").blur(function(event) {
-      var price = $("#price").prop("value");
-      <?php if(osc_locale_thousands_sep()!='') { ?>
-      while(price.indexOf('<?php echo osc_esc_js(osc_locale_thousands_sep());  ?>')!=-1) {
-        price = price.replace('<?php echo osc_esc_js(osc_locale_thousands_sep());  ?>', '');
-      }
-      <?php }; ?>
-      <?php if(osc_locale_dec_point()!='') { ?>
-      var tmp = price.split('<?php echo osc_esc_js(osc_locale_dec_point())?>');
-      if(tmp.length>2) {
-        price = tmp[0]+'<?php echo osc_esc_js(osc_locale_dec_point())?>'+tmp[1];
-      }
-      <?php }; ?>
-      $("#price").prop("value", price);
-    });
-  });
-  <?php }; ?>
+    }
+    nameInputs();
+    new MutationObserver(nameInputs).observe(document.body, { childList: true, subtree: true });
+  })();
 </script>
 <?php osc_current_web_theme_path('footer.php'); ?>

@@ -133,5 +133,6 @@ Referencias de estudio (sin verificar su vigencia en esta fecha):
 - Etapa 3 cerrada el 2026-10-09: `sistema-diseno/` (v1, con pendientes
   anotados en su `README.md`).
 - Etapa 5 en curso: tema `themes/alquileres/` activo desde el 2026-10-09 con
-  inicio, resultados y ficha rediseñados. Pendientes: publicar, contacto,
-  registro y cuenta.
+  inicio, resultados, ficha y formularios (publicar, contacto, registro,
+  ingreso, cuenta) rediseñados. Pendiente: revisar las páginas de cuenta con
+  un usuario.

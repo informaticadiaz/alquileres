@@ -453,13 +453,13 @@ if(!function_exists('get_breadcrumb_lang')) {
     $lang['search_pattern']     = __('Search results: %s', 'sigma');
     $lang['user_dashboard']     = __('Dashboard', 'sigma');
     $lang['user_dashboard_profile'] = __("%s's profile", 'sigma');
-    $lang['user_account']       = __('Account', 'sigma');
-    $lang['user_items']       = __('Listings', 'sigma');
-    $lang['user_alerts']      = __('Alerts', 'sigma');
+    $lang['user_account']       = 'Mis datos';
+    $lang['user_items']       = 'Mis alojamientos';
+    $lang['user_alerts']      = 'Alertas';
     $lang['user_profile']       = __('Update account', 'sigma');
-    $lang['user_change_email']    = __('Change email', 'sigma');
-    $lang['user_change_username']   = __('Change username', 'sigma');
-    $lang['user_change_password']   = __('Change password', 'sigma');
+    $lang['user_change_email']    = 'Cambiar correo';
+    $lang['user_change_username']   = 'Cambiar nombre de usuario';
+    $lang['user_change_password']   = 'Cambiar contraseña';
     $lang['login']          = __('Login', 'sigma');
     $lang['login_recover']      = __('Recover password', 'sigma');
     $lang['login_forgot']       = __('Change password', 'sigma');
@@ -487,7 +487,7 @@ if(!function_exists('get_user_menu')) {
   function get_user_menu() {
     $options   = array();
     $options[] = array(
-      'name' => __('Public Profile'),
+      'name' => 'Perfil público',
        'url' => osc_user_public_profile_url(),
        'class' => 'opt_publicprofile'
     );
@@ -522,7 +522,7 @@ if(!function_exists('get_user_menu')) {
       'class' => 'opt_change_password'
     );
     $options[] = array(
-      'name'  => __('Delete account', 'sigma'),
+      'name'  => 'Eliminar cuenta',
       'url'   => '#',
       'class' => 'opt_delete_account'
     );

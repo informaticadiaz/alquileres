@@ -43,9 +43,9 @@
 <section>
 <?php osc_show_widgets('header'); ?>
   <?php
-    // The redesigned pages (home, results, listing) draw their own breadcrumb.
-    $at_own_breadcrumb = osc_is_home_page() || osc_is_search_page() || osc_is_ad_page();
-    $breadcrumb = $at_own_breadcrumb ? '' : osc_breadcrumb('>', false, get_breadcrumb_lang());
+    // Osclass's generic breadcrumb (English labels, "Home > Contact") is not used anywhere: the
+    // results and listing pages draw their own, and forms and account pages do not need one.
+    $breadcrumb = '';
   ?>
 
   <?php if( $breadcrumb !== '') { ?>

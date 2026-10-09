@@ -23,57 +23,43 @@
     osc_enqueue_script('jquery-validate');
     osc_current_web_theme_path('header.php') ;
 ?>
-<div class="form-container form-horizontal form-container-box">
-    <div class="header">
-        <h1><?php _e('Register an account for free', 'sigma'); ?></h1>
+<div class="at-container at-form-page at-form-narrow">
+  <h1 class="at-form-title">Creá tu cuenta</h1>
+  <p class="at-form-intro">Con una cuenta publicás y editás tus alojamientos. Es gratis.</p>
+
+  <form name="register" class="at-form" action="<?php echo osc_base_url(true); ?>" method="post">
+    <input type="hidden" name="page" value="register" />
+    <input type="hidden" name="action" value="register_post" />
+
+    <?php osc_run_hook('user_pre_register_form'); ?>
+
+    <ul id="error_list"></ul>
+    <div class="at-field">
+      <label for="s_name">Nombre</label>
+      <?php UserForm::name_text(); ?>
     </div>
-    <div class="resp-wrapper">
-        <form name="register" action="<?php echo osc_base_url(true); ?>" method="post" >
-            <input type="hidden" name="page" value="register" />
-            <input type="hidden" name="action" value="register_post" />
-            
-            <?php osc_run_hook('user_pre_register_form'); ?>
-            
-            <ul id="error_list"></ul>
-            <div class="control-group">
-                <label class="control-label" for="name"><?php _e('Name', 'sigma'); ?></label>
-                <div class="controls">
-                    <?php UserForm::name_text(); ?>
-                </div>
-            </div>
-            <div class="control-group">
-                <label class="control-label" for="email"><?php _e('E-mail', 'sigma'); ?></label>
-                <div class="controls">
-                    <?php UserForm::email_text(); ?>
-                </div>
-            </div>
-            <div class="control-group">
-                <label class="control-label" for="password"><?php _e('Password', 'sigma'); ?></label>
-                <div class="controls">
-                    <?php UserForm::password_text(); ?>
-                </div>
-            </div>
-            <div class="control-group">
-                <label class="control-label" for="password-2"><?php _e('Repeat password', 'sigma'); ?></label>
-                <div class="controls">
-                    <?php UserForm::check_password_text(); ?>
-                    <p id="password-error" style="display:none;">
-                        <?php _e("Passwords don't match", 'sigma'); ?>
-                    </p>
-                </div>
-            </div>
-
-            <?php osc_run_hook('user_register_form'); ?>
-
-            <div class="control-group"><?php osc_show_recaptcha('register'); ?></div>
-
-            <div class="control-group">
-                <div class="controls">
-                    <button type="submit" class="btn btn-primary"><?php _e("Create account", 'sigma'); ?></button>
-                </div>
-            </div>
-        </form>
+    <div class="at-field">
+      <label for="s_email">Correo</label>
+      <?php UserForm::email_text(); ?>
     </div>
+    <div class="at-field">
+      <label for="s_password">Contraseña</label>
+      <?php UserForm::password_text(); ?>
+    </div>
+    <div class="at-field">
+      <label for="s_password2">Repetí la contraseña</label>
+      <?php UserForm::check_password_text(); ?>
+      <p id="password-error" class="at-error" style="display:none;">Las contraseñas no coinciden.</p>
+    </div>
+
+    <?php osc_run_hook('user_register_form'); ?>
+    <div class="at-recaptcha"><?php osc_show_recaptcha('register'); ?></div>
+
+    <div class="at-form-actions">
+      <button type="submit" class="at-btn at-btn-primary">Crear cuenta</button>
+      <p class="at-form-alt">¿Ya tenés cuenta? <a href="<?php echo osc_user_login_url(); ?>">Ingresá</a></p>
+    </div>
+  </form>
 </div>
 <?php UserForm::js_validation(); ?>
 <?php osc_current_web_theme_path('footer.php') ; ?>

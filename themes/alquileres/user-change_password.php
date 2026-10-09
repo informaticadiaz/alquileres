@@ -26,12 +26,12 @@
     }
     osc_add_filter('meta_title_filter','custom_meta_title');
     function custom_meta_title($data){
-        return __('Change password', 'sigma');;
+        return 'Cambiar contraseña';;
     }
     osc_current_web_theme_path('header.php') ;
     $osc_user = osc_user();
 ?>
-<h1><?php _e('Change password', 'sigma'); ?></h1>
+<h1><?php echo 'Cambiar contraseña'; ?></h1>
 <div class="form-container form-horizontal">
     <div class="resp-wrapper">
         <ul id="error_list"></ul>
@@ -39,26 +39,26 @@
             <input type="hidden" name="page" value="user" />
             <input type="hidden" name="action" value="change_password_post" />
             <div class="control-group">
-                <label class="control-label" for="password"><?php _e('Current password', 'sigma'); ?> *</label>
+                <label class="control-label" for="password"><?php echo 'Contraseña actual'; ?> *</label>
                 <div class="controls">
                     <input type="password" name="password" id="password" value="" autocomplete="off" />
                 </div>
             </div>
             <div class="control-group">
-                <label class="control-label" for="new_password"><?php _e('New password', 'sigma'); ?> *</label>
+                <label class="control-label" for="new_password"><?php echo 'Contraseña nueva'; ?> *</label>
                 <div class="controls">
                     <input type="password" name="new_password" id="new_password" value="" autocomplete="off" />
                 </div>
             </div>
             <div class="control-group">
-                <label class="control-label" for="new_password2"><?php _e('Repeat new password', 'sigma'); ?> *</label>
+                <label class="control-label" for="new_password2"><?php echo 'Repetí la contraseña nueva'; ?> *</label>
                 <div class="controls">
                     <input type="password" name="new_password2" id="new_password2" value="" autocomplete="off" />
                 </div>
             </div>
             <div class="control-group bts">
                 <div class="controls">
-                    <button type="submit" class="btn btn-primary"><?php _e("Update", 'sigma');?></button>
+                    <button type="submit" class="btn btn-primary"><?php echo 'Guardar cambios';?></button>
                 </div>
             </div>
         </form>

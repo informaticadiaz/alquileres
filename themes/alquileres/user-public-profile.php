@@ -84,7 +84,7 @@
   </div>
   
   <?php if(osc_user_info() !== '') { ?>
-    <h2><?php _e('Description', 'sigma'); ?></h2>
+    <h2><?php echo 'Descripción'; ?></h2>
     <?php echo nl2br(osc_user_info()); ?>
   <?php } ?>
   
@@ -92,7 +92,7 @@
   <div class="similar_ads user-public-profile-items">
     <?php osc_run_hook('user_public_profile_items_top'); ?>
 
-    <h2><?php _e('User listings', 'sigma'); ?></h2>
+    <h2><?php echo 'Alojamientos publicados'; ?></h2>
 
     <form name="user-public-profile-search" action="<?php echo osc_base_url(true); ?>" method="get" class="user-public-profile-search-form nocsrf">
       <input type="hidden" name="page" value="user"/>
@@ -102,7 +102,7 @@
       <?php osc_run_hook('user_public_profile_search_form_top'); ?>
       
       <div class="control-group">
-        <label class="control-label" for="sPattern"><?php _e('Keyword', 'sigma'); ?></label>
+        <label class="control-label" for="sPattern"><?php echo 'Palabra clave'; ?></label>
         
         <div class="controls">
           <?php UserForm::search_pattern_text(); ?>
@@ -110,7 +110,7 @@
       </div>
       
       <div class="control-group">
-        <label class="control-label" for="sCategory"><?php _e('Category', 'sigma'); ?></label>
+        <label class="control-label" for="sCategory"><?php echo 'Destino'; ?></label>
         
         <div class="controls">
           <?php UserForm::search_category_select(); ?>
@@ -118,7 +118,7 @@
       </div>
 
       <div class="control-group">
-        <label class="control-label" for="sCity"><?php _e('City', 'sigma'); ?></label>
+        <label class="control-label" for="sCity"><?php echo 'Localidad'; ?></label>
         
         <div class="controls">
           <?php UserForm::search_city_select(); ?>
@@ -128,14 +128,14 @@
       <?php osc_run_hook('user_public_profile_search_form_bottom'); ?>
       
       <div class="actions">
-        <button type="submit" class="btn btn-primary"><?php _e('Apply', 'sigma'); ?></button>
+        <button type="submit" class="btn btn-primary"><?php echo 'Aplicar'; ?></button>
       </div>
     </form>
     
     <div class="clear"></div>
 
     <?php if(osc_count_items() == 0) { ?>
-      <p class="empty" ><?php _e('No listings found', 'sigma'); ?></p>
+      <p class="empty" ><?php echo 'Todavía no publicaste alojamientos'; ?></p>
       
     <?php } else { ?>
       <?php osc_current_web_theme_path('loop.php'); ?>

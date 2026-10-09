@@ -15,10 +15,14 @@ Parte de una copia de Sigma 1.7.0 y aplica `../../sistema-diseno/`.
 | `search.php` | Banda del color de la región con migas y título, filtros de `tourist-showcase`, filas de alojamiento y paginación. Sin el panel lateral de Sigma. |
 | `item.php` | Ficha: datos, panel de acción (aviso de `tourist-directory` o contacto del propietario) y más alojamientos del destino. Sin consejos de clasificados, contador de visitas, "Marcar como…" ni comentarios. |
 | `functions.php` | Funciones `at_*` (color de región, nombres cortos, ruta de categorías, fila de alojamiento) y quita la grilla de últimos anuncios de Sigma. |
+| `item-post.php` | Publicar o editar alojamiento: secciones El alojamiento, Fotos, Ubicación y Contacto; sin precio ni barrio; correo y teléfono ocultos por defecto en alojamientos nuevos; sin aviso PHP cuando la instancia no tiene países cargados. |
+| `contact.php`, `user-register.php`, `user-login.php` | Formularios reescritos con etiquetas asociadas y voseo. |
+| `user-*.php` | Páginas de cuenta con el marcado de Sigma y textos en voseo; el menú de usuario se renombró en `get_user_menu()`. |
 | `index.php` | Metadatos del tema. |
 
-Las demás plantillas (publicar, contacto, registro, cuenta) siguen siendo las de
-Sigma con los estilos generales del tema.
+Ninguna página usa la miga de pan genérica de Osclass (etiquetas en inglés);
+resultados y ficha dibujan la suya. Las páginas de cuenta se verificaron sólo
+sin sesión (redirigen al ingreso); falta revisarlas con un usuario.
 
 ## Despliegue
 
@@ -47,6 +51,7 @@ Para volver a Sigma, el mismo comando con `"sigma"`. Sigma queda intacto en
 
 - `php -l` sobre las plantillas modificadas.
 - `php tests/test_tourist_showcase.php` desde la raíz del repo.
-- Auditoría visual: `../playwright/projects/alquileres.mjs` (inicio, región,
-  destino y ficha sin errores de consola, contraste, etiquetas ni nombres
-  accesibles el 2026-10-09).
+- Auditoría visual: `../playwright/projects/alquileres.mjs`; el 2026-10-09 las
+  siete pantallas (inicio, región, destino, ficha, publicar, contacto,
+  registro) dieron cero errores de consola, contraste, etiquetas y nombres
+  accesibles en escritorio y celular.

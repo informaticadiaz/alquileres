@@ -26,14 +26,14 @@
     }
     osc_add_filter('meta_title_filter','custom_meta_title');
     function custom_meta_title($data){
-        return __('Alerts', 'sigma');;
+        return 'Alertas';;
     }
     osc_current_web_theme_path('header.php') ;
     $osc_user = osc_user();
 ?>
-<h1><?php _e('Alerts', 'sigma'); ?></h1>
+<h1><?php echo 'Alertas'; ?></h1>
 <?php if(osc_count_alerts() == 0) { ?>
-    <p class="empty"><?php _e('You do not have any alerts yet', 'sigma'); ?>.</p>
+    <p class="empty"><?php echo 'Todavía no tenés alertas guardadas'; ?>.</p>
 <?php } else { ?>
     <?php
     $i = 1;
@@ -45,13 +45,13 @@
                   if(osc_alert_name() != '') { 
                     echo osc_alert_name(); 
                   } else { 
-                    echo sprintf(__('Alert #%d', 'sigma'), osc_alert_id()); 
+                    echo sprintf('Alerta n.º %d', osc_alert_id()); 
                   } 
                 ?>
               </h3>
               
-              <a onclick="javascript:return confirm('<?php echo osc_esc_js(__('This action can\'t be undone. Are you sure you want to continue?', 'sigmaw')); ?>');" href="<?php echo osc_user_unsubscribe_alert_url(); ?>"><?php _e('Delete this alert', 'sigma'); ?></a>
-              <a href="<?php echo osc_search_alert_url(); ?>"><?php _e('Open in search', 'sigma'); ?></a>
+              <a onclick="javascript:return confirm('<?php echo osc_esc_js('Esta acción no se puede deshacer. ¿Querés continuar?'); ?>');" href="<?php echo osc_user_unsubscribe_alert_url(); ?>">Eliminar esta alerta</a>
+              <a href="<?php echo osc_search_alert_url(); ?>"><?php echo 'Ver en el buscador'; ?></a>
 
               <div class="clear">
 
@@ -65,7 +65,7 @@
             
             <?php if(osc_count_items() == 0) { ?>
               <div class="alerts-items-empty">
-                0 <?php _e('Listings', 'sigma'); ?>
+                0 <?php echo 'Alojamientos'; ?>
               </div>
             <?php } ?>
             </div>

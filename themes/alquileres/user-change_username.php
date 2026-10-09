@@ -28,12 +28,12 @@
     }
     osc_add_filter('meta_title_filter','custom_meta_title');
     function custom_meta_title($data){
-        return __('Change username', 'sigma');;
+        return 'Cambiar nombre de usuario';;
     }
     osc_current_web_theme_path('header.php') ;
     $osc_user = osc_user();
 ?>
-<h1><?php _e('Change username', 'sigma'); ?></h1>
+<h1><?php echo 'Cambiar nombre de usuario'; ?></h1>
 <script type="text/javascript">
 $(document).ready(function() {
     $('form#change-username').validate({
@@ -88,7 +88,7 @@ $(document).ready(function() {
             <input type="hidden" name="page" value="user" />
             <input type="hidden" name="action" value="change_username_post" />
             <div class="control-group">
-                <label class="control-label" for="s_username"><?php _e('Username', 'sigma'); ?></label>
+                <label class="control-label" for="s_username"><?php echo 'Nombre de usuario'; ?></label>
                 <div class="controls">
                     <input type="text" name="s_username" id="s_username" value="" />
                     <div id="available"></div>
@@ -96,7 +96,7 @@ $(document).ready(function() {
             </div>
             <div class="control-group bts">
                 <div class="controls">
-                    <button type="submit" class="btn btn-primary"><?php _e("Update", 'sigma');?></button>
+                    <button type="submit" class="btn btn-primary"><?php echo 'Guardar cambios';?></button>
                 </div>
             </div>
         </form>

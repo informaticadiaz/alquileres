@@ -24,7 +24,7 @@
 ?>
 <div class="form-container form-horizontal form-container-box">
     <div class="header">
-        <h1><?php _e('Recover your password', 'sigma'); ?></h1>
+        <h1><?php echo 'Recuperá tu contraseña'; ?></h1>
     </div>
     <div class="resp-wrapper">
         <form action="<?php echo osc_base_url(true); ?>" method="post" >
@@ -33,13 +33,13 @@
             <input type="hidden" name="userId" value="<?php echo osc_esc_html(Params::getParam('userId')); ?>" />
             <input type="hidden" name="code" value="<?php echo osc_esc_html(Params::getParam('code')); ?>" />
             <div class="control-group">
-                <label class="control-label" for="new_password"><?php _e('New password', 'sigma'); ?></label>
+                <label class="control-label" for="new_password"><?php echo 'Contraseña nueva'; ?></label>
                 <div class="controls">
                     <input type="password" name="new_password" value="" autocomplete="off" />
                 </div>
             </div>
             <div class="control-group">
-                <label class="control-label" for="new_password2"><?php _e('Repeat new password', 'sigma'); ?></label>
+                <label class="control-label" for="new_password2"><?php echo 'Repetí la contraseña nueva'; ?></label>
                 <div class="controls">
                     <input type="password" name="new_password2" value="" autocomplete="off" />
                 </div>
@@ -49,7 +49,7 @@
             
             <div class="control-group">
                 <div class="controls">
-                    <button type="submit" class="ui-button ui-button-middle ui-button-main"><?php _e("Change password", 'sigma');?></button>
+                    <button type="submit" class="ui-button ui-button-middle ui-button-main"><?php echo 'Cambiar contraseña';?></button>
                 </div>
             </div>
         </form>

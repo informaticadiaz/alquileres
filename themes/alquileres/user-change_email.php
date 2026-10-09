@@ -27,12 +27,12 @@
     }
     osc_add_filter('meta_title_filter','custom_meta_title');
     function custom_meta_title($data){
-        return __('Change e-mail', 'sigma');;
+        return 'Cambiar correo';;
     }
     osc_current_web_theme_path('header.php') ;
     $osc_user = osc_user();
 ?>
-<h1><?php _e('Change e-mail', 'sigma'); ?></h1>
+<h1><?php echo 'Cambiar correo'; ?></h1>
 <div class="form-container form-horizontal">
     <div class="resp-wrapper">
         <ul id="error_list"></ul>
@@ -40,20 +40,20 @@
             <input type="hidden" name="page" value="user" />
             <input type="hidden" name="action" value="change_email_post" />
             <div class="control-group">
-                <label for="email"><?php _e('Current e-mail', 'sigma'); ?></label>
+                <label for="email"><?php echo 'Correo actual'; ?></label>
                 <div class="controls mls">
                     <?php echo osc_logged_user_email(); ?>
                 </div>
             </div>
             <div class="control-group">
-                <label class="control-label" for="new_email"><?php _e('New e-mail', 'sigma'); ?> *</label>
+                <label class="control-label" for="new_email"><?php echo 'Correo nuevo'; ?> *</label>
                 <div class="controls">
                     <input type="text" name="new_email" id="new_email" value="" />
                 </div>
             </div>
             <div class="control-group bts">
                 <div class="controls">
-                    <button type="submit" class="btn btn-primary"><?php _e("Update", 'sigma');?></button>
+                    <button type="submit" class="btn btn-primary"><?php echo 'Guardar cambios';?></button>
                 </div>
             </div>
         </form>
