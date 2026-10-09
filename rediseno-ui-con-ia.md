@@ -130,4 +130,6 @@ Referencias de estudio (sin verificar su vigencia en esta fecha):
 - Etapa 4 adelantada por decisión del usuario: prototipo v1 (inicio, destino y
   ficha) en `prototipo-ui/`.
 - Etapa 2 cerrada el 2026-10-09: `brief-ui.md`.
-- Etapa 3 (sistema de diseño) pendiente.
+- Etapa 3 cerrada el 2026-10-09: `sistema-diseno/` (v1, con pendientes
+  anotados en su `README.md`).
+- Etapa 5 (migración a Osclass) pendiente.

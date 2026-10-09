@@ -1,0 +1,48 @@
+<!-- @dsCard height=288 -->
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Cover</title>
+<style>
+body { padding: 0; margin: 0; }
+.cv { position: relative; width: 960px; height: 288px; background: var(--surface); overflow: hidden; font-family: var(--font-sans); }
+.cv-text { position: absolute; left: 48px; bottom: 40px; max-width: 440px; }
+.cv-name { margin: 0; font-size: 64px; line-height: 0.95; font-weight: 800; letter-spacing: -0.025em; color: var(--ink); }
+.cv-tag { margin: 12px 0 0; font-size: 14px; line-height: 1.4; color: var(--ink-muted); }
+.cv-art { position: absolute; left: 480px; top: 0; }
+.b-cba { fill: var(--region-cordoba); }
+.b-ba { fill: var(--region-buenos-aires); }
+.b-cuyo { fill: var(--region-cuyo); }
+.b-norte { fill: var(--region-norte); }
+.b-road { fill: var(--ink); }
+.lane { fill: var(--on-ink); }
+</style>
+</head>
+<body>
+<div class="cv">
+  <div class="cv-text">
+    <h1 class="cv-name">Alquileres<br>Temporarios</h1>
+    <p class="cv-tag">Alojamientos de temporada en Argentina, ordenados como una guía de rutas.</p>
+  </div>
+  <!--
+    blocks: region-cordoba 160x288, region-buenos-aires 148x136, region-cuyo 148x88, region-norte 148x36, ink 308x140; radius-lg corners
+    arrangement: one tall slab with satellites, modular like a road atlas index, gaps of space-3
+    pattern: road centreline dashes in on-ink across the ink block, because the brand organizes travel like an ACA road guide
+    steps and radii: space-3 (12) gaps, space-6 (32) dash length, space-1 (4) dash height, radius-lg (8) on blocks, square dashes
+  -->
+  <svg class="cv-art" width="480" height="288" viewBox="0 0 480 288" aria-hidden="true">
+    <rect class="b-cba" x="0" y="0" width="160" height="288" rx="8"></rect>
+    <rect class="b-ba" x="172" y="0" width="148" height="136" rx="8"></rect>
+    <rect class="b-cuyo" x="332" y="0" width="148" height="88" rx="8"></rect>
+    <rect class="b-norte" x="332" y="100" width="148" height="36" rx="8"></rect>
+    <rect class="b-road" x="172" y="148" width="308" height="140" rx="8"></rect>
+    <rect class="lane" x="196" y="216" width="32" height="4"></rect>
+    <rect class="lane" x="252" y="216" width="32" height="4"></rect>
+    <rect class="lane" x="308" y="216" width="32" height="4"></rect>
+    <rect class="lane" x="364" y="216" width="32" height="4"></rect>
+    <rect class="lane" x="420" y="216" width="32" height="4"></rect>
+  </svg>
+</div>
+</body>
+</html>

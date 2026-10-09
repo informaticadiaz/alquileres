@@ -1,0 +1,81 @@
+@import url("https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&display=swap");
+
+body { margin: 0; padding: 16px; background: var(--surface); color: var(--ink); font-family: var(--font-sans); font-size: 17px; line-height: 1.55; }
+a { color: var(--ink); text-underline-offset: 3px; }
+a:hover { text-decoration-thickness: 2px; }
+a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+
+.at-expanded { font-stretch: 125%; }
+.at-row { display: flex; flex-wrap: wrap; gap: var(--space-3); align-items: center; }
+.at-stack { display: flex; flex-direction: column; gap: var(--space-3); }
+
+/* Button */
+.at-btn { font: inherit; font-size: 17px; font-weight: 700; min-height: var(--target-min); padding: 0 var(--space-5); border-radius: var(--radius-md); border: 2px solid var(--ink); display: inline-flex; align-items: center; justify-content: center; text-decoration: none; cursor: pointer; box-sizing: border-box; }
+.at-btn-primary { background: var(--ink); color: var(--on-ink); }
+.at-btn-secondary { background: var(--surface); color: var(--ink); }
+.at-btn-inverse { background: var(--surface); color: var(--ink); border-color: var(--surface); }
+
+/* Field */
+.at-field { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.at-field label { font-size: 14px; font-weight: 600; line-height: 1.4; }
+.at-input, .at-select { font: inherit; font-size: 17px; min-height: 48px; padding: 0 14px; border: 1px solid var(--border-control); border-radius: var(--radius-md); background: var(--surface); color: var(--ink); box-sizing: border-box; width: 100%; }
+.at-help { font-size: 13px; line-height: 1.4; color: var(--ink-muted); }
+
+/* FilterChip */
+.at-chips { display: flex; flex-wrap: wrap; gap: var(--space-2); align-items: center; }
+.at-chip { font: inherit; font-size: 15px; font-weight: 600; min-height: var(--target-min); padding: 0 var(--space-4); border-radius: var(--radius-pill); border: 2px solid var(--border-control); background: var(--surface); color: var(--ink); cursor: pointer; }
+.at-chip[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: var(--on-ink); }
+
+/* Badge */
+.at-badge { display: inline-flex; align-items: center; padding: 2px 10px; border-radius: var(--radius-sm); font-size: 14px; font-weight: 600; line-height: 1.4; background: var(--surface-alt); color: var(--ink-soft); }
+.at-badge-owner { background: var(--ink); color: var(--on-ink); }
+
+/* RegionTag */
+.at-region-tag { display: inline-flex; align-items: center; gap: var(--space-2); font-size: 14px; font-weight: 600; }
+.at-region-tag::before { content: ""; width: 10px; height: 10px; border-radius: 2px; background: currentColor; }
+
+/* RegionTile */
+.at-region-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(300px, 100%), 1fr)); gap: var(--space-3); }
+.at-region-tile { color: var(--on-ink); border-radius: var(--radius-lg); padding: 26px 26px 22px; display: flex; flex-direction: column; gap: var(--space-4); }
+.at-region-tile h3 { margin: 0; font-stretch: 125%; font-weight: 800; font-size: 34px; line-height: 1.05; letter-spacing: -0.02em; }
+.at-region-tile ul { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 16px; }
+.at-region-tile a { color: var(--on-ink); }
+.at-region-tile .at-region-all { font-weight: 700; font-size: 15px; align-self: flex-start; }
+
+/* ListingRow */
+.at-listing-list { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--border); }
+.at-listing { display: flex; flex-wrap: wrap; gap: var(--space-3) var(--space-5); align-items: center; padding: 20px 0; border-bottom: 1px solid var(--border); }
+.at-listing-main { flex: 999 1 280px; min-width: 0; display: flex; flex-direction: column; gap: var(--space-1); }
+.at-listing-name { font-size: 19px; font-weight: 700; line-height: 1.3; text-decoration: none; }
+.at-listing-meta { display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: center; font-size: 15px; color: var(--ink-muted); }
+.at-listing-actions { display: flex; flex-wrap: wrap; gap: var(--space-2) var(--space-5); font-size: 15px; font-weight: 600; }
+.at-listing-actions a { min-height: var(--target-min); display: inline-flex; align-items: center; }
+
+/* Breadcrumb */
+.at-breadcrumb ol { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 4px 10px; font-size: 15px; }
+.at-breadcrumb-on-band, .at-breadcrumb-on-band a { color: var(--on-ink); }
+.at-breadcrumb-quiet, .at-breadcrumb-quiet a { color: var(--ink-muted); }
+
+/* Panel */
+.at-panel { border-radius: var(--radius-lg); padding: var(--space-5); display: flex; flex-direction: column; gap: var(--space-3); max-width: 420px; }
+.at-panel h2 { margin: 0; font-size: 19px; font-weight: 700; line-height: 1.3; }
+.at-panel p { margin: 0; font-size: 15px; line-height: 1.5; color: var(--ink-soft); }
+.at-panel-notice { background: var(--surface-alt); }
+.at-panel-action { background: var(--surface); border: 2px solid var(--ink); }
+
+/* StepList */
+.at-steps { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr)); gap: var(--space-6); }
+.at-step { display: flex; flex-direction: column; gap: var(--space-2); }
+.at-step-num { font-stretch: 125%; font-weight: 800; font-size: 44px; line-height: 1; color: var(--region-buenos-aires); }
+.at-step h3 { margin: 0; font-size: 19px; font-weight: 700; }
+.at-step p { margin: 0; color: var(--ink-muted); }
+
+/* SiteHeader */
+.at-header { border-bottom: 1px solid var(--border); padding: 18px 0; }
+.at-wordmark { font-stretch: 125%; font-weight: 800; font-size: 20px; letter-spacing: -0.01em; text-decoration: none; color: var(--ink); }
+
+/* SiteFooter */
+.at-footer { border-top: 1px solid var(--border); padding: var(--space-6) 0; display: flex; flex-wrap: wrap; gap: var(--space-4) var(--space-7); justify-content: space-between; font-size: 15px; color: var(--ink-muted); }
+.at-footer p { margin: 0; max-width: 70ch; }
+.at-footer nav { display: flex; flex-wrap: wrap; gap: var(--space-2) var(--space-5); align-items: center; font-size: 16px; }
+.at-footer nav a { min-height: var(--target-min); display: inline-flex; align-items: center; }
