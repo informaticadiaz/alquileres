@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Pinar de los Ríos · Alquileres Temporarios</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&amp;display=swap">
+<style>
+body{margin:0;background:#FFFFFF}
+a{color:#1B2633}
+a:hover{text-decoration-thickness:2px}
+a:focus-visible,button:focus-visible{outline:3px solid #1F5F8B;outline-offset:2px}
+</style>
+</helmet>
+<div style="font-family: 'Archivo', system-ui, sans-serif; color: #1B2633; background: #FFFFFF; font-size: 17px; line-height: 1.55;">
+
+<header style="border-bottom: 1px solid #DCE1DE;">
+<div style="max-width: 1200px; margin: 0 auto; padding: 18px 24px; display: flex; flex-wrap: wrap; gap: 16px 32px; align-items: center; justify-content: space-between;">
+<a href="Main.dc.html" style="font-stretch: 125%; font-weight: 800; font-size: 20px; letter-spacing: -0.01em; text-decoration: none; color: #1B2633;">Alquileres Temporarios</a>
+</div>
+</header>
+
+<main style="max-width: 1200px; margin: 0 auto; padding: 28px 24px 72px;">
+<nav aria-label="Ubicación" style="font-size: 15px; color: #4D5966;">
+<ol style="list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 4px 10px;">
+<li><a href="Main.dc.html" style="color: #4D5966;">Córdoba</a></li>
+<li aria-hidden="true">/</li>
+<li><a href="Destino.dc.html" style="color: #4D5966;">Mina Clavero</a></li>
+<li aria-hidden="true">/</li>
+<li aria-current="page">Pinar de los Ríos</li>
+</ol>
+</nav>
+
+<div style="margin-top: 20px; display: flex; flex-wrap: wrap; gap: 40px 64px; align-items: flex-start;">
+
+<article style="flex: 999 1 560px; min-width: 0;">
+<span style="display: inline-flex; align-items: center; gap: 8px; font-size: 15px; font-weight: 600; color: {{accent}};"><span aria-hidden="true" style="width: 10px; height: 10px; border-radius: 2px; background: {{accent}};"></span>Cabaña en Mina Clavero</span>
+<h1 style="margin: 10px 0 0; font-stretch: 125%; font-weight: 800; font-size: clamp(40px, 6vw, 72px); line-height: 1; letter-spacing: -0.03em;">Pinar de los Ríos</h1>
+
+<dl style="margin: 32px 0 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr)); gap: 20px 32px; padding: 22px 0; border-top: 1px solid #DCE1DE; border-bottom: 1px solid #DCE1DE;">
+<div>
+<dt style="font-size: 14px; color: #4D5966;">Tipo de alojamiento</dt>
+<dd style="margin: 2px 0 0; font-size: 18px; font-weight: 600;">Cabaña</dd>
+</div>
+<div>
+<dt style="font-size: 14px; color: #4D5966;">Ubicación</dt>
+<dd style="margin: 2px 0 0; font-size: 18px; font-weight: 600;">Mina Clavero, Valle de Traslasierra, Córdoba</dd>
+</div>
+<div>
+<dt style="font-size: 14px; color: #4D5966;">Publicada</dt>
+<dd style="margin: 2px 0 0; font-size: 18px; font-weight: 600;">8 de octubre de 2026</dd>
+</div>
+</dl>
+
+<section aria-labelledby="t-sobre" style="margin-top: 32px;">
+<h2 id="t-sobre" style="margin: 0 0 8px; font-size: 22px; font-weight: 700;">Sobre el alojamiento</h2>
+<p style="margin: 0; max-width: 62ch;">Pinar de los Ríos es una cabaña en Mina Clavero, en el Valle de Traslasierra. Las tarifas, la disponibilidad y los servicios se consultan en su sitio oficial.</p>
+</section>
+
+<section aria-labelledby="t-mas" style="margin-top: 48px;">
+<h2 id="t-mas" style="margin: 0 0 8px; font-size: 22px; font-weight: 700;">Más alojamientos en Mina Clavero</h2>
+<ul style="list-style: none; margin: 0; padding: 0; border-top: 1px solid #DCE1DE;">
+<sc-for list="{{similar}}" as="it" hint-placeholder-count="3">
+<li style="display: flex; flex-wrap: wrap; gap: 4px 24px; align-items: center; justify-content: space-between; padding: 14px 0; border-bottom: 1px solid #DCE1DE;">
+<a href="Ficha.dc.html" style="font-size: 18px; font-weight: 700; text-decoration: none; color: #1B2633; min-height: 32px; display: inline-flex; align-items: center;">{{it.name}}</a>
+<span style="font-size: 15px; color: #4D5966;">{{it.type}}</span>
+</li>
+</sc-for>
+</ul>
+<a href="Destino.dc.html" style="display: inline-flex; align-items: center; min-height: 44px; margin-top: 8px; font-weight: 600; font-size: 16px;">Ver los 5 alojamientos de Mina Clavero</a>
+</section>
+</article>
+
+<aside style="flex: 1 1 320px; display: flex; flex-direction: column; gap: 16px;">
+<section aria-labelledby="t-consulta" style="border: 2px solid #1B2633; border-radius: 10px; padding: 24px; display: flex; flex-direction: column; gap: 14px;">
+<h2 id="t-consulta" style="margin: 0; font-size: 20px; font-weight: 700;">Consultá y reservá en su sitio</h2>
+<p style="margin: 0; font-size: 15px; color: #3A4552;">Esta es una ficha informativa: la armamos con datos públicos y Pinar de los Ríos no la gestiona. Las consultas y reservas se hacen directamente en su sitio oficial.</p>
+<a href="#" style="background: #1B2633; color: #FFFFFF; font-weight: 700; text-decoration: none; min-height: 52px; display: inline-flex; align-items: center; justify-content: center; border-radius: 6px; padding: 0 20px;">Ir al sitio oficial</a>
+<span style="font-size: 13px; color: #4D5966;">Se abre en una pestaña nueva.</span>
+</section>
+<section aria-labelledby="t-baja" style="background: #F1F3F2; border-radius: 10px; padding: 20px 24px;">
+<h2 id="t-baja" style="margin: 0 0 6px; font-size: 16px; font-weight: 700;">¿Sos responsable de este alojamiento?</h2>
+<p style="margin: 0 0 6px; font-size: 15px; color: #3A4552;">Podés pedir que retiremos esta ficha o publicar tu alojamiento con tus propios datos.</p>
+<div style="display: flex; flex-wrap: wrap; gap: 0 20px; font-size: 15px; font-weight: 600;">
+<a href="#" style="min-height: 44px; display: inline-flex; align-items: center;">Solicitar baja</a>
+<a href="#" style="min-height: 44px; display: inline-flex; align-items: center;">Publicar alojamiento</a>
+</div>
+</section>
+</aside>
+
+</div>
+</main>
+
+<footer style="border-top: 1px solid #DCE1DE;">
+<div style="max-width: 1200px; margin: 0 auto; padding: 32px 24px 48px; display: flex; flex-wrap: wrap; gap: 16px 48px; justify-content: space-between; font-size: 15px; color: #4D5966;">
+<p style="margin: 0; max-width: 70ch;">Alquileres Temporarios es una vitrina de anuncios: conectamos propietarios y huéspedes, pero no procesamos reservas ni pagos ni intervenimos como intermediarios en la contratación. Todo acuerdo se realiza directamente entre las partes.</p>
+<nav aria-label="Principal" style="display: flex; flex-wrap: wrap; gap: 8px 24px; align-items: center; font-size: 16px; color: #1B2633;">
+<a href="Main.dc.html" style="min-height: 44px; display: inline-flex; align-items: center;">Destinos</a>
+<a href="Main.dc.html" style="min-height: 44px; display: inline-flex; align-items: center;">Cómo funciona</a>
+<a href="#" style="min-height: 44px; display: inline-flex; align-items: center;">Ingresar</a>
+<a href="#" style="text-decoration: none; font-weight: 600; padding: 0 16px; min-height: 44px; box-sizing: border-box; display: inline-flex; align-items: center; border: 2px solid #1B2633; border-radius: 6px;">Publicar alojamiento</a>
+</nav>
+</div>
+</footer>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"accent":{"editor":"color","default":"#3F6B3A","options":["#1F5F8B","#3F6B3A","#7A2E4A","#1E6B66","#8A5A00","#4B4E8A"]},"$preview":{"width":1440,"height":1400}}'>
+class Component extends DCLogic {
+renderVals() {
+return {
+accent: this.props.accent ?? '#3F6B3A',
+similar: [
+{ name: 'Complejo Augusta Cabañas y Suites', type: 'Cabaña' },
+{ name: 'Kaizen Cabañas', type: 'Cabaña' },
+{ name: 'Viejo Vivero', type: 'Cabaña' }
+]
+};
+}
+}
+</script>
+</body>
+</html>

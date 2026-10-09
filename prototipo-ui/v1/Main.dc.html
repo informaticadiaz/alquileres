@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Inicio · Alquileres Temporarios</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&amp;display=swap">
+<style>
+body{margin:0;background:#FFFFFF}
+a{color:#1B2633}
+a:hover{text-decoration-thickness:2px}
+a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #1F5F8B;outline-offset:2px}
+</style>
+</helmet>
+<div style="font-family: 'Archivo', system-ui, sans-serif; color: #1B2633; background: #FFFFFF; font-size: 17px; line-height: 1.55;">
+
+<header style="border-bottom: 1px solid #DCE1DE;">
+<div style="max-width: 1200px; margin: 0 auto; padding: 18px 24px; display: flex; flex-wrap: wrap; gap: 16px 32px; align-items: center; justify-content: space-between;">
+<a href="Main.dc.html" style="font-stretch: 125%; font-weight: 800; font-size: 20px; letter-spacing: -0.01em; text-decoration: none; color: #1B2633;">Alquileres Temporarios</a>
+</div>
+</header>
+
+<main>
+<section style="max-width: 1200px; margin: 0 auto; padding: 64px 24px 40px;">
+<h1 style="margin: 0; font-stretch: 125%; font-weight: 800; font-size: clamp(40px, 6vw, 76px); line-height: 1.02; letter-spacing: -0.025em; max-width: 14ch;">¿A dónde viajás esta temporada?</h1>
+<p style="margin: 20px 0 0; font-size: 20px; color: #4D5966; max-width: 46ch;">118 alojamientos en seis regiones de Argentina. Mirá cada ficha y consultá directo con el lugar.</p>
+</section>
+
+<section id="destinos" aria-labelledby="t-regiones" style="max-width: 1200px; margin: 0 auto; padding: 24px 24px 72px;">
+<h2 id="t-regiones" style="margin: 0 0 20px; font-size: 26px; font-weight: 700; letter-spacing: -0.01em;">Elegí una región</h2>
+<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(min(340px, 100%), 1fr)); gap: 12px;">
+<sc-for list="{{regions}}" as="r" hint-placeholder-count="6">
+<article style="background: {{r.color}}; color: #FFFFFF; border-radius: 8px; padding: 26px 26px 22px; display: flex; flex-direction: column; gap: 16px; min-height: 230px; box-sizing: border-box;">
+<h3 style="margin: 0; font-stretch: 125%; font-weight: 800; font-size: 34px; line-height: 1; letter-spacing: -0.02em;">{{r.name}}</h3>
+<ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 16px; flex-grow: 1; align-content: flex-start;">
+<sc-for list="{{r.destinations}}" as="d" hint-placeholder-count="6">
+<li><a href="Destino.dc.html" style="color: #FFFFFF; text-underline-offset: 3px;">{{d}}</a></li>
+</sc-for>
+</ul>
+<a href="Destino.dc.html" style="color: #FFFFFF; font-weight: 700; font-size: 15px; align-self: flex-start; text-underline-offset: 3px;">Ver toda la región</a>
+</article>
+</sc-for>
+</div>
+</section>
+
+<section aria-labelledby="t-nuevos" style="background: #F1F3F2;">
+<div style="max-width: 1200px; margin: 0 auto; padding: 64px 24px;">
+<div style="display: flex; flex-wrap: wrap; gap: 8px 24px; align-items: baseline; justify-content: space-between; margin-bottom: 20px;">
+<h2 id="t-nuevos" style="margin: 0; font-size: 26px; font-weight: 700; letter-spacing: -0.01em;">Recién sumados</h2>
+<a href="Destino.dc.html" style="font-weight: 600; font-size: 16px;">Ver todos los alojamientos</a>
+</div>
+<ul style="list-style: none; margin: 0; padding: 0; background: #FFFFFF; border-radius: 8px; border: 1px solid #DCE1DE;">
+<sc-for list="{{recent}}" as="it" hint-placeholder-count="6">
+<li style="display: flex; flex-wrap: wrap; gap: 8px 24px; align-items: center; padding: 18px 22px; border-bottom: 1px solid #E6EAE8;">
+<div style="flex: 999 1 280px; min-width: 0;">
+<a href="Ficha.dc.html" style="font-size: 19px; font-weight: 700; text-decoration: none; color: #1B2633;">{{it.name}}</a>
+<div style="font-size: 15px; color: #4D5966;">{{it.type}} en {{it.place}}</div>
+</div>
+<span style="display: inline-flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 600; color: {{it.color}}; flex: 0 0 auto;"><span aria-hidden="true" style="width: 10px; height: 10px; border-radius: 2px; background: {{it.color}};"></span>{{it.region}}</span>
+<a href="Ficha.dc.html" style="font-size: 15px; font-weight: 600; flex: 0 0 auto; min-height: 44px; display: inline-flex; align-items: center;">Ver ficha</a>
+</li>
+</sc-for>
+</ul>
+</div>
+</section>
+
+<section id="como-funciona" aria-labelledby="t-como" style="max-width: 1200px; margin: 0 auto; padding: 72px 24px;">
+<h2 id="t-como" style="margin: 0; font-size: 26px; font-weight: 700; letter-spacing: -0.01em;">Cómo funciona</h2>
+<p style="margin: 8px 0 32px; color: #4D5966; max-width: 60ch;">Somos una vitrina: reunimos alojamientos de todo el país para que los compares en un solo lugar. La reserva y el pago los acordás directamente con cada alojamiento.</p>
+<ol style="list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr)); gap: 32px;">
+<li style="display: flex; flex-direction: column; gap: 8px;">
+<span aria-hidden="true" style="font-stretch: 125%; font-weight: 800; font-size: 44px; line-height: 1; color: #1F5F8B;">1</span>
+<h3 style="margin: 0; font-size: 19px; font-weight: 700;">Elegí un destino</h3>
+<p style="margin: 0; color: #4D5966;">Recorré las regiones y elegí la ciudad, el valle o la costa que te interesa.</p>
+</li>
+<li style="display: flex; flex-direction: column; gap: 8px;">
+<span aria-hidden="true" style="font-stretch: 125%; font-weight: 800; font-size: 44px; line-height: 1; color: #1F5F8B;">2</span>
+<h3 style="margin: 0; font-size: 19px; font-weight: 700;">Revisá la ficha</h3>
+<p style="margin: 0; color: #4D5966;">Cada ficha indica quién publicó la información y cómo contactar al alojamiento.</p>
+</li>
+<li style="display: flex; flex-direction: column; gap: 8px;">
+<span aria-hidden="true" style="font-stretch: 125%; font-weight: 800; font-size: 44px; line-height: 1; color: #1F5F8B;">3</span>
+<h3 style="margin: 0; font-size: 19px; font-weight: 700;">Consultá directo</h3>
+<p style="margin: 0; color: #4D5966;">Escribile al alojamiento o entrá a su sitio oficial. No cobramos comisión ni intervenimos en la reserva.</p>
+</li>
+</ol>
+</section>
+
+<section id="publicar" aria-labelledby="t-publicar" style="max-width: 1200px; margin: 0 auto; padding: 0 24px 72px;">
+<div style="background: #1B2633; color: #FFFFFF; border-radius: 10px; padding: 40px; display: flex; flex-wrap: wrap; gap: 24px 48px; align-items: center; justify-content: space-between;">
+<div style="flex: 999 1 420px; min-width: 0;">
+<h2 id="t-publicar" style="margin: 0; font-stretch: 125%; font-weight: 800; font-size: 34px; line-height: 1.05; letter-spacing: -0.02em;">¿Tenés cabañas, un apart o un complejo?</h2>
+<p style="margin: 12px 0 0; color: #D3DAE0; max-width: 52ch;">Publicá tu alojamiento y recibí consultas de huéspedes directamente, sin intermediarios. Si tu complejo ya figura en una ficha informativa, podés pedir su baja desde la misma ficha.</p>
+</div>
+<a href="#" style="flex: 0 0 auto; background: #FFFFFF; color: #1B2633; font-weight: 700; text-decoration: none; padding: 0 26px; min-height: 52px; display: inline-flex; align-items: center; border-radius: 6px;">Publicar alojamiento</a>
+</div>
+</section>
+</main>
+
+<footer style="border-top: 1px solid #DCE1DE;">
+<div style="max-width: 1200px; margin: 0 auto; padding: 32px 24px 48px; display: flex; flex-wrap: wrap; gap: 16px 48px; justify-content: space-between; font-size: 15px; color: #4D5966;">
+<p style="margin: 0; max-width: 70ch;">Alquileres Temporarios es una vitrina de anuncios: conectamos propietarios y huéspedes, pero no procesamos reservas ni pagos ni intervenimos como intermediarios en la contratación. Todo acuerdo se realiza directamente entre las partes.</p>
+<nav aria-label="Principal" style="display: flex; flex-wrap: wrap; gap: 8px 24px; align-items: center; font-size: 16px; color: #1B2633;">
+<a href="#destinos" style="min-height: 44px; display: inline-flex; align-items: center;">Destinos</a>
+<a href="#como-funciona" style="min-height: 44px; display: inline-flex; align-items: center;">Cómo funciona</a>
+<a href="#" style="min-height: 44px; display: inline-flex; align-items: center;">Ingresar</a>
+<a href="#publicar" style="text-decoration: none; font-weight: 600; padding: 0 16px; min-height: 44px; box-sizing: border-box; display: inline-flex; align-items: center; border: 2px solid #1B2633; border-radius: 6px;">Publicar alojamiento</a>
+</nav>
+</div>
+</footer>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":2400}}'>
+class Component extends DCLogic {
+renderVals() {
+var C = { ba: '#1F5F8B', cba: '#3F6B3A', cuyo: '#7A2E4A', lit: '#1E6B66', norte: '#8A5A00', pat: '#4B4E8A' };
+return {
+regions: [
+{ name: 'Buenos Aires', color: C.ba, destinations: ['CABA', 'Mar del Plata', 'Pinamar y Cariló', 'Villa Gesell y Mar de las Pampas', 'San Bernardo y Costa Esmeralda', 'Tandil', 'Sierra de la Ventana', 'San Antonio de Areco', 'La Plata'] },
+{ name: 'Córdoba', color: C.cba, destinations: ['Villa Carlos Paz', 'La Cumbre y La Falda', 'Mina Clavero', 'Villa General Belgrano', 'La Cumbrecita', 'Ciudad de Córdoba', 'Alta Gracia'] },
+{ name: 'Cuyo', color: C.cuyo, destinations: ['Ciudad de Mendoza', 'Valle de Uco', 'San Rafael', 'Malargüe', 'San Juan y Calingasta', 'San Luis y sus sierras'] },
+{ name: 'Litoral', color: C.lit, destinations: ['Puerto Iguazú', 'Esteros del Iberá', 'Colón y Concepción del Uruguay', 'Gualeguaychú', 'Federación', 'Rosario', 'Corrientes'] },
+{ name: 'Norte', color: C.norte, destinations: ['Salta y Valles Calchaquíes', 'Cafayate', 'Purmamarca', 'Tilcara', 'Humahuaca', 'Tucumán', 'Tafí del Valle', 'Termas de Río Hondo'] },
+{ name: 'Patagonia', color: C.pat, destinations: ['Bariloche', 'Villa La Angostura', 'San Martín de los Andes', 'El Calafate', 'El Chaltén', 'Ushuaia', 'Puerto Madryn', 'Las Grutas'] }
+],
+recent: [
+{ name: 'Río Manso', type: 'Cabaña', place: 'La Cumbrecita', region: 'Córdoba', color: C.cba },
+{ name: 'Tá Péfka', type: 'Cabaña', place: 'La Cumbrecita', region: 'Córdoba', color: C.cba },
+{ name: 'Refugio del Río Cabañas', type: 'Cabaña', place: 'Mina Clavero', region: 'Córdoba', color: C.cba },
+{ name: 'Pinar de los Ríos', type: 'Cabaña', place: 'Mina Clavero', region: 'Córdoba', color: C.cba },
+{ name: 'El Chañar Apart', type: 'Apart hotel', place: 'Villa General Belgrano', region: 'Córdoba', color: C.cba },
+{ name: 'Am Bach', type: 'Cabaña', place: 'Villa General Belgrano', region: 'Córdoba', color: C.cba }
+]
+};
+}
+}
+</script>
+</body>
+</html>

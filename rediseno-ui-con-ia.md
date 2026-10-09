@@ -126,5 +126,5 @@ Referencias de estudio (sin verificar su vigencia en esta fecha):
 
 ## Estado
 
-Proceso documentado; ninguna etapa iniciada. Primer paso: diagnóstico con
-capturas de las pantallas clave.
+Etapa 4 adelantada por decisión del usuario: prototipo v1 (inicio, destino y
+ficha) en `prototipo-ui/`. Las etapas 1 a 3 siguen sin formalizar.

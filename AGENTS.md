@@ -58,7 +58,8 @@ se actualiza al sumar o retirar una solución.
 - `plan-tandas-complejos.md` define el orden, el circuito y el avance de las
   tandas de población del directorio.
 - `rediseno-ui-con-ia.md` define el proceso por etapas para rediseñar la UI con
-  asistencia de IA y su aplicación a este sitio.
+  asistencia de IA y su aplicación a este sitio; `prototipo-ui/` guarda las
+  fuentes versionadas de los prototipos.
 - `task.md`, `port-sqlite-design.md`, `sqlite-port-manifest.md` y
   `systemd/fewohbee*` son registros históricos de FewohBee; no describen el
   estado vigente.
