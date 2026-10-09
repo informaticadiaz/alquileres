@@ -129,4 +129,5 @@ Referencias de estudio (sin verificar su vigencia en esta fecha):
 - Etapa 1 cerrada el 2026-10-09: `diagnostico-ui.md`.
 - Etapa 4 adelantada por decisión del usuario: prototipo v1 (inicio, destino y
   ficha) en `prototipo-ui/`.
-- Etapas 2 y 3 pendientes.
+- Etapa 2 cerrada el 2026-10-09: `brief-ui.md`.
+- Etapa 3 (sistema de diseño) pendiente.

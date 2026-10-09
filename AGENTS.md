@@ -59,7 +59,8 @@ se actualiza al sumar o retirar una solución.
   tandas de población del directorio.
 - `rediseno-ui-con-ia.md` define el proceso por etapas para rediseñar la UI con
   asistencia de IA y su aplicación a este sitio; `diagnostico-ui.md` registra
-  la auditoría del sitio actual; `prototipo-ui/` guarda las
+  la auditoría del sitio actual; `brief-ui.md` fija audiencia, tono,
+  referencias y restricciones; `prototipo-ui/` guarda las
   fuentes versionadas de los prototipos.
 - `task.md`, `port-sqlite-design.md`, `sqlite-port-manifest.md` y
   `systemd/fewohbee*` son registros históricos de FewohBee; no describen el
